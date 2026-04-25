@@ -38,7 +38,7 @@ Kian enters a hallucinatory world from the flower's mucus. In this world, he fin
 
 To find the energy stones, Kian must gather clues and solve various puzzles. He receives both real and fake communications. He finds one energy stone by cracking a safe code in the bedroom. Two more remain—how will he obtain them?
 
-### 4. Story Branches
+### Story Branches
 
 **Path A: Open the Base Door**
 - Monsters are waiting outside
@@ -60,7 +60,7 @@ Kian must find a special wearable display device. With this, he can see the Boss
 
 ---
 
-## 5. Map Design
+## 4. Map Design
 
 | Location | Connections/Notes |
 |----------|-------------------|
@@ -75,7 +75,7 @@ Kian must find a special wearable display device. With this, he can see the Boss
 
 ---
 
-## 6. Game Flow
+## 5. Game Flow
 
 ### Opening Animation [1 min]
 Introduces Kian's memory and current situation:
@@ -193,7 +193,7 @@ Introduces Kian's memory and current situation:
 
 ---
 
-## 7. The Message System (Real vs. Fake)
+## 6. The Message System (Real vs. Fake)
 
 ### Wife's Calls (Fake)
 **Purpose:** Trick Kian into leaving the base—monsters waiting at the gate for instant kill
