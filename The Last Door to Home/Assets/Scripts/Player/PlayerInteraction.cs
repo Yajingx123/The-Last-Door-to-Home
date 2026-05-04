@@ -9,16 +9,24 @@ public class PlayerInteraction : MonoBehaviour
     private Vector2 faceDir = Vector2.right; // 玩家当前面朝方向
 
     void Update()
-    {
-        // 更新玩家面朝方向
-        UpdateFaceDirection();
+{
+    // 更新玩家面朝方向
+    UpdateFaceDirection();
 
-        // 按下 Enter 触发交互
-        if (Input.GetKeyDown(KeyCode.Return))
+    // 按下 Enter 触发交互
+    if (Input.GetKeyDown(KeyCode.Return))
+    {
+        // 如果对话面板显示，则关闭；否则触发交互
+        if (DialogueManager.Instance.dialoguePanel.activeSelf)
+        {
+            DialogueManager.Instance.HideDialogue();
+        }
+        else
         {
             TryInteract();
         }
     }
+}
 
     // 根据输入更新面朝方向
     void UpdateFaceDirection()
@@ -35,6 +43,13 @@ public class PlayerInteraction : MonoBehaviour
     // 核心交互逻辑
     void TryInteract()
     {
+        // 加这句调试
+        if (DialogueManager.Instance == null)
+        {
+            Debug.LogError("❌ DialogueManager 实例不存在！");
+            return;
+        }
+        
         // 找到场景中所有实现了 IInteractable 接口的物体
         ObjectDialogue[] interactables = FindObjectsOfType<ObjectDialogue>();
 
