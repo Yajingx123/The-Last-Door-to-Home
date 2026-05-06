@@ -21,8 +21,13 @@ public class OptionMenu : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            return;
+        }
+
         Instance = this;
-        optionPanel.SetActive(false);
+        if (optionPanel != null) optionPanel.SetActive(false);
 
         cursorRect = cursor != null ? cursor.GetComponent<RectTransform>() : null;
         if (cursorRect != null)
@@ -55,6 +60,13 @@ public class OptionMenu : MonoBehaviour
 
     public void ShowOptions(PickableItem item)
     {
+        if (optionPanel == null)
+        {
+            Debug.LogWarning("OptionMenu: optionPanel 引用为空或已销毁，无法显示选项。", this);
+            if (DialogueManager.Instance != null) DialogueManager.Instance.LockPlayer(false);
+            return;
+        }
+
         currentItem = item;
         optionPanel.SetActive(true);
         currentSelect = 0;
@@ -86,7 +98,7 @@ public class OptionMenu : MonoBehaviour
         }
 
         // 选项关闭 + 解锁玩家
-        optionPanel.SetActive(false);
-        DialogueManager.Instance.LockPlayer(false);
+        if (optionPanel != null) optionPanel.SetActive(false);
+        if (DialogueManager.Instance != null) DialogueManager.Instance.LockPlayer(false);
     }
 }

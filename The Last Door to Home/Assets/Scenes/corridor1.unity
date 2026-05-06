@@ -429,6 +429,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &585856128 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8781150791697953889, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
+  m_PrefabInstance: {fileID: 511670865}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &969243801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1943,6 +1948,20 @@ PrefabInstance:
 
 '
       objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[0]
+      value: 'This is just a flower.
+
+        You can''t take it away.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[1]
+      value: Go away.
+      objectReference: {fileID: 0}
     - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_Name
       value: flower
@@ -2004,6 +2023,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 5918691936333875775, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 585856128}
+    - target: {fileID: 7126057631249220050, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 585856128}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

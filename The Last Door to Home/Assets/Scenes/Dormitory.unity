@@ -172,7 +172,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: dialogues.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: dialogues.Array.data[0]
@@ -182,9 +182,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: dialogues.Array.data[1]
-      value: 'This is a flower.
-
-        You like it.'
+      value: Pick it?
       objectReference: {fileID: 0}
     - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: dialogues.Array.data[2]
@@ -1420,7 +1418,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 589911008920275296, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalPosition.x

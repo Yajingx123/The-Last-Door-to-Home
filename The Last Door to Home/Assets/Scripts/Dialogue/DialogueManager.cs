@@ -17,6 +17,10 @@ public class DialogueManager : MonoBehaviour
     private int dialogueIndex;
     private bool isDialogueActive;
     private int dialogueStartFrame = -1;
+    private int dialogueEndFrame = -1;
+
+    public bool IsDialogueActive => isDialogueActive;
+    public bool CanStartInteraction => !isDialogueActive && Time.frameCount != dialogueEndFrame;
 
     // 对话结束后要弹出的选项
     private PickableItem pendingPickItem;
@@ -93,19 +97,29 @@ public class DialogueManager : MonoBehaviour
     void EndDialogue()
     {
         isDialogueActive = false;
+        dialogueEndFrame = Time.frameCount;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
 
         if (pendingPickItem != null)
         {
             // 同时展开选项，保持玩家锁定
-            OptionMenu.Instance.ShowOptions(pendingPickItem);
+            if (OptionMenu.Instance != null)
+            {
+                OptionMenu.Instance.ShowOptions(pendingPickItem);
+            }
+            else
+            {
+                LockPlayer(false);
+            }
         }
         else
         {
             // 纯对话，直接解锁玩家
             LockPlayer(false);
         }
+
+        pendingPickItem = null;
     }
 
     // 锁/解锁玩家（禁用刚体 + 控制脚本）

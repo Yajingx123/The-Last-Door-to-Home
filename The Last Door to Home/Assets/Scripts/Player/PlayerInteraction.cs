@@ -13,6 +13,7 @@ public class PlayerInteraction : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            if (DialogueManager.Instance != null && !DialogueManager.Instance.CanStartInteraction) return;
             TryInteract();
         }
     }
