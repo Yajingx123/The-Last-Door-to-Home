@@ -13,26 +13,32 @@ public class DialogueManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            // 删掉这里对 dialoguePanel 的 DontDestroyOnLoad 调用！
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        Instance = this;
+        
+        // 保护整个 DialogueSystem 根物体，而不是只保护自己
+        transform.root.SetParent(null);
+        DontDestroyOnLoad(transform.root.gameObject);
     }
 
     public void ShowDialogue(string content)
     {
-        dialoguePanel.SetActive(true);
-        dialogueText.text = content;
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);
+        if (dialogueText != null)
+            dialogueText.text = content;
     }
 
     public void HideDialogue()
     {
-        dialoguePanel.SetActive(false);
-        dialogueText.text = "";
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(false);
+        if (dialogueText != null)
+            dialogueText.text = "";
     }
 }
