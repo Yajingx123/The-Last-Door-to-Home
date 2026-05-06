@@ -1,0 +1,38 @@
+# ==============================================
+# Unity 项目缓存 & 自动生成文件（绝对不上传）
+# 路径：The Last Door to Home/
+# ==============================================
+/The Last Door to Home/[Ll]ibrary/
+/The Last Door to Home/[Tt]emp/
+/The Last Door to Home/[Oo]bj/
+/The Last Door to Home/[Bb]uild/
+/The Last Door to Home/[Bb]uilds/
+/The Last Door to Home/[Ll]ogs/
+/The Last Door to Home/[Uu]serSettings/
+/The Last Door to Home/MemoryCaptures/
+
+# ==============================================
+# Plastic SCM 版本控制垃圾（完全不要）
+# ==============================================
+/The Last Door to Home/.plastic/
+/The Last Door to Home/.plasticworkspace
+/The Last Door to Home/.cm/
+/The Last Door to Home/.tokens
+/The Last Door to Home/workspace.metrics
+
+# ==============================================
+# VS / VS Code 自动生成文件
+# ==============================================
+/The Last Door to Home/.vs/
+/The Last Door to Home/.vscode/
+/The Last Door to Home/*.csproj
+/The Last Door to Home/*.sln
+/The Last Door to Home/*.suo
+/The Last Door to Home/*.user
+/The Last Door to Home/*.userprefs
+
+# ==============================================
+# 系统垃圾文件
+# ==============================================
+.DS_Store
+Thumbs.db
