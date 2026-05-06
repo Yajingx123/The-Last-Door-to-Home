@@ -46,4 +46,9 @@ public class PlayerMove : MonoBehaviour
                 anim.SetBool("isWalking", false);
         }
     }
+
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 }
