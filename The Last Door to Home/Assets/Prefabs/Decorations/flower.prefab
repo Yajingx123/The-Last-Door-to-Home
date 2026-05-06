@@ -156,4 +156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32c00f83df28a349973c5a0fdf4608d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogue: "\u8FD9\u662F\u4E00\u4E2A\u6446\u4EF6"
+  dialogue: 'This is a flower
+
+'

@@ -1,37 +1,21 @@
 using UnityEngine;
 
-public class ObjectDialogue : MonoBehaviour, IInteractable
+public class ObjectDialogue : MonoBehaviour
 {
-    [TextArea(2, 4)]
-    public string dialogue = "这是一个摆件";
+    [Header("多段对话（每一行按一次回车）")]
+    [TextArea(3, 10)]
+    public string[] dialogues;
 
-    // 一次性对话开关（可选开启）
-    // public bool oneTimeOnly = false;
-    // private bool hasTriggered = false;
+    private PickableItem pickable;
+
+    void Awake()
+    {
+        pickable = GetComponent<PickableItem>();
+    }
 
     public void OnInteract()
     {
-        // 一次性对话逻辑（可选启用）
-        // if (oneTimeOnly && hasTriggered)
-        // {
-        //     return;
-        // }
-        Debug.Log("【对话】" + dialogue);
-
-        // 调用对话管理器显示对话（替换原Debug.Log）
-        DialogueManager.Instance.ShowDialogue(dialogue);
-
-        // hasTriggered = true;
-
-        // 可选：添加“按任意键关闭对话”的逻辑（需在Update中监听）
-        // 示例：
-        // StartCoroutine(WaitForCloseDialogue());
+        // 直接把多段对话传给DialogueManager，可拾取物品同时传入
+        DialogueManager.Instance.ShowDialogue(dialogues, pickable);
     }
-
-    // 可选：协程等待按键关闭对话
-    // IEnumerator WaitForCloseDialogue()
-    // {
-    //     yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return));
-    //     DialogueManager.Instance.HideDialogue();
-    // }
 }
