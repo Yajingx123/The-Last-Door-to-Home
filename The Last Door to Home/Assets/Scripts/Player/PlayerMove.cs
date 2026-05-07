@@ -19,6 +19,13 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked)
+        {
+            if (rb != null) rb.velocity = Vector2.zero;
+            if (anim != null) anim.SetBool("isWalking", false);
+            return;
+        }
+
         // 上下左右输入
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");

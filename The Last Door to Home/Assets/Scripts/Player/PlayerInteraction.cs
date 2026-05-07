@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
@@ -36,10 +37,20 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        ObjectDialogue[] interactables = FindObjectsOfType<ObjectDialogue>();
-        foreach (var item in interactables)
+        MonoBehaviour[] behaviours = FindObjectsOfType<MonoBehaviour>();
+        List<IInteractable> interactables = new List<IInteractable>();
+        foreach (var behaviour in behaviours)
         {
-            if (!item.enabled) continue;
+            if (behaviour is IInteractable interactable)
+            {
+                interactables.Add(interactable);
+            }
+        }
+
+        foreach (var interactable in interactables)
+        {
+            MonoBehaviour item = interactable as MonoBehaviour;
+            if (item == null || !item.enabled) continue;
 
             float distance = Vector2.Distance(transform.position, item.transform.position);
             if (distance > interactRange) continue;
@@ -49,7 +60,7 @@ public class PlayerInteraction : MonoBehaviour
 
             if (angle <= angleTolerance)
             {
-                item.OnInteract();
+                interactable.OnInteract();
                 break;
             }
         }
