@@ -1,9 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using System.Collections.Generic;
 
 public class OptionMenu : MonoBehaviour
 {
+    [Serializable]
+    public class OptionEntry
+    {
+        public string text;
+        public Func<bool> canExecute;
+        public Action onExecute;
+        public Action onBlocked;
+    }
+
     public static OptionMenu Instance;
 
     [Header("UI")]
@@ -15,7 +26,9 @@ public class OptionMenu : MonoBehaviour
     public GameObject player;
 
     private int currentSelect;
-    private PickableItem currentItem;
+    private List<OptionEntry> currentEntries = new List<OptionEntry>();
+    private Action onClose;
+    private bool closeDialogueWhenConfirmed;
     private RectTransform cursorRect;
     private float cursorFixedX;
 
@@ -38,7 +51,7 @@ public class OptionMenu : MonoBehaviour
 
     void Update()
     {
-        if (!optionPanel.activeSelf) return;
+        if (optionPanel == null || !optionPanel.activeSelf) return;
 
         // 上下选选项
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -48,7 +61,8 @@ public class OptionMenu : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            currentSelect = Mathf.Min(1, currentSelect + 1);
+            int maxIndex = Mathf.Max(0, currentEntries.Count - 1);
+            currentSelect = Mathf.Min(maxIndex, currentSelect + 1);
             UpdateCursor();
         }
 
@@ -58,7 +72,29 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    public void ShowOptions(PickableItem item)
+    public void ShowPickOptions(PickableItem item)
+    {
+        if (item == null) return;
+
+        var entries = new List<OptionEntry>
+        {
+            new OptionEntry
+            {
+                text = "Pick Up",
+                canExecute = () => true,
+                onExecute = () => item.PickUp()
+            },
+            new OptionEntry
+            {
+                text = "Leave",
+                canExecute = () => true
+            }
+        };
+
+        ShowOptions(entries, true, null);
+    }
+
+    public void ShowOptions(List<OptionEntry> entries, bool closeDialogueOnConfirm = true, Action onMenuClosed = null)
     {
         if (optionPanel == null)
         {
@@ -67,9 +103,25 @@ public class OptionMenu : MonoBehaviour
             return;
         }
 
-        currentItem = item;
+        if (entries == null || entries.Count == 0)
+        {
+            return;
+        }
+
+        currentEntries = entries;
+        closeDialogueWhenConfirmed = closeDialogueOnConfirm;
+        onClose = onMenuClosed;
         optionPanel.SetActive(true);
+        if (DialogueManager.Instance != null) DialogueManager.Instance.LockPlayer(true);
         currentSelect = 0;
+
+        for (int i = 0; i < options.Length; i++)
+        {
+            bool active = i < currentEntries.Count;
+            options[i].gameObject.SetActive(active);
+            if (active) options[i].text = currentEntries[i].text;
+        }
+
         UpdateCursor();
     }
 
@@ -89,16 +141,47 @@ public class OptionMenu : MonoBehaviour
 
     void ConfirmSelect()
     {
-        if (currentSelect == 0) // 拾取
+        if (currentEntries == null || currentEntries.Count == 0) return;
+        if (currentSelect < 0 || currentSelect >= currentEntries.Count) return;
+
+        OptionEntry entry = currentEntries[currentSelect];
+        bool canExec = entry.canExecute == null || entry.canExecute.Invoke();
+
+        if (!canExec)
         {
-            if (currentItem != null)
+            if (optionPanel != null) optionPanel.SetActive(false);
+            if (closeDialogueWhenConfirmed && DialogueManager.Instance != null)
             {
-                currentItem.PickUp();
+                DialogueManager.Instance.CloseDialogueAfterOption();
             }
+            entry.onBlocked?.Invoke();
+            onClose?.Invoke();
+
+            if (DialogueManager.Instance != null)
+            {
+                if (!DialogueManager.Instance.IsDialogueActive)
+                {
+                    DialogueManager.Instance.LockPlayer(false);
+                }
+            }
+            return;
         }
 
-        // 选项关闭 + 解锁玩家
         if (optionPanel != null) optionPanel.SetActive(false);
-        if (DialogueManager.Instance != null) DialogueManager.Instance.LockPlayer(false);
+        if (closeDialogueWhenConfirmed && DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.CloseDialogueAfterOption();
+        }
+
+        entry.onExecute?.Invoke();
+        onClose?.Invoke();
+
+        if (DialogueManager.Instance != null)
+        {
+            if (!DialogueManager.Instance.IsDialogueActive)
+            {
+                DialogueManager.Instance.LockPlayer(false);
+            }
+        }
     }
 }

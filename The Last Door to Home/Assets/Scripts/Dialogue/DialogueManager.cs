@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -16,14 +17,19 @@ public class DialogueManager : MonoBehaviour
     private string[] currentDialogues;
     private int dialogueIndex;
     private bool isDialogueActive;
+    private bool isWaitingForOptionChoice;
     private int dialogueStartFrame = -1;
     private int dialogueEndFrame = -1;
 
     public bool IsDialogueActive => isDialogueActive;
-    public bool CanStartInteraction => !isDialogueActive && Time.frameCount != dialogueEndFrame;
+    public bool IsPlayerControlLocked => isDialogueActive || isWaitingForOptionChoice;
+    public bool CanStartInteraction =>
+        !isDialogueActive &&
+        !isWaitingForOptionChoice &&
+        Time.frameCount != dialogueEndFrame;
 
-    // 对话结束后要弹出的选项
-    private PickableItem pendingPickItem;
+    // 到最后一句时触发的可选回调（如弹出OptionMenu）
+    private Action pendingOptionAction;
 
     void Awake()
     {
@@ -54,7 +60,7 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        if (isDialogueActive && Input.GetKeyDown(KeyCode.Return))
+        if (isDialogueActive && !isWaitingForOptionChoice && Input.GetKeyDown(KeyCode.Return))
         {
             // 避免“开启对话”和“按回车翻页”发生在同一帧导致首句被跳过
             if (Time.frameCount == dialogueStartFrame) return;
@@ -63,12 +69,27 @@ public class DialogueManager : MonoBehaviour
     }
 
     // 显示多段对话
-    public void ShowDialogue(string[] texts, PickableItem item = null)
+    public void ShowDialogue(string[] texts, PickableItem item = null, Action onLastLineOption = null)
     {
         if (isDialogueActive) return;
         if (texts == null || texts.Length == 0) return;
 
-        pendingPickItem = item;
+        pendingOptionAction = onLastLineOption;
+        if (pendingOptionAction == null && item != null)
+        {
+            pendingOptionAction = () =>
+            {
+                if (OptionMenu.Instance != null)
+                {
+                    OptionMenu.Instance.ShowPickOptions(item);
+                }
+                else
+                {
+                    LockPlayer(false);
+                }
+            };
+        }
+
         currentDialogues = texts;
         dialogueIndex = 0;
         isDialogueActive = true;
@@ -85,41 +106,62 @@ public class DialogueManager : MonoBehaviour
         // 先判断是不是已经是最后一句了
         if (dialogueIndex >= currentDialogues.Length - 1)
         {
+            // 如果有待弹出的选项，则最后一句和选项同时出现
+            if (pendingOptionAction != null)
+            {
+                ShowOptionWithLastLine();
+                return;
+            }
+
             EndDialogue(); // 最后一句说完，直接结束
         }
         else
         {
             dialogueIndex++;
             dialogueText.text = currentDialogues[dialogueIndex];
+
+            // 切到最后一句时，立即弹出选项（不等待再次回车）
+            if (dialogueIndex == currentDialogues.Length - 1 && pendingOptionAction != null)
+            {
+                ShowOptionWithLastLine();
+            }
+        }
+    }
+
+    void ShowOptionWithLastLine()
+    {
+        if (isWaitingForOptionChoice) return;
+
+        if (OptionMenu.Instance != null)
+        {
+            isWaitingForOptionChoice = true;
+            pendingOptionAction?.Invoke();
+        }
+        else
+        {
+            EndDialogue();
         }
     }
 
     void EndDialogue()
     {
         isDialogueActive = false;
+        isWaitingForOptionChoice = false;
         dialogueEndFrame = Time.frameCount;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
+        LockPlayer(false);
 
-        if (pendingPickItem != null)
-        {
-            // 同时展开选项，保持玩家锁定
-            if (OptionMenu.Instance != null)
-            {
-                OptionMenu.Instance.ShowOptions(pendingPickItem);
-            }
-            else
-            {
-                LockPlayer(false);
-            }
-        }
-        else
-        {
-            // 纯对话，直接解锁玩家
-            LockPlayer(false);
-        }
+        pendingOptionAction = null;
+    }
 
-        pendingPickItem = null;
+    // 供OptionMenu确认选择后调用：关闭对白并结束流程
+    public void CloseDialogueAfterOption()
+    {
+        if (isWaitingForOptionChoice)
+        {
+            EndDialogue();
+        }
     }
 
     // 锁/解锁玩家（禁用刚体 + 控制脚本）
