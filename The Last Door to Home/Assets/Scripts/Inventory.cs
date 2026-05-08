@@ -15,6 +15,7 @@ public static class Inventory
     public static List<string> collectedItemNames = new List<string>();
     private static HashSet<string> collectedIDs = new HashSet<string>();
     private static HashSet<ItemType> collectedTypes = new HashSet<ItemType>();
+    private static HashSet<string> unlockedSafeIDs = new HashSet<string>();
 
     // 每次进游戏都强制清空！
     static Inventory()
@@ -22,6 +23,7 @@ public static class Inventory
         collectedIDs.Clear();
         collectedItemNames.Clear();
         collectedTypes.Clear();
+        unlockedSafeIDs.Clear();
     }
 
     public static void AddItem(string name, ItemType type, string uniqueID)
@@ -49,10 +51,23 @@ public static class Inventory
         return collectedTypes.Contains(itemType);
     }
 
+    public static void MarkSafeUnlocked(string safeUniqueID)
+    {
+        if (string.IsNullOrEmpty(safeUniqueID)) return;
+        unlockedSafeIDs.Add(safeUniqueID);
+    }
+
+    public static bool IsSafeUnlocked(string safeUniqueID)
+    {
+        if (string.IsNullOrEmpty(safeUniqueID)) return false;
+        return unlockedSafeIDs.Contains(safeUniqueID);
+    }
+
     public static void Clear()
     {
         collectedIDs.Clear();
         collectedItemNames.Clear();
         collectedTypes.Clear();
+        unlockedSafeIDs.Clear();
     }
 }

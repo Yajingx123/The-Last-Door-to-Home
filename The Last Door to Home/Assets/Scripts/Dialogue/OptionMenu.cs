@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
@@ -36,6 +36,7 @@ public class OptionMenu : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            Destroy(gameObject);
             return;
         }
 
@@ -49,11 +50,18 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
     void Update()
     {
         if (optionPanel == null || !optionPanel.activeSelf) return;
 
-        // 上下选选项
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             currentSelect = Mathf.Max(0, currentSelect - 1);
@@ -132,7 +140,6 @@ public class OptionMenu : MonoBehaviour
         RectTransform optionRect = options[currentSelect].GetComponent<RectTransform>();
         if (optionRect == null) return;
 
-        // 保留Inspector里设置的X，只跟随目标选项的Y，防止运行时X被覆盖
         Vector2 pos = cursorRect.anchoredPosition;
         pos.x = cursorFixedX;
         pos.y = optionRect.anchoredPosition.y;
