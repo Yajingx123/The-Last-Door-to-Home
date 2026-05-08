@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2705836639129023899}
   - component: {fileID: 8468183410532427115}
   - component: {fileID: 6732157947482495755}
-  - component: {fileID: 2235407527207384389}
+  - component: {fileID: 9012175523079188528}
   m_Layer: 0
   m_Name: flower
   m_TagString: Untagged
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12bda9079a779043a1f7f32ebec09d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2235407527207384389
+--- !u!114 &9012175523079188528
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,9 +153,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2965926302923172719}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c32c00f83df28a349973c5a0fdf4608d, type: 3}
+  m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dialogue: 'This is a flower
-
-'
+  itemUniqueID: flower_01
+  itemName: Flower
+  itemType: 3
+  prePickDialogues:
+  - This is a flower. You like it.
+  - Pick it?
+  pickOptionText: Pick Up
+  leaveOptionText: Leave
+  afterPickOptionDialogues:
+  - You got this flower.
+  afterLeaveOptionDialogues:
+  - You just left it there.

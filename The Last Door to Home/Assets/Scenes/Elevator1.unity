@@ -239,6 +239,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: flower
       objectReference: {fileID: 0}
+    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_TagString
+      value: decoration
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012175523079188528, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: itemUniqueID
+      value: flower_02
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -401,6 +409,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   preDialogues:
+  - This is an elevator.
+  - It can take you to B1 floor.
   - Go to B1?
   choices:
   - optionText: Yes
@@ -408,14 +418,6 @@ MonoBehaviour:
     requiredItemType: 3
     requiredItemUniqueID: 
     noItemMessage: You need a flower
-    actionType: 0
-    targetSceneName: 
-    spawnPosition: {x: 0, y: 0}
-  - optionText: No
-    requireMode: 0
-    requiredItemType: 0
-    requiredItemUniqueID: 
-    noItemMessage: 
     actionType: 0
     targetSceneName: 
     spawnPosition: {x: 0, y: 0}
