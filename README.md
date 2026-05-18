@@ -99,4 +99,4 @@ The planned systems include:
 These systems are intended to ensure that the project is not only narrative-based, but also demonstrates gameplay programming.
 
 ## 9. Development Plan
-![six weeks planning](docs/images/six_week_plan.png)
+![six weeks planning](docs/images/four_week_plan.png)

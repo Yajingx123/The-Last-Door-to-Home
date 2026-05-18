@@ -1,77 +1,53 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.font_manager import FontProperties
 from pathlib import Path
-import textwrap
 
 plan = {
-    "Week 1\nCore Framework": [
-        ("Day 1", "Create Unity 2D project; set up Grid, Tilemap, folders"),
-        ("Day 2", "Implement player movement, collision, camera follow"),
-        ("Day 3", "Build interaction system: press E to inspect objects"),
-        ("Day 4", "Add inventory items: ID card and energy stone"),
-        ("Day 5", "Add scene transitions between rooms"),
-        ("Day 6", "Add message trigger system with text popups"),
-        ("Day 7", "Prototype ending: leaving base causes death"),
+    "Week 1\nEnding 1 Slice": [
+        ("Day 1", "Build all non-Boss scenes and connect room transitions"),
+        ("Day 2", "Complete DormRoom gameplay: ID card, notes, safe, energy stone"),
+        ("Day 3", "Complete ArchiveRoom gameplay and ID-card access logic"),
+        ("Day 4", "Implement message trigger flow and gate decision logic"),
+        ("Day 5", "Implement Ending 1 and test the full route"),
+        ("Day 6", "Replace key placeholder tiles with basic styled environment art"),
     ],
-    "Week 2\nMain Flow": [
-        ("Day 8", "Build Archive Room and ID-card access logic"),
-        ("Day 9", "Add Control Room door puzzle"),
-        ("Day 10", "Add second energy stone and scanner item"),
-        ("Day 11", "Add monitor interaction and truth reveal"),
-        ("Day 12", "Add ID permission upgrade system"),
-        ("Day 13", "Add Teleport Room access logic"),
-        ("Day 14", "Test full playable main route"),
+    "Week 2\nFull Main Route": [
+        ("Day 1", "Implement Control Room entrance puzzle"),
+        ("Day 2", "Add second energy stone and Control Room core interactions"),
+        ("Day 3", "Implement monitor system and truth reveal sequence"),
+        ("Day 4", "Implement ID permission upgrade and Teleport Room access"),
+        ("Day 5", "Create simple Boss prototype with weak-point logic"),
+        ("Day 6", "Test full flow from opening to Teleport Room"),
     ],
-    "Week 3\nBoss Mechanics": [
-        ("Day 15", "Create Boss scene and spawn logic"),
-        ("Day 16", "Implement Boss Phase 1 attack pattern"),
-        ("Day 17", "Add player HP and damage system"),
-        ("Day 18", "Implement Boss Phase 2 attacks"),
-        ("Day 19", "Add weak-point visibility mechanic"),
-        ("Day 20", "Add win and lose conditions"),
-        ("Day 21", "Test and balance Boss fight"),
+    "Week 3\nBoss & Polish": [
+        ("Day 1", "Improve Boss attack patterns and basic pacing"),
+        ("Day 2", "Improve Scanner interaction and weak-point visibility"),
+        ("Day 3", "Implement Ending 2 and Ending 3 conditions"),
+        ("Day 4", "Redraw key assets for Control Room, Archive Room, and Teleport Room"),
+        ("Day 5", "Improve dialogue UI, message readability, and ending UI"),
+        ("Day 6", "Adjust story rhythm, trigger order, and player guidance"),
     ],
-    "Week 4\nStory & UI": [
-        ("Day 22", "Write opening story text"),
-        ("Day 23", "Write Stage 1–3 message text"),
-        ("Day 24", "Write Control Room reveal text"),
-        ("Day 25", "Write ending text drafts"),
-        ("Day 26", "Improve dialogue UI"),
-        ("Day 27", "Add inventory UI"),
-        ("Day 28", "Test full story flow"),
-    ],
-    "Week 5\nArt Replacement": [
-        ("Day 29", "Draw floor and wall tiles"),
-        ("Day 30", "Draw dorm furniture: bed and desk"),
-        ("Day 31", "Draw corridor props"),
-        ("Day 32", "Draw Control Room objects"),
-        ("Day 33", "Draw Teleport Room objects"),
-        ("Day 34", "Replace placeholder art"),
-        ("Day 35", "Unify color palette"),
-    ],
-    "Week 6\nAudio & Polish": [
-        ("Day 36", "Add walking sound"),
-        ("Day 37", "Add door and interaction sound"),
-        ("Day 38", "Add background music"),
-        ("Day 39", "Fix gameplay bugs"),
-        ("Day 40", "Improve UI feedback"),
-        ("Day 41", "Playtest full game"),
-        ("Day 42", "Prepare final build"),
+    "Week 4\nTesting & Atmosphere": [
+        ("Day 1", "Conduct external playtest and record confusion points"),
+        ("Day 2", "Fix critical progression, trigger, and scene transition bugs"),
+        ("Day 3", "Add core sound effects for doors, elevator, pickup, and messages"),
+        ("Day 4", "Add ambient sound, background music, and atmosphere effects"),
+        ("Day 5", "Update README, devlog, credits, and GitHub project board"),
+        ("Day 6", "Final build test, cleanup, and submission preparation"),
     ],
 }
 
 week_goals = {
-    "Week 1": "Goal: Setup engine and core movement.",
-    "Week 2": "Goal: Complete environment logic.",
-    "Week 3": "Goal: Implement Boss mechanics.",
-    "Week 4": "Goal: Finalize narrative & UI.",
-    "Week 5": "Goal: Complete Art replacement.",
-    "Week 6": "Goal: Final Polish and Release."
+    "Week 1": "Goal: Complete the first playable Ending 1 route.",
+    "Week 2": "Goal: Make the full main route playable.",
+    "Week 3": "Goal: Improve Boss, art, UI, and narrative flow.",
+    "Week 4": "Goal: Test, fix, polish, and prepare submission.",
 }
 
 TITLE = "The Last Door to Home"
-SUBTITLE = "Six-Week Development Plan"
-OUTPUT_PATH = Path("docs/images/six_week_plan.png")
+SUBTITLE = "Four-Week Development Plan"
+OUTPUT_PATH = Path("docs/images/four_week_plan.png")
 
 BG_COLOR = "#F6F4EF"
 CARD_COLOR = "#FFFFFF"
@@ -86,13 +62,37 @@ WEEK_COLORS = [
     "#6B8F71",
     "#A67C52",
     "#8A6F9E",
-    "#B47B77",
-    "#6D8A96",
 ]
 
 
-def wrap_text(text, width=31):
-    return "\n".join(textwrap.wrap(text, width))
+def wrap_text_to_data_width(ax, text, max_data_width, fontsize, fontweight="normal"):
+    renderer = ax.figure.canvas.get_renderer()
+    font_props = FontProperties(size=fontsize, weight=fontweight)
+
+    x0 = ax.transData.transform((0, 0))[0]
+    x1 = ax.transData.transform((max_data_width, 0))[0]
+    max_px_width = abs(x1 - x0)
+
+    words = text.split()
+    if not words:
+        return ""
+
+    lines = []
+    current = words[0]
+
+    for word in words[1:]:
+        trial = f"{current} {word}"
+        trial_width = renderer.get_text_width_height_descent(
+            trial, font_props, ismath=False
+        )[0]
+        if trial_width <= max_px_width:
+            current = trial
+        else:
+            lines.append(current)
+            current = word
+
+    lines.append(current)
+    return "\n".join(lines)
 
 
 def get_week_key(title):
@@ -145,7 +145,6 @@ def draw_week_card(ax, x, y, w, h, title, tasks, color):
         linespacing=1.05,
     )
 
-    # Goal box
     week_key = get_week_key(title)
     goal_text = week_goals.get(week_key, "")
 
@@ -176,14 +175,16 @@ def draw_week_card(ax, x, y, w, h, title, tasks, color):
         color=color,
     )
 
-    # Day cards
-    item_h = 0.405
-    gap = 0.055
-
     item_x = x + 0.20
     item_w = w - 0.40
 
-    start_y = goal_y - 0.16
+    top_gap = 0.16
+    bottom_gap = 0.14
+    gap = 0.06
+    task_count = len(tasks)
+    available_h = (goal_y - top_gap) - (y + bottom_gap)
+    item_h = (available_h - (task_count - 1) * gap) / task_count
+    start_y = goal_y - top_gap
 
     for i, (day, task) in enumerate(tasks):
         item_y = start_y - (i + 1) * item_h - i * gap
@@ -210,56 +211,66 @@ def draw_week_card(ax, x, y, w, h, title, tasks, color):
             color=color,
         )
 
+        task_x = item_x + 1.02
+        right_padding = 0.12
+        task_max_w = (item_x + item_w) - right_padding - task_x
+
         ax.text(
-            item_x + 1.02,
+            task_x,
             item_y + item_h / 2,
-            wrap_text(task, width=34),
+            wrap_text_to_data_width(
+                ax=ax,
+                text=task,
+                max_data_width=task_max_w,
+                fontsize=7.9,
+            ),
             ha="left",
             va="center",
-            fontsize=7.85,
+            fontsize=7.9,
             color=TEXT_COLOR,
             linespacing=0.95,
         )
 
 
 def generate_plan():
-    fig, ax = plt.subplots(figsize=(18, 12.6), facecolor=BG_COLOR)
-    ax.set_xlim(0, 18)
-    ax.set_ylim(0, 12.6)
+    fig, ax = plt.subplots(figsize=(15, 11.2), facecolor=BG_COLOR)
+    ax.set_xlim(0, 15)
+    ax.set_ylim(0, 11.2)
     ax.axis("off")
+    fig.canvas.draw()
 
     ax.text(
-        9,
-        12.05,
+        7.5,
+        10.65,
         TITLE,
         ha="center",
         va="center",
-        fontsize=30,
+        fontsize=28,
         fontweight="bold",
         color=TEXT_COLOR,
     )
 
     ax.text(
-        9,
-        11.65,
+        7.5,
+        10.25,
         SUBTITLE,
         ha="center",
         va="center",
-        fontsize=16,
+        fontsize=15,
         color=SUBTEXT_COLOR,
     )
 
-    card_w = 5.3
-    card_h = 4.85
+    card_w = 6.4
+    card_h = 4.35
 
-    x_positions = [0.7, 6.35, 12.0]
-    y_positions = [6.25, 0.95]
+    x_positions = [0.7, 7.9]
+    y_positions = [5.5, 0.75]
 
     items = list(plan.items())
 
     for idx, ((title, tasks), color) in enumerate(zip(items, WEEK_COLORS)):
-        row = idx // 3
-        col = idx % 3
+        row = idx // 2
+        col = idx % 2
 
         draw_week_card(
             ax=ax,
@@ -273,12 +284,12 @@ def generate_plan():
         )
 
     ax.text(
-        9,
-        0.35,
-        "Goal: Build a playable vertical slice first, then polish art, story, and audio.",
+        7.5,
+        0.28,
+        "Goal: Build the full playable route early, then improve Boss, art, testing, audio, and final polish.",
         ha="center",
         va="center",
-        fontsize=11.5,
+        fontsize=10.8,
         color=SUBTEXT_COLOR,
     )
 
