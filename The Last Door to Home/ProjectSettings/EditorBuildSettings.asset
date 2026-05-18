@@ -9,16 +9,31 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 3d036e8b527845a4baae5f8d7ad3a625
   - enabled: 1
-    path: Assets/Scenes/Dormitory.unity
+    path: Assets/Scenes/flooer_GF/Dormitory.unity
     guid: aee9054da63cbd34daefe12b71cc0222
   - enabled: 1
-    path: Assets/Scenes/Corridor1.unity
+    path: Assets/Scenes/flooer_GF/Corridor1.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/Elevator1.unity
+    path: Assets/Scenes/flooer_GF/Gateway.unity
+    guid: 04844c453890fa84ab3d3f9e246953e7
+  - enabled: 1
+    path: Assets/Scenes/flooer_GF/Elevator1.unity
     guid: 8fbbb4b128bfddc42b8cf599f3b2a4ac
   - enabled: 1
-    path: Assets/Scenes/Gateway.unity
-    guid: 04844c453890fa84ab3d3f9e246953e7
+    path: Assets/Scenes/flooer_B1/Elevator2.unity
+    guid: 5ea244f712a23bb439317907fc437157
+  - enabled: 1
+    path: Assets/Scenes/flooer_B1/ArchiveRoom.unity
+    guid: 778c5142ce303da488b041b4b814b0e2
+  - enabled: 1
+    path: Assets/Scenes/flooer_B1/Corridor2_left.unity
+    guid: eddf1102f65e3eb4ea54de602c24596d
+  - enabled: 1
+    path: Assets/Scenes/flooer_B1/Corridor2_right.unity
+    guid: 16a95af096ea73b41b4c556ca23f5fc1
+  - enabled: 1
+    path: Assets/Scenes/flooer_B1/ControlRoom.unity
+    guid: 8b275c2de8a5c434ea0799f49e53af99
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 085e6ac5f6cc16346bde96e8293f71b3, type: 3}

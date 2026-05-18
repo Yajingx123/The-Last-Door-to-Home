@@ -2,60 +2,111 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    [Header("移动设置")]
+    [Header("移动速度")]
     public float moveSpeed = 5f;
+    [Header("松键后动画缓冲时间（秒）")]
+    public float stopFreezeDelay = 0.08f;
 
     private Rigidbody2D rb;
     private Animator anim;
+    private Vector2 lastMoveDir = Vector2.down; // 默认朝下（正面）
+    private bool isMoving;
+    private float stopTimer;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
     void Update()
     {
+        // 对话锁定
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked)
         {
-            if (rb != null) rb.velocity = Vector2.zero;
-            if (anim != null) anim.SetBool("isWalking", false);
+            rb.velocity = Vector2.zero;
+            stopTimer = 0f;
+            FreezeAtCurrentDirection();
             return;
         }
 
-        // 上下左右输入
+        // 输入
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
+        // 🔴 禁止斜走：优先上下，再左右
+        Vector2 moveDir = Vector2.zero;
+
+        if (Mathf.Abs(v) > 0.1f)
+        {
+            moveDir = new Vector2(0, v);
+        }
+        else if (Mathf.Abs(h) > 0.1f)
+        {
+            moveDir = new Vector2(h, 0);
+        }
+
         // 移动
-        Vector2 moveDir = new Vector2(h, v).normalized;
         rb.velocity = moveDir * moveSpeed;
 
-        // 转向
-        if (h != 0)
-            transform.localScale = new Vector3(h, 1, 1);
-
-        // --------------------------
-        // 动画控制：移动/待机 切换
-        // --------------------------
-        float moveMagnitude = moveDir.magnitude;
-
-        if (anim != null)
+        if (moveDir.sqrMagnitude > 0.01f)
         {
-            // 移动 > 0.1 → 走路动画
-            if (moveMagnitude > 0.1f)
-                anim.SetBool("isWalking", true);
-            // 不动 → 待机动画
+            // 有输入：更新朝向并正常播放动画
+            lastMoveDir = moveDir;
+            anim.SetFloat("MoveX", moveDir.x);
+            anim.SetFloat("MoveY", moveDir.y);
+            anim.speed = 1f;
+            stopTimer = stopFreezeDelay;
+
+            // 让短按也能在本帧立刻评估方向切换，避免“点一下来不及转向”
+            anim.Update(0f);
+            isMoving = true;
+        }
+        else
+        {
+            // 无输入：先给一个很短的播放缓冲，避免短按只看到平移
+            if (stopTimer > 0f)
+            {
+                stopTimer -= Time.deltaTime;
+                rb.velocity = Vector2.zero;
+                anim.SetFloat("MoveX", lastMoveDir.x);
+                anim.SetFloat("MoveY", lastMoveDir.y);
+                anim.speed = 1f;
+            }
             else
-                anim.SetBool("isWalking", false);
+            {
+                // 缓冲结束后，停在最后朝向的第1帧
+                FreezeAtCurrentDirection();
+            }
         }
     }
 
-    void Awake()
+    private void FreezeAtCurrentDirection()
     {
-        // DontDestroyOnLoad(gameObject);
+        rb.velocity = Vector2.zero;
+        anim.SetFloat("MoveX", lastMoveDir.x);
+        anim.SetFloat("MoveY", lastMoveDir.y);
+
+        // 仅在“移动 -> 静止”切换时重置到首帧，避免每帧强制重置
+        if (isMoving)
+        {
+            int stateHash;
+            if (anim.IsInTransition(0))
+            {
+                // 如果正在切状态，优先锁定到目标状态的第1帧
+                stateHash = anim.GetNextAnimatorStateInfo(0).fullPathHash;
+            }
+            else
+            {
+                stateHash = anim.GetCurrentAnimatorStateInfo(0).fullPathHash;
+            }
+
+            anim.Play(stateHash, 0, 0f);
+        }
+
+        anim.speed = 0f;
+        isMoving = false;
     }
 }
