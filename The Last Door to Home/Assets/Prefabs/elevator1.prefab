@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 5116950032298456919}
   - component: {fileID: 3218047412384356101}
   - component: {fileID: 730480081529346527}
+  - component: {fileID: 7787605876307161826}
   m_Layer: 0
-  m_Name: elevator
+  m_Name: elevator1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -143,3 +144,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12bda9079a779043a1f7f32ebec09d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7787605876307161826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7800561700867895073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcfb653b485b3e94fafbb2df837e9a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  preDialogues:
+  - 'This is an elevator.
+
+    It can take you to B1 floor.'
+  - Go to B1?
+  options:
+  - optionText: Yes
+    targetSceneName: Elevator2
+    spawnPosition: {x: 0, y: 1}
+  - optionText: No
+    targetSceneName: 
+    spawnPosition: {x: 0, y: 0}
