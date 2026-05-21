@@ -20,6 +20,17 @@ public class CameraFollowPlayer : MonoBehaviour
         cam = GetComponent<Camera>();
     }
 
+    private void Start()
+    {
+        SnapToTargetIfReady();
+    }
+
+    private void OnEnable()
+    {
+        velocity = Vector3.zero;
+        SnapToTargetIfReady();
+    }
+
     private void LateUpdate()
     {
         if (target == null || mapBounds == null)
@@ -39,6 +50,22 @@ public class CameraFollowPlayer : MonoBehaviour
             followPos = Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime);
         }
 
+        transform.position = ClampToBounds(followPos);
+    }
+
+    private void SnapToTargetIfReady()
+    {
+        if (target == null || mapBounds == null || cam == null)
+        {
+            return;
+        }
+
+        Vector3 desired = new Vector3(target.position.x, target.position.y, transform.position.z);
+        transform.position = ClampToBounds(desired);
+    }
+
+    private Vector3 ClampToBounds(Vector3 position)
+    {
         Bounds b = mapBounds.bounds;
         float halfHeight = cam.orthographicSize;
         float halfWidth = halfHeight * cam.aspect;
@@ -48,10 +75,9 @@ public class CameraFollowPlayer : MonoBehaviour
         float minY = b.min.y + halfHeight;
         float maxY = b.max.y - halfHeight;
 
-        // 如果地图比相机可视范围还小，固定在地图中心，避免 Clamp 参数反转
-        float clampedX = minX > maxX ? b.center.x : Mathf.Clamp(followPos.x, minX, maxX);
-        float clampedY = minY > maxY ? b.center.y : Mathf.Clamp(followPos.y, minY, maxY);
+        float clampedX = minX > maxX ? b.center.x : Mathf.Clamp(position.x, minX, maxX);
+        float clampedY = minY > maxY ? b.center.y : Mathf.Clamp(position.y, minY, maxY);
 
-        transform.position = new Vector3(clampedX, clampedY, followPos.z);
+        return new Vector3(clampedX, clampedY, position.z);
     }
 }

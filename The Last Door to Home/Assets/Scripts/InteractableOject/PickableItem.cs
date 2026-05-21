@@ -76,24 +76,32 @@ public class PickableItem : MonoBehaviour, IInteractable
                 onExecute = () =>
                 {
                     PickUp();
-                    ShowDialogueIfAny(afterPickOptionDialogues);
+                    ShowDialogueAfterOptionOrClose(afterPickOptionDialogues);
                 }
             },
             new OptionMenu.OptionEntry
             {
                 text = leaveOptionText,
                 canExecute = () => true,
-                onExecute = () => ShowDialogueIfAny(afterLeaveOptionDialogues)
+                onExecute = () => ShowDialogueAfterOptionOrClose(afterLeaveOptionDialogues)
             }
         };
 
-        OptionMenu.Instance.ShowOptions(entries, true, null);
+        // PickableItem 选项确认后不立刻关对话框，避免“先关再开”的闪断感。
+        // 若有后续对白就直接衔接显示；没有后续对白时再主动关闭。
+        OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    private void ShowDialogueIfAny(string[] lines)
+    private void ShowDialogueAfterOptionOrClose(string[] lines)
     {
         if (DialogueManager.Instance == null) return;
-        if (lines == null || lines.Length == 0) return;
-        DialogueManager.Instance.ShowDialogue(lines);
+
+        if (lines != null && lines.Length > 0)
+        {
+            DialogueManager.Instance.ContinueDialogueAfterOption(lines);
+            return;
+        }
+
+        DialogueManager.Instance.CloseDialogueAfterOption();
     }
 }

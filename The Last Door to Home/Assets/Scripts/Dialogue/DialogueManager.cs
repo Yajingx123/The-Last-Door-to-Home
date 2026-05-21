@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using System;
+using System.Collections;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class DialogueManager : MonoBehaviour
     [Header("UI")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
+
+    [Header("对话框开关动画")]
+    [SerializeField] private float panelAnimDuration = 0.18f;
+    [SerializeField] private AnimationCurve panelAnimCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     [Header("玩家控制（拖Player物体）")]
     public GameObject player;
@@ -29,6 +34,9 @@ public class DialogueManager : MonoBehaviour
         Time.frameCount != dialogueEndFrame;
 
     private Action pendingOptionAction;
+    private RectTransform dialoguePanelRect;
+    private Vector3 dialoguePanelBaseScale = Vector3.one;
+    private Coroutine panelAnimRoutine;
 
     void Awake()
     {
@@ -40,7 +48,16 @@ public class DialogueManager : MonoBehaviour
 
         Instance = this;
 
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
+        if (dialoguePanel != null)
+        {
+            dialoguePanelRect = dialoguePanel.GetComponent<RectTransform>();
+            if (dialoguePanelRect != null)
+            {
+                dialoguePanelBaseScale = dialoguePanelRect.localScale;
+                dialoguePanelRect.pivot = new Vector2(0.5f, 0.5f);
+            }
+            dialoguePanel.SetActive(false);
+        }
 
         if (player != null)
         {
@@ -87,7 +104,8 @@ public class DialogueManager : MonoBehaviour
         dialogueIndex = 0;
         isDialogueActive = true;
         dialogueStartFrame = Time.frameCount;
-        dialoguePanel.SetActive(true);
+
+        PlayPanelOpenAnim();
         dialogueText.text = currentDialogues[dialogueIndex];
 
         LockPlayer(true);
@@ -137,7 +155,8 @@ public class DialogueManager : MonoBehaviour
         isDialogueActive = false;
         isWaitingForOptionChoice = false;
         dialogueEndFrame = Time.frameCount;
-        dialoguePanel.SetActive(false);
+
+        PlayPanelCloseAnim();
         dialogueText.text = "";
         LockPlayer(false);
 
@@ -150,6 +169,28 @@ public class DialogueManager : MonoBehaviour
         {
             EndDialogue();
         }
+    }
+
+    public void ContinueDialogueAfterOption(string[] texts)
+    {
+        if (texts == null || texts.Length == 0)
+        {
+            CloseDialogueAfterOption();
+            return;
+        }
+
+        if (!isDialogueActive) 
+        {
+            ShowDialogue(texts);
+            return;
+        }
+
+        isWaitingForOptionChoice = false;
+        pendingOptionAction = null;
+        currentDialogues = texts;
+        dialogueIndex = 0;
+        dialogueStartFrame = Time.frameCount;
+        dialogueText.text = currentDialogues[dialogueIndex];
     }
 
     public void LockPlayer(bool lockIt)
@@ -167,5 +208,82 @@ public class DialogueManager : MonoBehaviour
                 script.enabled = !lockIt;
             }
         }
+    }
+
+    void PlayPanelOpenAnim()
+    {
+        if (dialoguePanel == null) return;
+
+        if (panelAnimRoutine != null)
+        {
+            StopCoroutine(panelAnimRoutine);
+            panelAnimRoutine = null;
+        }
+
+        dialoguePanel.SetActive(true);
+        panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(0f, 1f, false));
+    }
+
+    void PlayPanelCloseAnim()
+    {
+        if (dialoguePanel == null) return;
+
+        if (panelAnimRoutine != null)
+        {
+            StopCoroutine(panelAnimRoutine);
+            panelAnimRoutine = null;
+        }
+
+        if (!dialoguePanel.activeSelf)
+        {
+            dialoguePanel.SetActive(false);
+            return;
+        }
+
+        panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(1f, 0f, true));
+    }
+
+    IEnumerator AnimatePanelScaleY(float fromY, float toY, bool deactivateOnFinish)
+    {
+        if (dialoguePanelRect == null)
+        {
+            dialoguePanel.SetActive(!deactivateOnFinish);
+            yield break;
+        }
+
+        float duration = Mathf.Max(0.01f, panelAnimDuration);
+        float t = 0f;
+
+        SetPanelScaleY(fromY);
+
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            float normalized = Mathf.Clamp01(t / duration);
+            float eased = panelAnimCurve != null ? panelAnimCurve.Evaluate(normalized) : normalized;
+            SetPanelScaleY(Mathf.LerpUnclamped(fromY, toY, eased));
+            yield return null;
+        }
+
+        SetPanelScaleY(toY);
+
+        if (deactivateOnFinish)
+        {
+            dialoguePanel.SetActive(false);
+            SetPanelScaleY(1f);
+        }
+
+        panelAnimRoutine = null;
+    }
+
+    void SetPanelScaleY(float scaleY01)
+    {
+        if (dialoguePanelRect == null) return;
+
+        dialoguePanelRect.localScale = new Vector3(
+            dialoguePanelBaseScale.x,
+            dialoguePanelBaseScale.y * scaleY01,
+            dialoguePanelBaseScale.z
+        );
     }
 }
