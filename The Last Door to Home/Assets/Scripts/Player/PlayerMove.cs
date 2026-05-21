@@ -3,13 +3,14 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     [Header("移动速度")]
-    public float moveSpeed = 5f;
+    public float moveSpeed = 2.5f;
     [Header("松键后动画缓冲时间（秒）")]
     public float stopFreezeDelay = 0.08f;
 
     private Rigidbody2D rb;
     private Animator anim;
     private Vector2 lastMoveDir = Vector2.down; // 默认朝下（正面）
+    private Vector2 inputMoveDir = Vector2.zero;
     private bool isMoving;
     private float stopTimer;
 
@@ -19,6 +20,7 @@ public class PlayerMove : MonoBehaviour
         anim = GetComponent<Animator>();
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
     void Update()
@@ -26,7 +28,7 @@ public class PlayerMove : MonoBehaviour
         // 对话锁定
         if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked)
         {
-            rb.velocity = Vector2.zero;
+            inputMoveDir = Vector2.zero;
             stopTimer = 0f;
             FreezeAtCurrentDirection();
             return;
@@ -37,26 +39,23 @@ public class PlayerMove : MonoBehaviour
         float v = Input.GetAxisRaw("Vertical");
 
         // 🔴 禁止斜走：优先上下，再左右
-        Vector2 moveDir = Vector2.zero;
+        inputMoveDir = Vector2.zero;
 
         if (Mathf.Abs(v) > 0.1f)
         {
-            moveDir = new Vector2(0, v);
+            inputMoveDir = new Vector2(0, v);
         }
         else if (Mathf.Abs(h) > 0.1f)
         {
-            moveDir = new Vector2(h, 0);
+            inputMoveDir = new Vector2(h, 0);
         }
 
-        // 移动
-        rb.velocity = moveDir * moveSpeed;
-
-        if (moveDir.sqrMagnitude > 0.01f)
+        if (inputMoveDir.sqrMagnitude > 0.01f)
         {
             // 有输入：更新朝向并正常播放动画
-            lastMoveDir = moveDir;
-            anim.SetFloat("MoveX", moveDir.x);
-            anim.SetFloat("MoveY", moveDir.y);
+            lastMoveDir = inputMoveDir;
+            anim.SetFloat("MoveX", inputMoveDir.x);
+            anim.SetFloat("MoveY", inputMoveDir.y);
             anim.speed = 1f;
             stopTimer = stopFreezeDelay;
 
@@ -70,7 +69,6 @@ public class PlayerMove : MonoBehaviour
             if (stopTimer > 0f)
             {
                 stopTimer -= Time.deltaTime;
-                rb.velocity = Vector2.zero;
                 anim.SetFloat("MoveX", lastMoveDir.x);
                 anim.SetFloat("MoveY", lastMoveDir.y);
                 anim.speed = 1f;
@@ -81,6 +79,11 @@ public class PlayerMove : MonoBehaviour
                 FreezeAtCurrentDirection();
             }
         }
+    }
+
+    void FixedUpdate()
+    {
+        rb.velocity = inputMoveDir * moveSpeed;
     }
 
     private void FreezeAtCurrentDirection()

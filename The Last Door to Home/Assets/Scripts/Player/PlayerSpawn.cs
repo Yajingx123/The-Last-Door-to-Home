@@ -5,7 +5,7 @@ public class PlayerSpawn : MonoBehaviour
     public static Vector2 SPAWN_POSITION;
     public static bool NEED_SPAWN = false;
 
-    private void Start()
+    private void Awake()
     {
         if (NEED_SPAWN)
         {

@@ -66,20 +66,18 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         {
             if (!hasOwnedKey)
             {
-                if (DialogueManager.Instance != null)
-                {
-                    // 结束前置对白的“等待选项”状态，避免卡住无法关闭。
-                    DialogueManager.Instance.CloseDialogueAfterOption();
-                }
-
                 if (!string.IsNullOrWhiteSpace(noKeyMessage) && DialogueManager.Instance != null)
                 {
-                    DialogueManager.Instance.ShowDialogue(new string[] { noKeyMessage });
+                    DialogueManager.Instance.ContinueDialogueAfterOption(new string[] { noKeyMessage });
+                }
+                else if (DialogueManager.Instance != null)
+                {
+                    DialogueManager.Instance.CloseDialogueAfterOption();
                 }
                 return;
             }
 
-            OptionMenu.Instance.ShowOptions(entries, true, null);
+            OptionMenu.Instance.ShowOptions(entries, false, null);
         };
 
         if (preDialogues != null && preDialogues.Length > 0 && DialogueManager.Instance != null)
@@ -125,7 +123,11 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
 
         if (DialogueManager.Instance != null && !string.IsNullOrWhiteSpace(keyOption.wrongKeyMessage))
         {
-            DialogueManager.Instance.ShowDialogue(new string[] { keyOption.wrongKeyMessage });
+            DialogueManager.Instance.ContinueDialogueAfterOption(new string[] { keyOption.wrongKeyMessage });
+        }
+        else if (DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.CloseDialogueAfterOption();
         }
     }
 

@@ -124,8 +124,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         if (passwordPanel == null || digitTexts == null || digitTexts.Length < 4)
         {
             Debug.LogWarning("SafeInteraction: passwordPanel 或 digitTexts 未正确配置（需要4个数字文本）。", this);
-            ShowFallbackDialogue(new string[] { "Password panel is not configured." }, "Password panel is not configured.");
-            if (DialogueManager.Instance != null) DialogueManager.Instance.CloseDialogueAfterOption();
+            ShowFallbackDialogue(new string[] { "Password panel is not configured." }, "Password panel is not configured.", true);
             return;
         }
 
@@ -231,7 +230,6 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         string input = BuildPasswordString();
 
         ClosePasswordInput();
-        if (DialogueManager.Instance != null) DialogueManager.Instance.CloseDialogueAfterOption();
 
         if (input == correctPassword)
         {
@@ -241,7 +239,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
             return;
         }
 
-        ShowFallbackDialogue(wrongPasswordDialogues, "密码错误。");
+        ShowFallbackDialogue(wrongPasswordDialogues, "密码错误。", true);
     }
 
     private void ClosePasswordInput()
@@ -290,7 +288,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
         else
         {
-            ShowFallbackDialogue(unlockedDialogues, "保险箱打开了。");
+            ShowFallbackDialogue(unlockedDialogues, "保险箱打开了。", false);
         }
     }
 
@@ -300,17 +298,31 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         return Inventory.HasCollected(rewardItem.itemUniqueID);
     }
 
-    private void ShowFallbackDialogue(string[] lines, string fallback)
+    private void ShowFallbackDialogue(string[] lines, string fallback, bool continueAfterOption = false)
     {
         if (DialogueManager.Instance == null) return;
 
         if (lines != null && lines.Length > 0)
         {
-            DialogueManager.Instance.ShowDialogue(lines);
+            if (continueAfterOption)
+            {
+                DialogueManager.Instance.ContinueDialogueAfterOption(lines);
+            }
+            else
+            {
+                DialogueManager.Instance.ShowDialogue(lines);
+            }
         }
         else
         {
-            DialogueManager.Instance.ShowDialogue(new string[] { fallback });
+            if (continueAfterOption)
+            {
+                DialogueManager.Instance.ContinueDialogueAfterOption(new string[] { fallback });
+            }
+            else
+            {
+                DialogueManager.Instance.ShowDialogue(new string[] { fallback });
+            }
         }
     }
 }
