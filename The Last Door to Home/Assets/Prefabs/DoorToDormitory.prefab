@@ -157,4 +157,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: Dormitory
-  spawnPosition: {x: 0, y: -3}
+  spawnPosition: {x: 0, y: 0}
