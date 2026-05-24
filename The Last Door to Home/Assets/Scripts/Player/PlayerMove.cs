@@ -86,6 +86,13 @@ public class PlayerMove : MonoBehaviour
         rb.velocity = inputMoveDir * moveSpeed;
     }
 
+    public void ForceStopImmediate()
+    {
+        inputMoveDir = Vector2.zero;
+        stopTimer = 0f;
+        FreezeAtCurrentDirection();
+    }
+
     private void FreezeAtCurrentDirection()
     {
         rb.velocity = Vector2.zero;

@@ -6,6 +6,9 @@ public class PlayerInteraction : MonoBehaviour
     [Header("交互设置")]
     public float interactRange = 1.5f;
     public float angleTolerance = 60f;
+    [Tooltip("即使碰撞体最近点很近，也要求与物体锚点(Transform)距离不能超过该值，避免大碰撞体导致远距离误触发。")]
+    public float maxAnchorDistance = 1.9f;
+
     private Vector2 faceDir = Vector2.right;
 
     void Update()
@@ -50,10 +53,14 @@ public class PlayerInteraction : MonoBehaviour
         IInteractable bestInteractable = null;
         float bestDistance = float.MaxValue;
 
-        foreach (var interactable in interactables)
+        for (int i = 0; i < interactables.Count; i++)
         {
+            IInteractable interactable = interactables[i];
             MonoBehaviour item = interactable as MonoBehaviour;
             if (item == null || !item.enabled) continue;
+
+            float anchorDistance = Vector2.Distance(transform.position, item.transform.position);
+            if (anchorDistance > maxAnchorDistance) continue;
 
             Vector2 targetPoint = GetInteractionPoint(item);
             float distance = Vector2.Distance(transform.position, targetPoint);
@@ -62,13 +69,10 @@ public class PlayerInteraction : MonoBehaviour
             Vector2 dirToItem = (targetPoint - (Vector2)transform.position).normalized;
             float angle = Vector2.Angle(faceDir, dirToItem);
 
-            if (angle <= angleTolerance)
+            if (angle <= angleTolerance && distance < bestDistance)
             {
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    bestInteractable = interactable;
-                }
+                bestDistance = distance;
+                bestInteractable = interactable;
             }
         }
 

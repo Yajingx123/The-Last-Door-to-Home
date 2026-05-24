@@ -51,6 +51,7 @@ public class DialogueManager : MonoBehaviour
     private Vector2 imageBaseAnchoredPos;
     private bool hasImageBaseAnchoredPos;
     private bool isDialogueImageActive;
+    private MonoBehaviour[] cachedMovementScripts;
 
     void Awake()
     {
@@ -73,16 +74,15 @@ public class DialogueManager : MonoBehaviour
             dialoguePanel.SetActive(false);
         }
 
-        if (player != null)
-        {
-            playerRb = player.GetComponent<Rigidbody2D>();
-        }
-        else
-        {
-            Debug.LogWarning("DialogueManager：未赋值Player物体！", this);
-        }
-
+        ResolvePlayerReference();
         SetupDialogueImageUI();
+        CachePlayerMovementScripts();
+    }
+
+    IEnumerator Start()
+    {
+        yield return null;
+        PrewarmDialogueUI();
     }
 
     void OnDestroy()
@@ -90,6 +90,50 @@ public class DialogueManager : MonoBehaviour
         if (Instance == this)
         {
             Instance = null;
+        }
+    }
+
+    private void ResolvePlayerReference()
+    {
+        if (player == null)
+        {
+            GameObject taggedPlayer = GameObject.FindGameObjectWithTag("Player");
+            if (taggedPlayer != null)
+            {
+                player = taggedPlayer;
+            }
+        }
+
+        if (player != null)
+        {
+            playerRb = player.GetComponent<Rigidbody2D>();
+            return;
+        }
+
+        Debug.LogWarning("DialogueManager：未赋值Player物体，且未找到Tag=Player的对象。", this);
+    }
+
+    private void CachePlayerMovementScripts()
+    {
+        if (player == null) return;
+        cachedMovementScripts = player.GetComponents<MonoBehaviour>();
+    }
+
+    private void PrewarmDialogueUI()
+    {
+        if (dialogueText != null)
+        {
+            dialogueText.text = " ";
+            dialogueText.ForceMeshUpdate();
+            dialogueText.text = "";
+        }
+
+        if (dialoguePanel != null)
+        {
+            bool wasActive = dialoguePanel.activeSelf;
+            dialoguePanel.SetActive(true);
+            Canvas.ForceUpdateCanvases();
+            dialoguePanel.SetActive(wasActive);
         }
     }
 
@@ -124,7 +168,6 @@ public class DialogueManager : MonoBehaviour
         PlayPanelOpenAnim();
         EnsureDialoguePanelInFrontOfImage();
         dialogueText.text = currentDialogues[dialogueIndex];
-
         LockPlayer(true);
     }
 
@@ -255,13 +298,24 @@ public class DialogueManager : MonoBehaviour
         if (playerRb == null || player == null) return;
 
         playerRb.velocity = Vector2.zero;
-        playerRb.simulated = !lockIt;
 
-        MonoBehaviour[] moveScripts = player.GetComponents<MonoBehaviour>();
-        foreach (var script in moveScripts)
+        PlayerMove playerMove = player.GetComponent<PlayerMove>();
+        if (lockIt && playerMove != null)
         {
+            playerMove.ForceStopImmediate();
+        }
+
+        if (cachedMovementScripts == null || cachedMovementScripts.Length == 0)
+        {
+            CachePlayerMovementScripts();
+        }
+
+        foreach (var script in cachedMovementScripts)
+        {
+            if (script == null) continue;
             if (script.GetType().Name.Contains("Move") || script.GetType().Name.Contains("Movement"))
             {
+                if (script == playerMove) continue;
                 script.enabled = !lockIt;
             }
         }
