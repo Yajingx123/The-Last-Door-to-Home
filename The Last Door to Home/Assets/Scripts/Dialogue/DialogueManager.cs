@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System;
 using System.Collections;
+using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -17,6 +18,12 @@ public class DialogueManager : MonoBehaviour
 
     [Header("玩家控制（拖Player物体）")]
     public GameObject player;
+
+    [Header("对话插图（可选）")]
+    public GameObject dialogueImagePanel;
+    public Image dialogueImage;
+    [SerializeField] private float imageAnimDuration = 0.2f;
+    [SerializeField] private float imageRiseDistance = 28f;
 
     private Rigidbody2D playerRb;
     private string[] currentDialogues;
@@ -37,6 +44,13 @@ public class DialogueManager : MonoBehaviour
     private RectTransform dialoguePanelRect;
     private Vector3 dialoguePanelBaseScale = Vector3.one;
     private Coroutine panelAnimRoutine;
+
+    private RectTransform dialogueImageRect;
+    private CanvasGroup dialogueImageCanvasGroup;
+    private Coroutine imageAnimRoutine;
+    private Vector2 imageBaseAnchoredPos;
+    private bool hasImageBaseAnchoredPos;
+    private bool isDialogueImageActive;
 
     void Awake()
     {
@@ -67,6 +81,8 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("DialogueManager：未赋值Player物体！", this);
         }
+
+        SetupDialogueImageUI();
     }
 
     void OnDestroy()
@@ -106,6 +122,7 @@ public class DialogueManager : MonoBehaviour
         dialogueStartFrame = Time.frameCount;
 
         PlayPanelOpenAnim();
+        EnsureDialoguePanelInFrontOfImage();
         dialogueText.text = currentDialogues[dialogueIndex];
 
         LockPlayer(true);
@@ -159,6 +176,7 @@ public class DialogueManager : MonoBehaviour
         PlayPanelCloseAnim();
         dialogueText.text = "";
         LockPlayer(false);
+        HideDialogueImage();
 
         pendingOptionAction = null;
     }
@@ -171,7 +189,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void ContinueDialogueAfterOption(string[] texts)
+    public void ContinueDialogueAfterOption(string[] texts, PickableItem item = null, Action onLastLineOption = null)
     {
         if (texts == null || texts.Length == 0)
         {
@@ -179,18 +197,57 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        if (!isDialogueActive) 
+        if (!isDialogueActive)
         {
-            ShowDialogue(texts);
+            ShowDialogue(texts, item, onLastLineOption);
             return;
         }
 
+        pendingOptionAction = onLastLineOption;
+        if (pendingOptionAction == null && item != null)
+        {
+            pendingOptionAction = () =>
+            {
+                item.ShowPickOptionsMenu();
+            };
+        }
+
         isWaitingForOptionChoice = false;
-        pendingOptionAction = null;
         currentDialogues = texts;
         dialogueIndex = 0;
         dialogueStartFrame = Time.frameCount;
         dialogueText.text = currentDialogues[dialogueIndex];
+    }
+
+    public void ShowDialogueImage(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            HideDialogueImage();
+            return;
+        }
+
+        SetupDialogueImageUI();
+        if (dialogueImagePanel == null || dialogueImage == null)
+        {
+            Debug.LogWarning("DialogueManager: 对话插图引用不完整，ShowDialogueImage 被跳过。", this);
+            return;
+        }
+
+        dialogueImage.sprite = sprite;
+        dialogueImage.type = Image.Type.Simple;
+        dialogueImage.preserveAspect = true;
+        dialogueImage.SetNativeSize();
+        dialogueImagePanel.SetActive(true);
+        EnsureDialoguePanelInFrontOfImage();
+        PlayDialogueImageAnim(true);
+    }
+
+    public void HideDialogueImage()
+    {
+        if (dialogueImagePanel == null || dialogueImage == null) return;
+        if (!isDialogueImageActive && !dialogueImagePanel.activeSelf) return;
+        PlayDialogueImageAnim(false);
     }
 
     public void LockPlayer(bool lockIt)
@@ -285,5 +342,106 @@ public class DialogueManager : MonoBehaviour
             dialoguePanelBaseScale.y * scaleY01,
             dialoguePanelBaseScale.z
         );
+    }
+
+    void EnsureDialoguePanelInFrontOfImage()
+    {
+        if (dialoguePanel == null || dialogueImagePanel == null) return;
+        if (dialoguePanel.transform.parent != dialogueImagePanel.transform.parent) return;
+        dialoguePanel.transform.SetAsLastSibling();
+    }
+
+    void SetupDialogueImageUI()
+    {
+        if (dialogueImagePanel == null)
+        {
+            Debug.LogWarning("DialogueManager: dialogueImagePanel 未绑定，无法显示对话插图。", this);
+            return;
+        }
+
+        if (dialogueImage == null)
+        {
+            dialogueImage = dialogueImagePanel.GetComponentInChildren<Image>(true);
+            if (dialogueImage == null)
+            {
+                Debug.LogWarning("DialogueManager: dialogueImage 未绑定，且在 dialogueImagePanel 子层级中未找到 Image。", this);
+                return;
+            }
+        }
+
+        dialogueImageRect = dialogueImagePanel.GetComponent<RectTransform>();
+        if (dialogueImageRect != null && !hasImageBaseAnchoredPos)
+        {
+            imageBaseAnchoredPos = dialogueImageRect.anchoredPosition;
+            hasImageBaseAnchoredPos = true;
+        }
+
+        dialogueImageCanvasGroup = dialogueImagePanel.GetComponent<CanvasGroup>();
+        if (dialogueImageCanvasGroup == null)
+        {
+            dialogueImageCanvasGroup = dialogueImagePanel.AddComponent<CanvasGroup>();
+        }
+
+        dialogueImageCanvasGroup.alpha = 0f;
+        dialogueImagePanel.SetActive(false);
+        isDialogueImageActive = false;
+    }
+
+    void PlayDialogueImageAnim(bool show)
+    {
+        if (dialogueImagePanel == null || dialogueImageRect == null || dialogueImageCanvasGroup == null) return;
+
+        if (imageAnimRoutine != null)
+        {
+            StopCoroutine(imageAnimRoutine);
+            imageAnimRoutine = null;
+        }
+
+        imageAnimRoutine = StartCoroutine(AnimateDialogueImage(show));
+    }
+
+    IEnumerator AnimateDialogueImage(bool show)
+    {
+        if (show) dialogueImagePanel.SetActive(true);
+
+        float duration = Mathf.Max(0.01f, imageAnimDuration);
+        float elapsed = 0f;
+
+        float startAlpha = dialogueImageCanvasGroup.alpha;
+        float targetAlpha = show ? 1f : 0f;
+
+        Vector2 hiddenPos = imageBaseAnchoredPos - new Vector2(0f, imageRiseDistance);
+        Vector2 startPos = dialogueImageRect.anchoredPosition;
+        Vector2 targetPos = show ? imageBaseAnchoredPos : hiddenPos;
+
+        if (show)
+        {
+            startPos = hiddenPos;
+            dialogueImageRect.anchoredPosition = startPos;
+            startAlpha = 0f;
+            dialogueImageCanvasGroup.alpha = 0f;
+        }
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            dialogueImageCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+            dialogueImageRect.anchoredPosition = Vector2.LerpUnclamped(startPos, targetPos, t);
+            yield return null;
+        }
+
+        dialogueImageCanvasGroup.alpha = targetAlpha;
+        dialogueImageRect.anchoredPosition = targetPos;
+        isDialogueImageActive = show;
+
+        if (!show)
+        {
+            dialogueImagePanel.SetActive(false);
+            dialogueImage.sprite = null;
+            dialogueImageRect.anchoredPosition = imageBaseAnchoredPos;
+        }
+
+        imageAnimRoutine = null;
     }
 }

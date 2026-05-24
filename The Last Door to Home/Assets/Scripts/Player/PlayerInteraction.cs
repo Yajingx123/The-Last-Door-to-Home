@@ -47,22 +47,45 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
+        IInteractable bestInteractable = null;
+        float bestDistance = float.MaxValue;
+
         foreach (var interactable in interactables)
         {
             MonoBehaviour item = interactable as MonoBehaviour;
             if (item == null || !item.enabled) continue;
 
-            float distance = Vector2.Distance(transform.position, item.transform.position);
+            Vector2 targetPoint = GetInteractionPoint(item);
+            float distance = Vector2.Distance(transform.position, targetPoint);
             if (distance > interactRange) continue;
 
-            Vector2 dirToItem = (item.transform.position - transform.position).normalized;
+            Vector2 dirToItem = (targetPoint - (Vector2)transform.position).normalized;
             float angle = Vector2.Angle(faceDir, dirToItem);
 
             if (angle <= angleTolerance)
             {
-                interactable.OnInteract();
-                break;
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestInteractable = interactable;
+                }
             }
         }
+
+        if (bestInteractable != null)
+        {
+            bestInteractable.OnInteract();
+        }
+    }
+
+    Vector2 GetInteractionPoint(MonoBehaviour item)
+    {
+        Collider2D col = item.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            return col.ClosestPoint(transform.position);
+        }
+
+        return item.transform.position;
     }
 }

@@ -232,6 +232,96 @@ Transform:
   - {fileID: 1796620631}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &933961117
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1747818431}
+    m_Modifications:
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.958715
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.060319
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.029843727
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogue
+      value: 'This is a flower
+
+'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[0]
+      value: 'This is just a flower.
+
+        You can''t take it away.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2235407527207384389, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[1]
+      value: Go away.
+      objectReference: {fileID: 0}
+    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_Name
+      value: Flower (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_TagString
+      value: decoration
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012175523079188528, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: itemUniqueID
+      value: flower_05
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012175523079188528, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: prePickDialogues.Array.data[0]
+      value: Another beautiful flower. God knows why Jeff likes those flowers so
+        much.
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
 --- !u!1 &969243801
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,6 +445,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1420361673 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+  m_PrefabInstance: {fileID: 933961117}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1460789946
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -511,6 +606,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 498993768}
+  - {fileID: 1420361673}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1796620631 stripped
