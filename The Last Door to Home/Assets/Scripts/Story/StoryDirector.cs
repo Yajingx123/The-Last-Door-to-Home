@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class StoryDirector : MonoBehaviour
 {
@@ -6,6 +7,10 @@ public class StoryDirector : MonoBehaviour
 
     [Header("剧情条目（按优先级从高到低匹配）")]
     public StoryBeat[] beats;
+    
+    [Header("开场自动播放")]
+    public bool autoPlayFirstBeatOnStart = false;
+    public float autoPlayDelaySeconds = 1f;
 
     void Awake()
     {
@@ -26,6 +31,14 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        if (autoPlayFirstBeatOnStart)
+        {
+            StartCoroutine(AutoPlayFirstBeatWhenReady());
+        }
+    }
+
     public bool TryHandleEvent(string eventId)
     {
         StoryBeat best = FindBestBeat(eventId);
@@ -36,6 +49,42 @@ public class StoryDirector : MonoBehaviour
         PlayDialogues(linesToPlay);
         IncreaseAttemptCounter(best);
         return best.blockDefaultAction;
+    }
+
+    private IEnumerator AutoPlayFirstBeatWhenReady()
+    {
+        while (DialogueManager.Instance == null)
+        {
+            yield return null;
+        }
+
+        // Let DialogueManager finish its own Start prewarm flow first.
+        yield return null;
+        yield return null;
+
+        float delay = Mathf.Max(0f, autoPlayDelaySeconds);
+        if (delay > 0f)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+
+        TryAutoPlayFirstBeat();
+    }
+
+    private void TryAutoPlayFirstBeat()
+    {
+        if (beats == null || beats.Length == 0) return;
+        if (beats[0] == null) return;
+        if (DialogueManager.Instance == null) return;
+        if (DialogueManager.Instance.IsDialogueActive) return;
+
+        StoryBeat first = beats[0];
+        if (!CanPlay(first)) return;
+
+        ApplyFlags(first.setFlagsOnPlay);
+        string[] linesToPlay = ResolveDialogues(first);
+        PlayDialogues(linesToPlay);
+        IncreaseAttemptCounter(first);
     }
 
     private StoryBeat FindBestBeat(string eventId)

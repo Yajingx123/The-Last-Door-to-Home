@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
-  m_Name: pager_Elena_1
+  m_Name: dormitory_intro
   m_EditorClassIdentifier: 
-  eventId: pager_Elena_1
+  eventId: dormitory_intro
   priority: 0
   requiredFlags: []
   blockedFlags: []
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - "\u201CKi\u2014... an...\u201D"
-  - "\u201DCan you... hear...\u201C"
-  - "\u201DStay... with... voice...\nDon\u2019t... sink...\u201C"
-  setFlagsOnPlay: []
+  - You feel confused and dizzy. But lets find your wife and colleagues first. They
+    must know something.
+  setFlagsOnPlay:
+  - dormitory_intro_played
   blockDefaultAction: 0
   useAttemptNarration: 0
   attemptCounterKey: 

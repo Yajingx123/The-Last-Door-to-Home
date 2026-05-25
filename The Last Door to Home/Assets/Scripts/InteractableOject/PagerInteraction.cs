@@ -18,11 +18,8 @@ public class PagerInteraction : MonoBehaviour, IInteractable
 
     [Header("首次发现：是否播放录音选项")]
     public string playRecordingOptionText = "播放录音";
-    public string skipRecordingOptionText = "先不播放";
     [TextArea(2, 8)]
     public string[] afterPlayRecordingDialogues;
-    [TextArea(2, 8)]
-    public string[] afterSkipRecordingDialogues;
 
     private bool pickupInProgress;
 
@@ -67,12 +64,6 @@ public class PagerInteraction : MonoBehaviour, IInteractable
                 text = playRecordingOptionText,
                 canExecute = () => true,
                 onExecute = () => ContinueAndPickup(afterPlayRecordingDialogues)
-            },
-            new OptionMenu.OptionEntry
-            {
-                text = skipRecordingOptionText,
-                canExecute = () => true,
-                onExecute = () => ContinueAndPickup(afterSkipRecordingDialogues)
             }
         };
 

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7403559264001958982}
   - component: {fileID: 3930603653305694595}
   - component: {fileID: 7560863497210995078}
+  - component: {fileID: 5113282963952080773}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 2014017643
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1641667602, guid: e34010064a2f5114ab29f34bfdc2bdc8, type: 3}
+  m_Sprite: {fileID: 663773704, guid: 8bb51aa0b6254a34cbea380b5e52dc9e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -198,6 +199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactRange: 1.5
   angleTolerance: 60
+  maxAnchorDistance: 1.9
 --- !u!114 &7403559264001958982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,3 +248,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2.5
   stopFreezeDelay: 0.08
+--- !u!114 &5113282963952080773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8781150791697953889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5108c7b365a39b748a1343dfdbfd4e35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openMenuKey: 112
+  pagerUniqueID: pager
+  callAOptionText: A
+  callADialogues:
+  - 111
+  callBOptionText: B
+  callBDialogues: []
+  callCOptionText: C
+  callCDialogues: []
+  dontCallOptionText: D
+  dontCallDialogues: []
