@@ -315,7 +315,6 @@ public class DialogueManager : MonoBehaviour
             if (script == null) continue;
             if (script.GetType().Name.Contains("Move") || script.GetType().Name.Contains("Movement"))
             {
-                if (script == playerMove) continue;
                 script.enabled = !lockIt;
             }
         }
