@@ -19,8 +19,8 @@ MonoBehaviour:
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - You feel confused and dizzy. But lets find your wife and colleagues first. They
-    must know something.
+  - You feel confused and dizzy. The headache feels like a concussion.
+  - ... is Amelia okay now?
   setFlagsOnPlay:
   - dormitory_intro_played
   blockDefaultAction: 0

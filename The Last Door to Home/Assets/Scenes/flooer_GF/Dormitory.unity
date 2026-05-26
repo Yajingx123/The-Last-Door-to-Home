@@ -138,91 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &396890567
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1999931943}
-    m_Modifications:
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3.7447596
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.0619347
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.013889618
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2705836639129023899, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_SortingLayer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2705836639129023899, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_Name
-      value: flower
-      objectReference: {fileID: 0}
-    - target: {fileID: 9012175523079188528, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: itemUniqueID
-      value: flower_09
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
---- !u!4 &396890568 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-  m_PrefabInstance: {fileID: 396890567}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &434553673 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9012175523079188528, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-  m_PrefabInstance: {fileID: 396890567}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &456444755
 GameObject:
   m_ObjectHideFlags: 0
@@ -3068,7 +2983,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogues:
-  - Jeff's note.
+  - Jeff's note. Above is some information about the organisms we discovered here.
+  - He is usually responsible for sorting out and documenting these. It is admitted
+    that he is a professional biologist.
   showDialogueImage: 1
   dialogueImageSprite: {fileID: 21300000, guid: 5657b0e86d4587746b9c3556db91b61d, type: 3}
 --- !u!212 &1329084531
@@ -3311,17 +3228,161 @@ MonoBehaviour:
   pagerItemType: 1
   pickupHideTarget: {fileID: 1625645182}
   foundDialogues:
-  - 'Your pager. Usually it is used for calling your colleagues. '
-  - Seems there is a message for you. It is from your wifi. Play it?
+  - Your pager. You always bring it with you.
+  - Seems there is already a message for you. Play it?
   playRecordingOptionText: play
   afterPlayRecordingDialogues:
   - '"...Kian, if you can hear this, take a breath first."'
-  - "\"You may not remember everything right away. That\u2019s normal. There was
-    an accident during the portal launch, and we had to move before the backup power
-    dropped too low.\""
-  - "\"I left your pager on because I knew you would wake up.\nCheck the room. Take
-    anything useful. Then come find us.\u201C"
+  - It is Amelia! Thanks god!
+  - Although you really want to enjoy the sense of peace brought by your lover's
+    voice for a little longer, you must focus your attention on listening right now.
+  - "\"...You may not remember everything right away. That\u2019s normal. There was
+    an accident during the portal launch.\nNo one knows what exactly happened, but
+    the portal seems been used and now we don't have enough enery stone to lanch
+    it again\""
+  - "\u201DMeanwhile, we found one person is missing ... that's Jeff.\u201C"
+  - '"We didn''t find him in the base.
+
+    And You are the one in a coma for the
+    longest time. So we left you in the base."'
+  - "\"...I know it is a strange thing but,\nthe worst case is that Jeff betrays
+    us and leaves through the portal by himself.\u201C"
+  - "\u201DIf you wake up, take a rest, then come and find us. We are searching for
+    new enery stones outside the base.\u201C"
   - "\u201DWe are still going home.\u201C"
+  - ...Jeff?
+  - Althouth he is your roommate, you could hardly see him, so still now, you don't
+    know much about Jeff.
+  - Anyway, find some clues about Jeff is the only thing you can do for your team
+    right now.
+--- !u!1 &1646473445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1646473446}
+  - component: {fileID: 1646473447}
+  m_Layer: 0
+  m_Name: ID_card_Jeff
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1646473446
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646473445}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.01, y: 1.03, z: -0.0024473853}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1999931943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1646473447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646473445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemUniqueID: ID_card_Jeff
+  itemName: Jeff's ID card
+  itemType: 0
+  prePickDialogues: []
+  pickOptionText: Pick Up
+  leaveOptionText: Leave
+  afterPickOptionDialogues:
+  - You got Jeff's ID card.
+  afterLeaveOptionDialogues:
+  - You left it there.
+--- !u!1001 &1730595337
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[0]
+      value: A bunch of eye flowers.
+      objectReference: {fileID: 0}
+    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[1]
+      value: In fact, you can see eye flowers in the base everywhere. They are all
+        placed by Jeff.
+      objectReference: {fileID: 0}
+    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: dialogues.Array.data[2]
+      value: Looking at them for a long time makes you feel a bit creepy.
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.78125
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.8125
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.013889618
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+      propertyPath: m_Name
+      value: flower
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
 --- !u!1 &1823307918
 GameObject:
   m_ObjectHideFlags: 0
@@ -3368,7 +3429,7 @@ MonoBehaviour:
   - Pick it ?
   afterLootDialogues:
   - You pick the stone.
-  rewardItem: {fileID: 434553673}
+  rewardItem: {fileID: 0}
   passwordPanel: {fileID: 48762075}
   digitTexts:
   - {fileID: 380586712}
@@ -3672,6 +3733,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1942549428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1942549429}
+  - component: {fileID: 1942549430}
+  m_Layer: 0
+  m_Name: enery_stone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1942549429
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942549428}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.1931713, y: 2.049976, z: -0.0024473853}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1999931943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1942549430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942549428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemUniqueID: stone_01
+  itemName: enery stone
+  itemType: 4
+  prePickDialogues: []
+  pickOptionText: Pick Up
+  leaveOptionText: Leave
+  afterPickOptionDialogues: []
+  afterLeaveOptionDialogues: []
 --- !u!20 &1966924526 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3917171415433109522, guid: 58aca674f7c83d048955f509cb1338b1, type: 3}
@@ -3706,10 +3819,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 396890568}
   - {fileID: 1823307922}
   - {fileID: 1329084532}
   - {fileID: 1625645183}
+  - {fileID: 1646473446}
+  - {fileID: 1942549429}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2068016165
@@ -3942,3 +4056,4 @@ SceneRoots:
   - {fileID: 1913702136}
   - {fileID: 1999931943}
   - {fileID: 1838058741}
+  - {fileID: 1730595337}

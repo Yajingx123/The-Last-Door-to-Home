@@ -7,7 +7,7 @@ public enum ItemType
     Tool,
     Note,
     Flower,
-    Box
+    stone
 }
 
 public static class Inventory

@@ -25,6 +25,8 @@ MonoBehaviour:
   useAttemptNarration: 1
   attemptCounterKey: exit_dormitory_no_pager_count
   attemptDialogues:
-  - Wait a moment. I have to take the pager with me just in case.
-  - It feels quite uneasy without a pager. I have to look for it again.
+  - Did you bring your pager?
+  - It feels quite uneasy without a pager.
+  - You'd better take a pager with you.
+  - Why not find and use your pager to get contact with your colleagues?
   clampToLastAttemptLine: 1
