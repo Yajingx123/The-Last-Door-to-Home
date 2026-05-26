@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 2705836639129023899}
   - component: {fileID: 8468183410532427115}
   - component: {fileID: 6732157947482495755}
-  - component: {fileID: 9012175523079188528}
+  - component: {fileID: -2562356799011869283}
   m_Layer: 0
   m_Name: flower
-  m_TagString: Untagged
+  m_TagString: decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2965926302923172719}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.1875, y: -1.53125, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.7447596, y: 1.0619347, z: -0.013889618}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12bda9079a779043a1f7f32ebec09d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9012175523079188528
+--- !u!114 &-2562356799011869283
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,18 +153,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2965926302923172719}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
+  m_Script: {fileID: 11500000, guid: c32c00f83df28a349973c5a0fdf4608d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemUniqueID: flower_01
-  itemName: Flower
-  itemType: 3
-  prePickDialogues:
-  - This is a flower. You like it.
-  - Pick it?
-  pickOptionText: Pick Up
-  leaveOptionText: Leave
-  afterPickOptionDialogues:
-  - You got this flower.
-  afterLeaveOptionDialogues:
-  - You just left it there.
+  dialogues:
+  - 111
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}

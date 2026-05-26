@@ -21,6 +21,10 @@ public class OptionMenu : MonoBehaviour
     public GameObject optionPanel;
     public TextMeshProUGUI[] options;
     public Image cursor;
+    [SerializeField] private int maxOptions = 4;
+    [SerializeField] private float minPanelHeight = 120f;
+    [SerializeField] private float panelPaddingTop = 20f;
+    [SerializeField] private float panelPaddingBottom = 20f;
 
     [Header("玩家物体（拖Player）")]
     public GameObject player;
@@ -31,6 +35,14 @@ public class OptionMenu : MonoBehaviour
     private bool closeDialogueWhenConfirmed;
     private RectTransform cursorRect;
     private float cursorFixedX;
+    private readonly List<TextMeshProUGUI> optionSlots = new List<TextMeshProUGUI>();
+    private float optionSpacing = 100f;
+    private float optionItemHeight = 50f;
+    private RectTransform optionPanelRect;
+    private Vector2 optionPanelBaseAnchoredPos;
+    private bool hasPanelBaseAnchoredPos;
+    private float optionSlotsBaseCenterY;
+    private bool hasOptionSlotsBaseCenterY;
 
     void Awake()
     {
@@ -42,12 +54,20 @@ public class OptionMenu : MonoBehaviour
 
         Instance = this;
         if (optionPanel != null) optionPanel.SetActive(false);
+        optionPanelRect = optionPanel != null ? optionPanel.GetComponent<RectTransform>() : null;
+        if (optionPanelRect != null)
+        {
+            optionPanelBaseAnchoredPos = optionPanelRect.anchoredPosition;
+            hasPanelBaseAnchoredPos = true;
+        }
 
         cursorRect = cursor != null ? cursor.GetComponent<RectTransform>() : null;
         if (cursorRect != null)
         {
             cursorFixedX = cursorRect.anchoredPosition.x;
         }
+
+        BuildOptionSlots();
     }
 
     void OnDestroy()
@@ -116,34 +136,152 @@ public class OptionMenu : MonoBehaviour
             return;
         }
 
-        currentEntries = entries;
+        BuildOptionSlots();
+
+        int supportedCount = Mathf.Clamp(maxOptions, 1, 4);
+        if (entries.Count > supportedCount)
+        {
+            Debug.LogWarning($"OptionMenu: 收到 {entries.Count} 个选项，最多支持 {supportedCount} 个，超出部分将被忽略。", this);
+        }
+
+        int showCount = Mathf.Min(entries.Count, supportedCount);
+        currentEntries = entries.GetRange(0, showCount);
         closeDialogueWhenConfirmed = closeDialogueOnConfirm;
         onClose = onMenuClosed;
         optionPanel.SetActive(true);
         if (DialogueManager.Instance != null) DialogueManager.Instance.LockPlayer(true);
         currentSelect = 0;
 
-        for (int i = 0; i < options.Length; i++)
+        for (int i = 0; i < optionSlots.Count; i++)
         {
             bool active = i < currentEntries.Count;
-            options[i].gameObject.SetActive(active);
-            if (active) options[i].text = currentEntries[i].text;
+            optionSlots[i].gameObject.SetActive(active);
+            if (active) optionSlots[i].text = currentEntries[i].text;
         }
 
+        ResizeOptionPanel(currentEntries.Count);
         UpdateCursor();
     }
 
     void UpdateCursor()
     {
-        if (cursorRect == null || options == null || options.Length == 0 || options[currentSelect] == null) return;
+        if (cursorRect == null || currentEntries == null || currentEntries.Count == 0) return;
+        if (currentSelect < 0 || currentSelect >= currentEntries.Count) return;
+        if (currentSelect >= optionSlots.Count || optionSlots[currentSelect] == null) return;
 
-        RectTransform optionRect = options[currentSelect].GetComponent<RectTransform>();
+        RectTransform optionRect = optionSlots[currentSelect].GetComponent<RectTransform>();
         if (optionRect == null) return;
 
         Vector2 pos = cursorRect.anchoredPosition;
         pos.x = cursorFixedX;
         pos.y = optionRect.anchoredPosition.y;
         cursorRect.anchoredPosition = pos;
+    }
+
+    private void BuildOptionSlots()
+    {
+        optionSlots.Clear();
+        if (options == null || options.Length == 0) return;
+
+        int supportedCount = Mathf.Clamp(maxOptions, 1, 4);
+
+        for (int i = 0; i < options.Length; i++)
+        {
+            if (options[i] != null) optionSlots.Add(options[i]);
+            if (optionSlots.Count >= supportedCount) break;
+        }
+
+        if (optionSlots.Count == 0) return;
+
+        RectTransform firstRect = optionSlots[0].GetComponent<RectTransform>();
+        if (firstRect != null)
+        {
+            optionItemHeight = Mathf.Max(1f, firstRect.sizeDelta.y);
+        }
+
+        if (optionSlots.Count >= 2)
+        {
+            RectTransform secondRect = optionSlots[1].GetComponent<RectTransform>();
+            if (firstRect != null && secondRect != null)
+            {
+                optionSpacing = Mathf.Abs(firstRect.anchoredPosition.y - secondRect.anchoredPosition.y);
+                optionSlotsBaseCenterY = (firstRect.anchoredPosition.y + secondRect.anchoredPosition.y) * 0.5f;
+                hasOptionSlotsBaseCenterY = true;
+            }
+        }
+        else
+        {
+            optionSpacing = Mathf.Max(optionItemHeight, 1f);
+            if (firstRect != null)
+            {
+                optionSlotsBaseCenterY = firstRect.anchoredPosition.y;
+                hasOptionSlotsBaseCenterY = true;
+            }
+        }
+
+        TextMeshProUGUI template = optionSlots[0];
+        if (!hasOptionSlotsBaseCenterY && firstRect != null)
+        {
+            optionSlotsBaseCenterY = firstRect.anchoredPosition.y;
+            hasOptionSlotsBaseCenterY = true;
+        }
+        for (int i = optionSlots.Count; i < supportedCount; i++)
+        {
+            TextMeshProUGUI slot = Instantiate(template, template.transform.parent);
+            slot.name = $"{template.name}_Auto_{i + 1}";
+
+            RectTransform rect = slot.GetComponent<RectTransform>();
+            if (rect != null && firstRect != null)
+            {
+                Vector2 anchored = firstRect.anchoredPosition;
+                anchored.y = firstRect.anchoredPosition.y - optionSpacing * i;
+                rect.anchoredPosition = anchored;
+            }
+
+            slot.gameObject.SetActive(false);
+            optionSlots.Add(slot);
+        }
+    }
+
+    private void ResizeOptionPanel(int count)
+    {
+        if (optionPanel == null) return;
+        RectTransform panelRect = optionPanelRect != null ? optionPanelRect : optionPanel.GetComponent<RectTransform>();
+        if (panelRect == null) return;
+
+        if (!hasPanelBaseAnchoredPos)
+        {
+            optionPanelBaseAnchoredPos = panelRect.anchoredPosition;
+            hasPanelBaseAnchoredPos = true;
+        }
+
+        float spacing = Mathf.Max(0f, optionSpacing - optionItemHeight);
+        float contentHeight = count * optionItemHeight + Mathf.Max(0, count - 1) * spacing;
+        float targetHeight = panelPaddingTop + panelPaddingBottom + contentHeight;
+
+        Vector2 size = panelRect.sizeDelta;
+        size.y = Mathf.Max(minPanelHeight, targetHeight);
+        panelRect.sizeDelta = size;
+
+        panelRect.anchoredPosition = optionPanelBaseAnchoredPos;
+        RepositionOptionSlots(count);
+    }
+
+    private void RepositionOptionSlots(int count)
+    {
+        if (count <= 0) return;
+        if (!hasOptionSlotsBaseCenterY) return;
+
+        float startY = optionSlotsBaseCenterY + ((count - 1) * 0.5f * optionSpacing);
+        for (int i = 0; i < optionSlots.Count; i++)
+        {
+            RectTransform rect = optionSlots[i] != null ? optionSlots[i].GetComponent<RectTransform>() : null;
+            if (rect == null) continue;
+
+            Vector2 anchored = rect.anchoredPosition;
+            anchored.y = startY - i * optionSpacing;
+            rect.anchoredPosition = anchored;
+        }
     }
 
     void ConfirmSelect()

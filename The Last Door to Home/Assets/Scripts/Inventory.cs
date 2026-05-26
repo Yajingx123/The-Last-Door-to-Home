@@ -7,7 +7,7 @@ public enum ItemType
     Tool,
     Note,
     Flower,
-    Box
+    stone
 }
 
 public static class Inventory
@@ -26,6 +26,7 @@ public static class Inventory
         collectedTypes.Clear();
         unlockedSafeIDs.Clear();
         unlockedDoorIDs.Clear();
+        StoryFlags.Clear();
     }
 
     public static void AddItem(string name, ItemType type, string uniqueID)
@@ -84,5 +85,6 @@ public static class Inventory
         collectedTypes.Clear();
         unlockedSafeIDs.Clear();
         unlockedDoorIDs.Clear();
+        StoryFlags.Clear();
     }
 }

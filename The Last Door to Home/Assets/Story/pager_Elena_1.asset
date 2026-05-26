@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
+  m_Name: pager_Elena_1
+  m_EditorClassIdentifier: 
+  eventId: pager_Elena_1
+  priority: 0
+  requiredFlags: []
+  blockedFlags: []
+  requiredItemUniqueIDs: []
+  blockedItemUniqueIDs: []
+  dialogues:
+  - "\u201CKi\u2014... an...\u201D"
+  - "\u201DCan you... hear...\u201C"
+  - "\u201DStay... with... voice...\nDon\u2019t... sink...\u201C"
+  setFlagsOnPlay: []
+  blockDefaultAction: 0
+  useAttemptNarration: 0
+  attemptCounterKey: 
+  attemptDialogues: []
+  clampToLastAttemptLine: 0

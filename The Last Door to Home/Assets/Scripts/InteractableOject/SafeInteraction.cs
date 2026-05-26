@@ -235,7 +235,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         {
             isUnlocked = true;
             Inventory.MarkSafeUnlocked(safeUniqueID);
-            ShowUnlockedDialogueWithPick();
+            ContinueUnlockedDialogueWithPickAfterPassword();
             return;
         }
 
@@ -289,6 +289,20 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         else
         {
             ShowFallbackDialogue(unlockedDialogues, "保险箱打开了。", false);
+        }
+    }
+
+    private void ContinueUnlockedDialogueWithPickAfterPassword()
+    {
+        if (DialogueManager.Instance == null) return;
+
+        if (rewardItem != null)
+        {
+            DialogueManager.Instance.ContinueDialogueAfterOption(unlockedDialogues, rewardItem);
+        }
+        else
+        {
+            ShowFallbackDialogue(unlockedDialogues, "保险箱打开了。", true);
         }
     }
 

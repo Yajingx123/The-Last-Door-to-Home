@@ -3,10 +3,25 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    [Header("New Game 跳转场景")]
+    public string newGameSceneName = "IntroCutscene";
+
     // 跳转到指定场景（通过场景名）
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+    }
+
+    // MainMenu 的 New Game 调用这个
+    public void StartNewGame()
+    {
+        if (string.IsNullOrWhiteSpace(newGameSceneName))
+        {
+            Debug.LogWarning("SceneLoader: newGameSceneName 为空，无法开始新游戏。", this);
+            return;
+        }
+
+        SceneManager.LoadScene(newGameSceneName);
     }
 
     // 退出游戏（仅打包后生效，编辑器中无效果）

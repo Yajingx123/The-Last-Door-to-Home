@@ -26,5 +26,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/flooer_B1/ControlRoom.unity
     guid: 8b275c2de8a5c434ea0799f49e53af99
+  - enabled: 1
+    path: Assets/Scenes/IntroCutScene.unity
+    guid: 8714c09f56f963e4287e6e7ffa9443b4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 085e6ac5f6cc16346bde96e8293f71b3, type: 3}
