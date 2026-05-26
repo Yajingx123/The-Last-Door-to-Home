@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Collider2D))]
 public class StoryEventTrigger : MonoBehaviour
@@ -14,12 +15,38 @@ public class StoryEventTrigger : MonoBehaviour
 
     private bool triggered;
 
+    private string GetHierarchyPath()
+    {
+        string path = gameObject.name;
+        Transform current = transform.parent;
+
+        while (current != null)
+        {
+            path = current.name + "/" + path;
+            current = current.parent;
+        }
+
+        return path;
+    }
+
+    private string GetEffectiveFlag()
+    {
+        if (!string.IsNullOrWhiteSpace(playedFlag)) return playedFlag;
+        if (!triggerOnce) return string.Empty;
+
+        // Auto-generate a stable key per scene object for one-shot triggers.
+        Scene scene = gameObject.scene;
+        string sceneName = scene.IsValid() ? scene.name : "UnknownScene";
+        return $"StoryTrigger:{sceneName}:{GetHierarchyPath()}";
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
         if (triggerOnce && triggered) return;
 
-        if (!string.IsNullOrWhiteSpace(playedFlag) && StoryFlags.Has(playedFlag))
+        string effectiveFlag = GetEffectiveFlag();
+        if (!string.IsNullOrWhiteSpace(effectiveFlag) && StoryFlags.Has(effectiveFlag))
         {
             triggered = true;
             return;
@@ -30,9 +57,9 @@ public class StoryEventTrigger : MonoBehaviour
         StoryDirector.Instance.TryHandleEvent(eventId);
         triggered = true;
 
-        if (!string.IsNullOrWhiteSpace(playedFlag))
+        if (!string.IsNullOrWhiteSpace(effectiveFlag))
         {
-            StoryFlags.Set(playedFlag);
+            StoryFlags.Set(effectiveFlag);
         }
     }
 }
