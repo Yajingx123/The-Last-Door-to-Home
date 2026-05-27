@@ -373,6 +373,14 @@ PrefabInstance:
       propertyPath: spawnPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8803074210248707412, guid: 3af3c8a63de78db4e9c4d20f22988a05, type: 3}
+      propertyPath: keyOptions.Array.data[0].keyUniqueID
+      value: ID_card_Kian
+      objectReference: {fileID: 0}
+    - target: {fileID: 8803074210248707412, guid: 3af3c8a63de78db4e9c4d20f22988a05, type: 3}
+      propertyPath: keyOptions.Array.data[1].keyUniqueID
+      value: ID_card_Jeff
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

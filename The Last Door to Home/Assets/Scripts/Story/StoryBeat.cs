@@ -22,6 +22,9 @@ public class StoryBeat : ScriptableObject
     [Header("执行")]
     [TextArea(2, 6)]
     public string[] dialogues;
+    [Header("阅读插图（可选）")]
+    public bool showDialogueImage = false;
+    public Sprite dialogueImageSprite;
     public string[] setFlagsOnPlay;
     public bool blockDefaultAction = false;
 
