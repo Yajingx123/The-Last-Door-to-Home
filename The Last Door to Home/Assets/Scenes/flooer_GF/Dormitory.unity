@@ -2378,6 +2378,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3528270791877549681, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
   m_PrefabInstance: {fileID: 1842182712}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &728024243 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
+  m_PrefabInstance: {fileID: 1730595337}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &846272416
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,7 +3320,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1999931943}
     m_Modifications:
     - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: dialogues.Array.size
@@ -3336,15 +3341,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.78125
+      value: -1.0885096
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.8125
+      value: 4.4369345
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.013889618
+      value: -0.027779236
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3426,10 +3431,9 @@ MonoBehaviour:
   - A soft and dazzling blue light burst forth immediately. You could see the true
     appearance inside untill you fully opened the safe door.
   - It is ... an enery stone?!
-  - Pick it ?
   afterLootDialogues:
-  - You pick the stone.
-  rewardItem: {fileID: 0}
+  - It is empty.
+  rewardItem: {fileID: 1942549430}
   passwordPanel: {fileID: 48762075}
   digitTexts:
   - {fileID: 380586712}
@@ -3783,8 +3787,10 @@ MonoBehaviour:
   prePickDialogues: []
   pickOptionText: Pick Up
   leaveOptionText: Leave
-  afterPickOptionDialogues: []
-  afterLeaveOptionDialogues: []
+  afterPickOptionDialogues:
+  - You picked the stone.
+  afterLeaveOptionDialogues:
+  - You left the stone there. You can come back to pick it up anytime.
 --- !u!20 &1966924526 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3917171415433109522, guid: 58aca674f7c83d048955f509cb1338b1, type: 3}
@@ -3824,6 +3830,7 @@ Transform:
   - {fileID: 1625645183}
   - {fileID: 1646473446}
   - {fileID: 1942549429}
+  - {fileID: 728024243}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2068016165
@@ -4056,4 +4063,3 @@ SceneRoots:
   - {fileID: 1913702136}
   - {fileID: 1999931943}
   - {fileID: 1838058741}
-  - {fileID: 1730595337}
