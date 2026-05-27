@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Collider2D))]
 public class StoryEventTrigger : MonoBehaviour
 {
+    private const string OneShotPrefPrefix = "OneShotTrigger:";
+
     [Header("事件")]
     public string eventId;
 
@@ -46,7 +48,7 @@ public class StoryEventTrigger : MonoBehaviour
         if (triggerOnce && triggered) return;
 
         string effectiveFlag = GetEffectiveFlag();
-        if (!string.IsNullOrWhiteSpace(effectiveFlag) && StoryFlags.Has(effectiveFlag))
+        if (IsAlreadyPlayed(effectiveFlag))
         {
             triggered = true;
             return;
@@ -59,7 +61,23 @@ public class StoryEventTrigger : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(effectiveFlag))
         {
-            StoryFlags.Set(effectiveFlag);
+            MarkPlayed(effectiveFlag);
         }
+    }
+
+    private bool IsAlreadyPlayed(string effectiveFlag)
+    {
+        if (string.IsNullOrWhiteSpace(effectiveFlag)) return false;
+        if (StoryFlags.Has(effectiveFlag)) return true;
+        return PlayerPrefs.GetInt(OneShotPrefPrefix + effectiveFlag, 0) == 1;
+    }
+
+    private void MarkPlayed(string effectiveFlag)
+    {
+        if (string.IsNullOrWhiteSpace(effectiveFlag)) return;
+
+        StoryFlags.Set(effectiveFlag);
+        PlayerPrefs.SetInt(OneShotPrefPrefix + effectiveFlag, 1);
+        PlayerPrefs.Save();
     }
 }

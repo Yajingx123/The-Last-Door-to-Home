@@ -22,6 +22,12 @@ MonoBehaviour:
   - "\u201CKi\u2014... an...\u201D"
   - "\u201DCan you... hear...\u201C"
   - "\u201DStay... with... voice...\nDon\u2019t... sink...\u201C"
+  - ...
+  - The signal is completely broken. It's hard to tell which of your colleagues this
+    voice is from.
+  - But you are not worried. In fact, the signal at the base has been fluctuating
+    frequently recently. You believe it will be back to normal in a while.
+  - But, what does that mean?
   setFlagsOnPlay: []
   blockDefaultAction: 0
   useAttemptNarration: 0
