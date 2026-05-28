@@ -808,9 +808,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beats:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 3b7fd522626b92841b514b2ca09e54a8, type: 2}
+  - {fileID: 11400000, guid: c7a0a63c1889adb4588bb2f00b703288, type: 2}
   beatSets:
   - {fileID: 11400000, guid: 0f80b7d74b233f246849cac4206a9879, type: 2}
+  persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 0
   autoPlayDelaySeconds: 1
 --- !u!4 &305740677
@@ -1205,6 +1207,10 @@ PrefabInstance:
       propertyPath: targetSceneName
       value: Corridor2
       objectReference: {fileID: 0}
+    - target: {fileID: 7641030584106298265, guid: 201e54f9d6b22f543815b1cdde3520e2, type: 3}
+      propertyPath: beforeExitEventId
+      value: exit_archiveroom
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1522,6 +1528,7 @@ MonoBehaviour:
   targets:
   - {fileID: 921893225}
   - {fileID: 1251576581}
+  - {fileID: 1527819873}
   beatSet: {fileID: 11400000, guid: 0f80b7d74b233f246849cac4206a9879, type: 2}
   groupId: shelves
   fallbackDialogues:
@@ -3929,7 +3936,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 4.96803, y: 4.4974933}
+  m_Offset: {x: 5.4259806, y: 5.048087}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -3940,7 +3947,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 13.024637, y: 10.582852}
+  m_Size: {x: 12.108736, y: 9.481665}
   m_EdgeRadius: 0
 --- !u!4 &1492957804
 Transform:

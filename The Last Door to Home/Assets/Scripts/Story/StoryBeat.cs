@@ -30,6 +30,8 @@ public class StoryBeat : ScriptableObject
 
     [Header("递进台词（可选）")]
     public bool useAttemptNarration = false;
+    [Tooltip("开启后：该Beat不会被\"只播放一次\"拦截，可多次触发以推进attemptDialogues。")]
+    public bool allowRepeatForAttemptNarration = false;
     public string attemptCounterKey = "";
     [TextArea(2, 6)]
     public string[] attemptDialogues;

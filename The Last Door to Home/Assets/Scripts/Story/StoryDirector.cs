@@ -126,7 +126,7 @@ public class StoryDirector : MonoBehaviour
 
     private bool CanPlay(StoryBeat beat)
     {
-        if (IsBeatAlreadyPlayed(beat)) return false;
+        if (IsOneShotEnabled(beat) && IsBeatAlreadyPlayed(beat)) return false;
         if (!HasAllFlags(beat.requiredFlags)) return false;
         if (HasAnyFlag(beat.blockedFlags)) return false;
         if (!HasAllItems(beat.requiredItemUniqueIDs)) return false;
@@ -265,6 +265,8 @@ public class StoryDirector : MonoBehaviour
 
     private void MarkBeatPlayed(StoryBeat beat)
     {
+        if (!IsOneShotEnabled(beat)) return;
+
         string key = GetBeatKey(beat);
         if (string.IsNullOrWhiteSpace(key)) return;
 
@@ -274,6 +276,13 @@ public class StoryDirector : MonoBehaviour
             PlayerPrefs.SetInt(BeatPlayedPrefPrefix + key, 1);
             PlayerPrefs.Save();
         }
+    }
+
+    private bool IsOneShotEnabled(StoryBeat beat)
+    {
+        if (beat == null) return true;
+        if (beat.useAttemptNarration) return false;
+        return true;
     }
 
     private string GetBeatKey(StoryBeat beat)

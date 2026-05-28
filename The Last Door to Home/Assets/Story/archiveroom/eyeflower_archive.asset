@@ -15,3 +15,4 @@ MonoBehaviour:
   beats:
   - {fileID: 11400000, guid: 274c6f7f242475942b05220bc6ff7526, type: 2}
   - {fileID: 11400000, guid: 5201710c66a762246ba49bd72f472d64, type: 2}
+  - {fileID: 11400000, guid: dec17fe70aadeb74f9ca99974fcd3fce, type: 2}
