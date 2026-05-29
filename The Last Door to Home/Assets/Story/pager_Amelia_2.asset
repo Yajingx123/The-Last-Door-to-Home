@@ -10,26 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
-  m_Name: dormroom_hasPager
+  m_Name: pager_Amelia_2
   m_EditorClassIdentifier: 
-  eventId: exit_dormitory
-  priority: 0
-  requiredFlags: []
+  eventId: exit_archiveroom
+  priority: 10
+  requiredFlags:
+  - archive_done
   blockedFlags: []
   requiredItemUniqueIDs: []
-  blockedItemUniqueIDs:
-  - pager
-  dialogues: []
+  blockedItemUniqueIDs: []
+  dialogues:
+  - '"Kian,..."'
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay: []
   blockDefaultAction: 1
-  useAttemptNarration: 1
-  allowRepeatForAttemptNarration: 1
-  attemptCounterKey: exit_dormitory_no_pager_count
-  attemptDialogues:
-  - Did you bring your pager?
-  - It feels quite uneasy without a pager.
-  - You'd better take a pager with you.
-  - Why not find and use your pager to get contact with your colleagues?
+  useAttemptNarration: 0
+  allowRepeatForAttemptNarration: 0
+  attemptCounterKey: 
+  attemptDialogues: []
   clampToLastAttemptLine: 1

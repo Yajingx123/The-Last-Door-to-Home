@@ -497,4 +497,5 @@ public class DialogueManager : MonoBehaviour
 
         imageAnimRoutine = null;
     }
+
 }

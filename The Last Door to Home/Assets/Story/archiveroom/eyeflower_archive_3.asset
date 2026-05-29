@@ -10,26 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
-  m_Name: dormroom_hasPager
+  m_Name: eyeflower_archive_3
   m_EditorClassIdentifier: 
-  eventId: exit_dormitory
+  eventId: eyeflower_archive_3
   priority: 0
   requiredFlags: []
   blockedFlags: []
   requiredItemUniqueIDs: []
-  blockedItemUniqueIDs:
-  - pager
-  dialogues: []
+  blockedItemUniqueIDs: []
+  dialogues:
+  - 333
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
-  setFlagsOnPlay: []
-  blockDefaultAction: 1
-  useAttemptNarration: 1
-  allowRepeatForAttemptNarration: 1
-  attemptCounterKey: exit_dormitory_no_pager_count
-  attemptDialogues:
-  - Did you bring your pager?
-  - It feels quite uneasy without a pager.
-  - You'd better take a pager with you.
-  - Why not find and use your pager to get contact with your colleagues?
+  setFlagsOnPlay:
+  - archive_done
+  blockDefaultAction: 0
+  useAttemptNarration: 0
+  attemptCounterKey: 
+  attemptDialogues: []
   clampToLastAttemptLine: 1

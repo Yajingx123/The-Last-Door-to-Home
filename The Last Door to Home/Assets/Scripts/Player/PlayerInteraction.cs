@@ -59,12 +59,13 @@ public class PlayerInteraction : MonoBehaviour
             MonoBehaviour item = interactable as MonoBehaviour;
             if (item == null || !item.enabled) continue;
 
-            float anchorDistance = Vector2.Distance(transform.position, item.transform.position);
-            if (anchorDistance > maxAnchorDistance) continue;
-
             Vector2 targetPoint = GetInteractionPoint(item);
             float distance = Vector2.Distance(transform.position, targetPoint);
             if (distance > interactRange) continue;
+
+            float anchorDistance = Vector2.Distance(transform.position, item.transform.position);
+            float effectiveAnchorDistance = Mathf.Min(anchorDistance, distance);
+            if (effectiveAnchorDistance > maxAnchorDistance) continue;
 
             Vector2 dirToItem = (targetPoint - (Vector2)transform.position).normalized;
             float angle = Vector2.Angle(faceDir, dirToItem);
@@ -88,6 +89,28 @@ public class PlayerInteraction : MonoBehaviour
         if (col != null)
         {
             return col.ClosestPoint(transform.position);
+        }
+
+        Collider2D[] childCols = item.GetComponentsInChildren<Collider2D>(true);
+        if (childCols != null && childCols.Length > 0)
+        {
+            Vector2 bestPoint = item.transform.position;
+            float bestDistance = float.MaxValue;
+
+            for (int i = 0; i < childCols.Length; i++)
+            {
+                Collider2D childCol = childCols[i];
+                if (childCol == null) continue;
+                Vector2 point = childCol.ClosestPoint(transform.position);
+                float d = Vector2.Distance(transform.position, point);
+                if (d < bestDistance)
+                {
+                    bestDistance = d;
+                    bestPoint = point;
+                }
+            }
+
+            return bestPoint;
         }
 
         return item.transform.position;

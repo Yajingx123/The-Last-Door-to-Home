@@ -28,6 +28,8 @@ MonoBehaviour:
   - But you are not worried. In fact, the signal at the base has been fluctuating
     frequently recently. You believe it will be back to normal in a while.
   - But, what does that mean?
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay: []
   blockDefaultAction: 0
   useAttemptNarration: 0

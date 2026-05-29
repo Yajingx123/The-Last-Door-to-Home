@@ -3,10 +3,19 @@ using System.Collections;
 
 public class StoryDirector : MonoBehaviour
 {
+    private const string BeatPlayedPrefPrefix = "StoryBeatPlayed:";
+
     public static StoryDirector Instance;
 
     [Header("剧情条目（按优先级从高到低匹配）")]
     public StoryBeat[] beats;
+
+    [Header("剧情条目组（可选）")]
+    public StoryBeatSet[] beatSets;
+
+    [Header("一次性记忆范围")]
+    [Tooltip("关闭=仅当前Play运行期有效（跨场景有效，停止Play后重置）；开启=写入PlayerPrefs，跨多次运行也记住。")]
+    public bool persistBeatPlayedToPlayerPrefs = false;
     
     [Header("开场自动播放")]
     public bool autoPlayFirstBeatOnStart = false;
@@ -42,13 +51,23 @@ public class StoryDirector : MonoBehaviour
     public bool TryHandleEvent(string eventId)
     {
         StoryBeat best = FindBestBeat(eventId);
-        if (best == null) return false;
+        return TryHandleBeat(best);
+    }
 
-        ApplyFlags(best.setFlagsOnPlay);
-        string[] linesToPlay = ResolveDialogues(best);
-        PlayDialogues(linesToPlay);
-        IncreaseAttemptCounter(best);
-        return best.blockDefaultAction;
+    public bool TryHandleBeat(StoryBeat beat)
+    {
+        if (beat == null) return false;
+        if (!CanPlay(beat)) return false;
+
+        ApplyFlags(beat.setFlagsOnPlay);
+        string[] linesToPlay = ResolveDialogues(beat);
+        bool played = PlayDialogues(beat, linesToPlay);
+        if (played)
+        {
+            MarkBeatPlayed(beat);
+        }
+        IncreaseAttemptCounter(beat);
+        return beat.blockDefaultAction;
     }
 
     private IEnumerator AutoPlayFirstBeatWhenReady()
@@ -79,12 +98,7 @@ public class StoryDirector : MonoBehaviour
         if (DialogueManager.Instance.IsDialogueActive) return;
 
         StoryBeat first = beats[0];
-        if (!CanPlay(first)) return;
-
-        ApplyFlags(first.setFlagsOnPlay);
-        string[] linesToPlay = ResolveDialogues(first);
-        PlayDialogues(linesToPlay);
-        IncreaseAttemptCounter(first);
+        TryHandleBeat(first);
     }
 
     private StoryBeat FindBestBeat(string eventId)
@@ -112,6 +126,7 @@ public class StoryDirector : MonoBehaviour
 
     private bool CanPlay(StoryBeat beat)
     {
+        if (IsOneShotEnabled(beat) && IsBeatAlreadyPlayed(beat)) return false;
         if (!HasAllFlags(beat.requiredFlags)) return false;
         if (HasAnyFlag(beat.blockedFlags)) return false;
         if (!HasAllItems(beat.requiredItemUniqueIDs)) return false;
@@ -223,12 +238,58 @@ public class StoryDirector : MonoBehaviour
         StoryFlags.IncrementCounter(beat.attemptCounterKey);
     }
 
-    private void PlayDialogues(string[] lines)
+    private bool PlayDialogues(StoryBeat beat, string[] lines)
     {
-        if (DialogueManager.Instance == null) return;
-        if (lines == null || lines.Length == 0) return;
+        if (DialogueManager.Instance == null) return false;
+        if (lines == null || lines.Length == 0) return false;
 
-        if (DialogueManager.Instance.IsDialogueActive) return;
+        if (DialogueManager.Instance.IsDialogueActive) return false;
+
+        if (beat != null && beat.showDialogueImage && beat.dialogueImageSprite != null)
+        {
+            DialogueManager.Instance.ShowDialogueImage(beat.dialogueImageSprite);
+        }
+
         DialogueManager.Instance.ShowDialogue(lines);
+        return true;
+    }
+
+    private bool IsBeatAlreadyPlayed(StoryBeat beat)
+    {
+        string key = GetBeatKey(beat);
+        if (string.IsNullOrWhiteSpace(key)) return false;
+        if (StoryFlags.Has(key)) return true;
+        if (!persistBeatPlayedToPlayerPrefs) return false;
+        return PlayerPrefs.GetInt(BeatPlayedPrefPrefix + key, 0) == 1;
+    }
+
+    private void MarkBeatPlayed(StoryBeat beat)
+    {
+        if (!IsOneShotEnabled(beat)) return;
+
+        string key = GetBeatKey(beat);
+        if (string.IsNullOrWhiteSpace(key)) return;
+
+        StoryFlags.Set(key);
+        if (persistBeatPlayedToPlayerPrefs)
+        {
+            PlayerPrefs.SetInt(BeatPlayedPrefPrefix + key, 1);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private bool IsOneShotEnabled(StoryBeat beat)
+    {
+        if (beat == null) return true;
+        if (beat.useAttemptNarration) return false;
+        return true;
+    }
+
+    private string GetBeatKey(StoryBeat beat)
+    {
+        if (beat == null) return string.Empty;
+        string safeEventId = string.IsNullOrWhiteSpace(beat.eventId) ? "NoEvent" : beat.eventId.Trim();
+        string safeName = string.IsNullOrWhiteSpace(beat.name) ? "UnnamedBeat" : beat.name.Trim();
+        return $"StoryBeat:{safeEventId}:{safeName}";
     }
 }
