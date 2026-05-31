@@ -28,6 +28,7 @@ MonoBehaviour:
   allowRepeatForAttemptNarration: 1
   attemptCounterKey: found_all_archive
   attemptDialogues:
-  - 111
-  - 222
+  - I can't just leave, there might be some useful information.
+  - Did you find any useful information?
+  - Did you check all the shelves?
   clampToLastAttemptLine: 1

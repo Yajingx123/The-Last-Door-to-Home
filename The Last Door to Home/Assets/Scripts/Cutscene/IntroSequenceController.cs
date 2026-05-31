@@ -30,10 +30,13 @@ public class IntroSequenceController : MonoBehaviour
     private int currentIndex;
     private bool isTransitioning;
     private int sceneStartFrame = -1;
+    private float configuredImageHeight = -1f;
 
     void Start()
     {
         sceneStartFrame = Time.frameCount;
+
+        CacheConfiguredImageHeight();
 
         if (slides == null || slides.Length == 0)
         {
@@ -89,7 +92,7 @@ public class IntroSequenceController : MonoBehaviour
         {
             slideImage.sprite = slide.image;
             slideImage.preserveAspect = true;
-            slideImage.SetNativeSize();
+            FitImageToAvailableHeight();
         }
 
         if (captionText != null)
@@ -129,5 +132,60 @@ public class IntroSequenceController : MonoBehaviour
         }
 
         SceneManager.LoadScene(nextSceneName);
+    }
+
+    private void OnRectTransformDimensionsChange()
+    {
+        if (slideImage != null && slideImage.sprite != null)
+        {
+            if (configuredImageHeight <= 0f)
+            {
+                CacheConfiguredImageHeight();
+            }
+            FitImageToAvailableHeight();
+        }
+    }
+
+    private void FitImageToAvailableHeight()
+    {
+        if (slideImage == null || slideImage.sprite == null)
+        {
+            return;
+        }
+
+        RectTransform imageRect = slideImage.rectTransform;
+        float targetHeight = configuredImageHeight;
+        if (targetHeight <= 0f)
+        {
+            targetHeight = imageRect.rect.height;
+            configuredImageHeight = targetHeight;
+        }
+        if (targetHeight <= 0f) return;
+
+        Rect spriteRect = slideImage.sprite.rect;
+        if (spriteRect.height <= 0f)
+        {
+            return;
+        }
+
+        float aspect = spriteRect.width / spriteRect.height;
+        float targetWidth = targetHeight * aspect;
+
+        imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, targetHeight);
+        imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
+    }
+
+    private void CacheConfiguredImageHeight()
+    {
+        if (slideImage == null)
+        {
+            return;
+        }
+
+        float height = slideImage.rectTransform.rect.height;
+        if (height > 0f)
+        {
+            configuredImageHeight = height;
+        }
     }
 }
