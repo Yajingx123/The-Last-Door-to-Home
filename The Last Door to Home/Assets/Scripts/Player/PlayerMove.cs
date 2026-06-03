@@ -6,6 +6,10 @@ public class PlayerMove : MonoBehaviour
     public float moveSpeed = 2.5f;
     [Header("松键后动画缓冲时间（秒）")]
     public float stopFreezeDelay = 0.08f;
+    [Header("脚步音效")]
+    public AudioClip footstepClip;
+    public float footstepInterval = 0.38f;
+    [Range(0f, 1f)] public float footstepVolume = 0.55f;
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -13,6 +17,8 @@ public class PlayerMove : MonoBehaviour
     private Vector2 inputMoveDir = Vector2.zero;
     private bool isMoving;
     private float stopTimer;
+    private float footstepTimer;
+    private bool wasMovingThisFrame;
 
     public bool IsCurrentlyMoving => inputMoveDir.sqrMagnitude > 0.01f;
 
@@ -32,6 +38,9 @@ public class PlayerMove : MonoBehaviour
         {
             inputMoveDir = Vector2.zero;
             stopTimer = 0f;
+            footstepTimer = 0f;
+            wasMovingThisFrame = false;
+            StopFootstepAudio();
             FreezeAtCurrentDirection();
             return;
         }
@@ -52,6 +61,8 @@ public class PlayerMove : MonoBehaviour
             inputMoveDir = new Vector2(h, 0);
         }
 
+        wasMovingThisFrame = inputMoveDir.sqrMagnitude > 0.01f;
+
         if (inputMoveDir.sqrMagnitude > 0.01f)
         {
             // 有输入：更新朝向并正常播放动画
@@ -64,6 +75,7 @@ public class PlayerMove : MonoBehaviour
             // 让短按也能在本帧立刻评估方向切换，避免“点一下来不及转向”
             anim.Update(0f);
             isMoving = true;
+            UpdateFootstepAudio();
         }
         else
         {
@@ -74,10 +86,13 @@ public class PlayerMove : MonoBehaviour
                 anim.SetFloat("MoveX", lastMoveDir.x);
                 anim.SetFloat("MoveY", lastMoveDir.y);
                 anim.speed = 1f;
+                StopFootstepAudio();
             }
             else
             {
                 // 缓冲结束后，停在最后朝向的第1帧
+                footstepTimer = 0f;
+                StopFootstepAudio();
                 FreezeAtCurrentDirection();
             }
         }
@@ -92,7 +107,30 @@ public class PlayerMove : MonoBehaviour
     {
         inputMoveDir = Vector2.zero;
         stopTimer = 0f;
+        footstepTimer = 0f;
+        wasMovingThisFrame = false;
+        StopFootstepAudio();
         FreezeAtCurrentDirection();
+    }
+
+    private void UpdateFootstepAudio()
+    {
+        if (footstepClip == null || !wasMovingThisFrame)
+        {
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer > 0f) return;
+
+        AudioManager.EnsureInstance().PlayFootstep(footstepClip, footstepVolume);
+        footstepTimer = Mathf.Max(0.05f, footstepInterval);
+    }
+
+    private void StopFootstepAudio()
+    {
+        if (AudioManager.Instance == null) return;
+        AudioManager.Instance.StopFootstep();
     }
 
     private void FreezeAtCurrentDirection()

@@ -130,7 +130,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: -150, y: 0}
-  m_SizeDelta: {x: 250, y: 200}
+  m_SizeDelta: {x: 250, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2145058059631283745
 CanvasRenderer:
@@ -332,6 +332,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  useTypewriterEffect: 1
+  charactersPerSecond: 20
+  commaPauseSeconds: 0.12
+  periodPauseSeconds: 0.22
+  ellipsisDotPauseSeconds: 0.16
+  ellipsisEndPauseSeconds: 0.4
+  defaultTypingSfx: {fileID: 8300000, guid: 80f3c26443928774999814cd3c903c2b, type: 3}
+  defaultTypingSfxVolume: 0.6
+  defaultQuotedTypingSfx: {fileID: 0}
+  defaultQuotedTypingSfxVolume: 0.2
   player: {fileID: 0}
   dialogueImagePanel: {fileID: 636114567980585239}
   dialogueImage: {fileID: 15512942441953461}
@@ -519,6 +529,11 @@ MonoBehaviour:
   options:
   - {fileID: 8591845319697067426}
   cursor: {fileID: 753718361479494199}
+  maxOptions: 4
+  minPanelHeight: 120
+  panelPaddingTop: 20
+  panelPaddingBottom: 20
+  optionLineGap: 20
   player: {fileID: 0}
 --- !u!1 &2214405500509646459
 GameObject:

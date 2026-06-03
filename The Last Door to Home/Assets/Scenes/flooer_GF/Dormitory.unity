@@ -138,6 +138,111 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &446790070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 446790071}
+  - component: {fileID: 446790073}
+  - component: {fileID: 446790072}
+  m_Layer: 0
+  m_Name: picture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &446790071
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446790070}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.83, y: 5.74, z: 647.9085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1999931943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &446790072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446790070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c32c00f83df28a349973c5a0fdf4608d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogues:
+  - 'A painting drawn by Jeff.
+
+    It looks like a real window that you can see
+    the natural beauty outside.'
+  - ... that make you feel homesick.
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}
+--- !u!212 &446790073
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446790070}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: -547207886, guid: c016052e8ef278249bdce19de1c9c285, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1.53125, y: 0.75}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &456444755
 GameObject:
   m_ObjectHideFlags: 0
@@ -2494,7 +2599,7 @@ Transform:
   m_GameObject: {fileID: 517538978}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.0572596, y: 4.5306845, z: 0}
+  m_LocalPosition: {x: -0.15100953, y: 4.5306845, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2606,6 +2711,7 @@ GameObject:
   - component: {fileID: 804135057}
   - component: {fileID: 804135056}
   - component: {fileID: 804135059}
+  - component: {fileID: 804135060}
   m_Layer: 0
   m_Name: desk_closet_Kian
   m_TagString: Untagged
@@ -2724,7 +2830,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.07954919, y: -0.9333765}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2735,7 +2841,52 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.28125, y: 3.4375}
+  m_Size: {x: 1.4403484, y: 1.570747}
+  m_EdgeRadius: 0
+--- !u!61 &804135060
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804135055}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.13788497, y: 0.38183594}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.28125, y: 3.4375}
+    newSize: {x: 1.28125, y: 3.4375}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.00548, y: 2.6738281}
   m_EdgeRadius: 0
 --- !u!1 &846272416
 GameObject:
@@ -3817,6 +3968,7 @@ GameObject:
   - component: {fileID: 1080931761}
   - component: {fileID: 1080931760}
   - component: {fileID: 1080931762}
+  - component: {fileID: 1080931763}
   m_Layer: 0
   m_Name: bed
   m_TagString: decoration
@@ -3948,6 +4100,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2.09375, y: 2.0625}
   m_EdgeRadius: 0
+--- !u!114 &1080931763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080931758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c32c00f83df28a349973c5a0fdf4608d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogues:
+  - "The bed. Jeff slept on the upper bunk.\n Why Jeff never fall from it?"
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}
 --- !u!114 &1302717595 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 643744353654708271, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
@@ -4286,13 +4454,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12bda9079a779043a1f7f32ebec09d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &1329084534
-BoxCollider:
+--- !u!61 &1329084534
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1329084529}
+  m_Enabled: 1
+  m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4301,12 +4471,34 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.5625, y: 0.8125, z: 0.2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.5625, y: 0.8125}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.5625, y: 0.8125}
+  m_EdgeRadius: 0
 --- !u!1 &1408520866
 GameObject:
   m_ObjectHideFlags: 0
@@ -4325,7 +4517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1408520867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4542,7 +4734,7 @@ Transform:
   m_GameObject: {fileID: 1544284856}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.3072596, y: 4.9994345, z: 0}
+  m_LocalPosition: {x: 1.1614904, y: 5.0931845, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4711,26 +4903,26 @@ MonoBehaviour:
   foundDialogues:
   - Your pager. You always bring it with you.
   - Seems there is already a message for you. Play it?
-  playRecordingOptionText: play
+  playRecordingOptionText: Play
   afterPlayRecordingDialogues:
   - '"...Kian, if you can hear this, take a breath first."'
   - It is Amelia! Thanks god!
   - Although you really want to enjoy the sense of peace brought by your lover's
     voice for a little longer, you must focus your attention on listening right now.
-  - "\"...You may not remember everything right away. That\u2019s normal. There was
-    an accident during the portal launch.\nNo one knows what exactly happened, but
-    the portal seems been used and now we don't have enough enery stone to lanch
-    it again\""
+  - '"...You may not remember everything.  There was an accident during the portal
+    launch.
+
+    No one knows what exactly happened, but the portal seems been used
+    and now we don''t have enough enery stone to lanch it again"'
   - "\u201DMeanwhile, we found one person is missing ... that's Jeff.\u201C"
   - '"We didn''t find him in the base.
 
     And You are the one in a coma for the
     longest time. So we left you in the base."'
-  - "\"...I know it is a strange thing but,\nthe worst case is that Jeff betrays
-    us and leaves through the portal by himself.\u201C"
-  - "\u201DIf you wake up, take a rest, then come and find us. We are searching for
-    new enery stones outside the base.\u201C"
+  - "\u201D...I know it is a strange thing but, if you wake up, take a rest, then
+    come and find us. We are searching for new enery stones outside the base.\u201C"
   - "\u201DWe are still going home.\u201C"
+  - ...
   - ...Jeff?
   - Althouth he is your roommate, you could hardly see him, so still now, you don't
     know much about Jeff.
@@ -4745,8 +4937,11 @@ MonoBehaviour:
     bgmOnCompleteFadeOutDuration: 1
     bgmOnCompleteFadeInDuration: 1
     bgmOnCompleteVolume: 1
-    lineSfx: {fileID: 0}
-    lineSfxVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 8300000, guid: 94b9d45a44e47b54a8bd29acb2b84928, type: 3}
+    quotedTypingSfxVolume: 0.8
 --- !u!61 &1625645189
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4803,7 +4998,6 @@ GameObject:
   - component: {fileID: 1646473446}
   - component: {fileID: 1646473447}
   - component: {fileID: 1646473449}
-  - component: {fileID: 1646473448}
   m_Layer: 0
   m_Name: ID_card_Jeff
   m_TagString: Untagged
@@ -4820,7 +5014,7 @@ Transform:
   m_GameObject: {fileID: 1646473445}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.65, y: 2.38, z: 0}
+  m_LocalPosition: {x: 1.16, y: 4.71, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4841,66 +5035,17 @@ MonoBehaviour:
   itemUniqueID: ID_card_Jeff
   itemName: Jeff's ID card
   itemType: 0
-  prePickDialogues: []
-  pickOptionText: Pick Up
+  prePickDialogues:
+  - Jeff's closet. It is empty ... wait, you see his ID card laying at the bottom
+    layer.
+  - Now Jeff is the prime suspect. You can take his things and investigate them.
+  pickOptionText: Pick it
   leaveOptionText: Leave
   afterPickOptionDialogues:
   - You got Jeff's ID card.
   - How did he leave this thing here?
   afterLeaveOptionDialogues:
-  - You left it there.
---- !u!212 &1646473448
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1646473445}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5657b0e86d4587746b9c3556db91b61d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  - You left it there. You can come back and get it at any time.
 --- !u!61 &1646473449
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4973,11 +5118,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.68225956
+      value: -0.49475953
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.3119345
+      value: 5.3431845
       objectReference: {fileID: 0}
     - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5050,7 +5195,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1823307919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5063,20 +5208,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b13c41917672c8946b32a6a30be404b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  safeUniqueID: safe_01
+  safeUniqueID: safe
   correctPassword: 1000
   lockedDialogues:
-  - That is a safe. It is locked.
-  - ...You never see Jeff use this safe before, what could be in it?
+  - Jeff's desk. The drawer is locked.
+  - ...You never see Jeff use this drawer before, what could be in it?
   wrongPasswordDialogues:
   - Nothing happened. The password is wrong.
   unlockedDialogues:
-  - With a crisp metallic sound, the safe opened.
-  - A soft and dazzling blue light burst forth immediately. You could see the true
-    appearance inside untill you fully opened the safe door.
+  - With a crisp metallic sound, you open the drawer.
   - It is ... an enery stone?!
   afterLootDialogues:
-  - It is empty.
+  - You took the stone. It is empty now.
   rewardItem: {fileID: 1942549430}
   passwordPanel: {fileID: 48762075}
   digitTexts:
@@ -5120,9 +5263,9 @@ BoxCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
+    border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.16, y: 0.16}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -5172,7 +5315,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8f03b3733259a6041b5b08f59b3b1c5b, type: 3}
+  m_Sprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -5192,8 +5335,8 @@ Transform:
   m_GameObject: {fileID: 1823307918}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.02, y: 3.73, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.13, y: 4.32, z: 0}
+  m_LocalScale: {x: 1.1786, y: 0.6964, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1999931943}
@@ -5483,6 +5626,7 @@ Transform:
   - {fileID: 1408520869}
   - {fileID: 804135058}
   - {fileID: 985597425}
+  - {fileID: 446790071}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2068016165
@@ -5493,14 +5637,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 589911008920275296, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 980536457221070690, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.3813709
@@ -5540,14 +5676,6 @@ PrefabInstance:
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2167586844562587051, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171236740293333972, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3974275403115473221, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_Camera
@@ -5633,6 +5761,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SwitchScene
       objectReference: {fileID: 0}
+    - target: {fileID: 7641030584106298265, guid: 201e54f9d6b22f543815b1cdde3520e2, type: 3}
+      propertyPath: sceneSwitchSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: c2860eef12a1b5f4eba1163f802e55e5, type: 3}
     - target: {fileID: 7641030584106298265, guid: 201e54f9d6b22f543815b1cdde3520e2, type: 3}
       propertyPath: targetSceneName
       value: Corridor1

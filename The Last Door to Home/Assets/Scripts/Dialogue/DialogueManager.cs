@@ -21,9 +21,15 @@ public class DialogueManager : MonoBehaviour
 
     [Header("打字机效果")]
     [SerializeField] private bool useTypewriterEffect = true;
-    [SerializeField] private float charactersPerSecond = 28f;
+    [SerializeField] private float charactersPerSecond = 20f;
+    [SerializeField] private float commaPauseSeconds = 0.12f;
+    [SerializeField] private float periodPauseSeconds = 0.22f;
+    [SerializeField] private float ellipsisDotPauseSeconds = 0.16f;
+    [SerializeField] private float ellipsisEndPauseSeconds = 0.4f;
     [SerializeField] private AudioClip defaultTypingSfx;
     [SerializeField] [Range(0f, 1f)] private float defaultTypingSfxVolume = 0.2f;
+    [SerializeField] private AudioClip defaultQuotedTypingSfx;
+    [SerializeField] [Range(0f, 1f)] private float defaultQuotedTypingSfxVolume = 0.2f;
 
     [Header("玩家控制（拖Player物体）")]
     public GameObject player;
@@ -622,9 +628,17 @@ public class DialogueManager : MonoBehaviour
         int totalCharacters = line.Length;
         float interval = 1f / Mathf.Max(1f, charactersPerSecond);
         float elapsed = 0f;
+        float pendingPause = 0f;
 
         while (visibleCount < totalCharacters)
         {
+            if (pendingPause > 0f)
+            {
+                pendingPause -= Time.unscaledDeltaTime;
+                yield return null;
+                continue;
+            }
+
             elapsed += Time.unscaledDeltaTime;
 
             while (elapsed >= interval && visibleCount < totalCharacters)
@@ -632,6 +646,13 @@ public class DialogueManager : MonoBehaviour
                 elapsed -= interval;
                 visibleCount++;
                 dialogueText.maxVisibleCharacters = visibleCount;
+
+                float punctuationPause = GetPauseAfterCharacter(line, visibleCount - 1);
+                if (punctuationPause > 0f)
+                {
+                    pendingPause = punctuationPause;
+                    break;
+                }
             }
 
             yield return null;
@@ -670,15 +691,12 @@ public class DialogueManager : MonoBehaviour
 
     private void StartTypingSfx()
     {
-        AudioClip clip = activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null
-            ? activeDialogueAudioSettings.typingSfx
-            : defaultTypingSfx;
+        bool isQuotedLine = IsQuotedLine(GetCurrentDialogueLine());
+        AudioClip clip = ResolveTypingClip(isQuotedLine);
 
         if (clip == null) return;
 
-        float volume = activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null
-            ? activeDialogueAudioSettings.typingSfxVolume
-            : defaultTypingSfxVolume;
+        float volume = ResolveTypingVolume(isQuotedLine);
 
         AudioManager.EnsureInstance().PlayTypingLoop(clip, volume);
     }
@@ -687,6 +705,153 @@ public class DialogueManager : MonoBehaviour
     {
         if (AudioManager.Instance == null) return;
         AudioManager.Instance.StopTypingLoop();
+    }
+
+    private string GetCurrentDialogueLine()
+    {
+        if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
+        {
+            return string.Empty;
+        }
+
+        return currentDialogues[dialogueIndex] ?? string.Empty;
+    }
+
+    private bool IsQuotedLine(string line)
+    {
+        if (string.IsNullOrEmpty(line)) return false;
+
+        return line.Contains("\"") ||
+               line.Contains("“") ||
+               line.Contains("”") ||
+               line.Contains("「") ||
+               line.Contains("」") ||
+               line.Contains("『") ||
+               line.Contains("』");
+    }
+
+    private AudioClip ResolveTypingClip(bool isQuotedLine)
+    {
+        if (isQuotedLine)
+        {
+            if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.quotedTypingSfx != null)
+            {
+                return activeDialogueAudioSettings.quotedTypingSfx;
+            }
+
+            if (defaultQuotedTypingSfx != null)
+            {
+                return defaultQuotedTypingSfx;
+            }
+        }
+
+        if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null)
+        {
+            return activeDialogueAudioSettings.typingSfx;
+        }
+
+        return defaultTypingSfx;
+    }
+
+    private float ResolveTypingVolume(bool isQuotedLine)
+    {
+        if (isQuotedLine)
+        {
+            if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.quotedTypingSfx != null)
+            {
+                return activeDialogueAudioSettings.quotedTypingSfxVolume;
+            }
+
+            if (defaultQuotedTypingSfx != null)
+            {
+                return defaultQuotedTypingSfxVolume;
+            }
+        }
+
+        if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null)
+        {
+            return activeDialogueAudioSettings.typingSfxVolume;
+        }
+
+        return defaultTypingSfxVolume;
+    }
+
+    private float GetPauseAfterCharacter(string line, int charIndex)
+    {
+        if (string.IsNullOrEmpty(line) || charIndex < 0 || charIndex >= line.Length)
+        {
+            return 0f;
+        }
+
+        char current = line[charIndex];
+
+        if (IsEllipsisDot(line, charIndex, out bool isEllipsisEnd))
+        {
+            return Mathf.Max(0f, isEllipsisEnd ? ellipsisEndPauseSeconds : ellipsisDotPauseSeconds);
+        }
+
+        if (current == ',' || current == '，')
+        {
+            return Mathf.Max(0f, commaPauseSeconds);
+        }
+
+        if (IsStandalonePeriod(line, charIndex))
+        {
+            return Mathf.Max(0f, periodPauseSeconds);
+        }
+
+        return 0f;
+    }
+
+    private bool IsStandalonePeriod(string line, int charIndex)
+    {
+        char current = line[charIndex];
+        if (current != '.' && current != '。')
+        {
+            return false;
+        }
+
+        if (current == '.')
+        {
+            bool prevIsDot = charIndex > 0 && line[charIndex - 1] == '.';
+            bool nextIsDot = charIndex < line.Length - 1 && line[charIndex + 1] == '.';
+            if (prevIsDot || nextIsDot)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool IsEllipsisDot(string line, int charIndex, out bool isEllipsisEnd)
+    {
+        isEllipsisEnd = false;
+        char current = line[charIndex];
+
+        if (current == '…')
+        {
+            bool nextIsEllipsis = charIndex < line.Length - 1 && line[charIndex + 1] == '…';
+            isEllipsisEnd = !nextIsEllipsis;
+            return true;
+        }
+
+        if (current != '.')
+        {
+            return false;
+        }
+
+        bool prevIsDot = charIndex > 0 && line[charIndex - 1] == '.';
+        bool nextIsDot = charIndex < line.Length - 1 && line[charIndex + 1] == '.';
+        bool isPartOfEllipsis = prevIsDot || nextIsDot;
+
+        if (!isPartOfEllipsis)
+        {
+            return false;
+        }
+
+        isEllipsisEnd = !nextIsDot;
+        return true;
     }
 
 }

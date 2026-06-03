@@ -5981,6 +5981,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 585856128}
+    - target: {fileID: 7126057631249220050, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: defaultQuotedTypingSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 94b9d45a44e47b54a8bd29acb2b84928, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

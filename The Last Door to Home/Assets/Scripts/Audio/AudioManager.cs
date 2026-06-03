@@ -13,6 +13,7 @@ public class AudioManager : MonoBehaviour
     private AudioSource bgmSource;
     private AudioSource sfxSource;
     private AudioSource typingSource;
+    private AudioSource footstepSource;
     private Coroutine bgmRoutine;
 
     public AudioClip CurrentBgmClip => bgmSource != null ? bgmSource.clip : null;
@@ -48,7 +49,7 @@ public class AudioManager : MonoBehaviour
 
     private void Initialize()
     {
-        if (bgmSource != null && sfxSource != null && typingSource != null)
+        if (bgmSource != null && sfxSource != null && typingSource != null && footstepSource != null)
         {
             DontDestroyOnLoad(gameObject);
             return;
@@ -59,10 +60,12 @@ public class AudioManager : MonoBehaviour
         bgmSource = GetOrCreateSource("BGM", true);
         sfxSource = GetOrCreateSource("SFX", false);
         typingSource = GetOrCreateSource("TypingSFX", true);
+        footstepSource = GetOrCreateSource("FootstepSFX", false);
 
         bgmSource.volume = defaultBgmVolume;
         sfxSource.volume = defaultSfxVolume;
         typingSource.volume = defaultSfxVolume;
+        footstepSource.volume = defaultSfxVolume;
     }
 
     private AudioSource GetOrCreateSource(string childName, bool loop)
@@ -160,6 +163,31 @@ public class AudioManager : MonoBehaviour
         typingSource.Stop();
         typingSource.clip = null;
         typingSource.pitch = 1f;
+    }
+
+    public void PlayFootstep(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
+    {
+        Initialize();
+
+        if (clip == null) return;
+        if (footstepSource.isPlaying) return;
+
+        footstepSource.clip = clip;
+        footstepSource.volume = Mathf.Clamp01(volumeScale);
+        footstepSource.pitch = pitch;
+        footstepSource.loop = false;
+        footstepSource.Play();
+    }
+
+    public void StopFootstep()
+    {
+        Initialize();
+
+        if (!footstepSource.isPlaying) return;
+
+        footstepSource.Stop();
+        footstepSource.clip = null;
+        footstepSource.pitch = 1f;
     }
 
     private IEnumerator SwitchBgmRoutine(AudioClip nextClip, float fadeOutDuration, float targetVolume)

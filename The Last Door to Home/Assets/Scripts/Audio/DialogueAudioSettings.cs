@@ -20,4 +20,8 @@ public class DialogueAudioSettings
     public AudioClip typingSfx;
     [Range(0f, 1f)] public float typingSfxVolume = 0.25f;
     [Min(1)] public int typingSfxEveryNCharacters = 2;
+
+    [Header("双引号内容专用音效（可空）")]
+    public AudioClip quotedTypingSfx;
+    [Range(0f, 1f)] public float quotedTypingSfxVolume = 0.25f;
 }
