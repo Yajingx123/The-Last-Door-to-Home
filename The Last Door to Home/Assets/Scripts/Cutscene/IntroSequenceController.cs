@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
@@ -26,11 +25,15 @@ public class IntroSequenceController : MonoBehaviour
     [Header("Flow")]
     public string nextSceneName;
     [SerializeField] private float fadeDuration = 0.35f;
+    [SerializeField] private bool useTypewriterEffect = true;
+    [SerializeField] private float charactersPerSecond = 28f;
 
     private int currentIndex;
     private bool isTransitioning;
+    private bool isTypingCaption;
     private int sceneStartFrame = -1;
     private float configuredImageHeight = -1f;
+    private Coroutine captionTypeRoutine;
 
     void Start()
     {
@@ -61,6 +64,12 @@ public class IntroSequenceController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
         {
+            if (isTypingCaption)
+            {
+                CompleteCaptionInstantly();
+                return;
+            }
+
             StartCoroutine(AdvanceSlide());
         }
     }
@@ -97,7 +106,7 @@ public class IntroSequenceController : MonoBehaviour
 
         if (captionText != null)
         {
-            captionText.text = slide.caption ?? string.Empty;
+            ShowCaption(slide.caption ?? string.Empty);
         }
     }
 
@@ -131,7 +140,7 @@ public class IntroSequenceController : MonoBehaviour
             return;
         }
 
-        SceneManager.LoadScene(nextSceneName);
+        SceneTransition.LoadScene(nextSceneName);
     }
 
     private void OnRectTransformDimensionsChange()
@@ -187,5 +196,76 @@ public class IntroSequenceController : MonoBehaviour
         {
             configuredImageHeight = height;
         }
+    }
+
+    private void ShowCaption(string caption)
+    {
+        if (captionText == null)
+        {
+            return;
+        }
+
+        if (captionTypeRoutine != null)
+        {
+            StopCoroutine(captionTypeRoutine);
+            captionTypeRoutine = null;
+        }
+
+        captionText.text = caption;
+        captionText.maxVisibleCharacters = 0;
+        captionText.ForceMeshUpdate();
+
+        if (!useTypewriterEffect || string.IsNullOrEmpty(caption))
+        {
+            captionText.maxVisibleCharacters = int.MaxValue;
+            isTypingCaption = false;
+            return;
+        }
+
+        captionTypeRoutine = StartCoroutine(TypeCaptionRoutine(caption));
+    }
+
+    private IEnumerator TypeCaptionRoutine(string caption)
+    {
+        isTypingCaption = true;
+        int visibleCount = 0;
+        int totalCharacters = caption.Length;
+        float interval = 1f / Mathf.Max(1f, charactersPerSecond);
+        float elapsed = 0f;
+
+        while (visibleCount < totalCharacters)
+        {
+            elapsed += Time.unscaledDeltaTime;
+
+            while (elapsed >= interval && visibleCount < totalCharacters)
+            {
+                elapsed -= interval;
+                visibleCount++;
+                captionText.maxVisibleCharacters = visibleCount;
+            }
+
+            yield return null;
+        }
+
+        captionText.maxVisibleCharacters = int.MaxValue;
+        isTypingCaption = false;
+        captionTypeRoutine = null;
+    }
+
+    private void CompleteCaptionInstantly()
+    {
+        if (!isTypingCaption || captionText == null)
+        {
+            return;
+        }
+
+        if (captionTypeRoutine != null)
+        {
+            StopCoroutine(captionTypeRoutine);
+            captionTypeRoutine = null;
+        }
+
+        captionText.maxVisibleCharacters = int.MaxValue;
+        isTypingCaption = false;
     }
 }

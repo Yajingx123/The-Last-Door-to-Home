@@ -18,17 +18,6 @@ public static class Inventory
     private static HashSet<string> unlockedSafeIDs = new HashSet<string>();
     private static HashSet<string> unlockedDoorIDs = new HashSet<string>();
 
-    // 每次进游戏都强制清空！
-    static Inventory()
-    {
-        collectedIDs.Clear();
-        collectedItemNames.Clear();
-        collectedTypes.Clear();
-        unlockedSafeIDs.Clear();
-        unlockedDoorIDs.Clear();
-        StoryFlags.Clear();
-    }
-
     public static void AddItem(string name, ItemType type, string uniqueID)
     {
         if (!collectedIDs.Contains(uniqueID))

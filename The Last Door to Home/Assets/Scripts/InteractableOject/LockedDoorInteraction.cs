@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class LockedDoorInteraction : MonoBehaviour, IInteractable
 {
@@ -41,6 +40,10 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
 
     [Header("可尝试的Key选项")]
     public DoorKeyOption[] keyOptions;
+
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     private bool isUnlocked;
 
@@ -140,9 +143,16 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
     private void SwitchSceneNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
-        PlayerSpawn.SPAWN_POSITION = spawnPosition;
-        PlayerSpawn.NEED_SPAWN = true;
-        SceneManager.LoadScene(targetSceneName);
+        if (sceneSwitchSfx != null)
+        {
+            AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+        }
+
+        SceneTransition.LoadScene(targetSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = spawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 
     private void OnTriggerEnter2D(Collider2D other)

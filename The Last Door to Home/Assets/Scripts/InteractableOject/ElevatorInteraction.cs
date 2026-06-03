@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class ElevatorInteraction : MonoBehaviour, IInteractable
 {
@@ -19,6 +18,10 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
 
     [Header("电梯选项")]
     public ElevatorOption[] options;
+
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     public void OnInteract()
     {
@@ -62,8 +65,15 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
     private void LoadScene(ElevatorOption option)
     {
         if (string.IsNullOrWhiteSpace(option.targetSceneName)) return;
-        PlayerSpawn.SPAWN_POSITION = option.spawnPosition;
-        PlayerSpawn.NEED_SPAWN = true;
-        SceneManager.LoadScene(option.targetSceneName);
+        if (sceneSwitchSfx != null)
+        {
+            AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+        }
+
+        SceneTransition.LoadScene(option.targetSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = option.spawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 }

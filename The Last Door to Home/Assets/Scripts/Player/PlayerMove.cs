@@ -14,6 +14,8 @@ public class PlayerMove : MonoBehaviour
     private bool isMoving;
     private float stopTimer;
 
+    public bool IsCurrentlyMoving => inputMoveDir.sqrMagnitude > 0.01f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();

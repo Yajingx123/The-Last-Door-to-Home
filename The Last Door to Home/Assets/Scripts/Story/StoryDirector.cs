@@ -250,7 +250,7 @@ public class StoryDirector : MonoBehaviour
             DialogueManager.Instance.ShowDialogueImage(beat.dialogueImageSprite);
         }
 
-        DialogueManager.Instance.ShowDialogue(lines);
+        DialogueManager.Instance.ShowDialogue(lines, null, null, null, beat != null ? beat.dialogueAudioSettings : null);
         return true;
     }
 

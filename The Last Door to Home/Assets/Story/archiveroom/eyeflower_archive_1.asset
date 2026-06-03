@@ -22,9 +22,11 @@ MonoBehaviour:
   - 111
   showDialogueImage: 1
   dialogueImageSprite: {fileID: 21300000, guid: fa08d21e40f3d8447b3a107cd4561a88, type: 3}
-  setFlagsOnPlay: []
+  setFlagsOnPlay:
+  - archive_done
   blockDefaultAction: 0
   useAttemptNarration: 0
+  allowRepeatForAttemptNarration: 0
   attemptCounterKey: 
   attemptDialogues: []
   clampToLastAttemptLine: 1

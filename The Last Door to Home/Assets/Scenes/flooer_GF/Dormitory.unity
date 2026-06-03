@@ -3613,6 +3613,55 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &907283670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 907283672}
+  - component: {fileID: 907283671}
+  m_Layer: 0
+  m_Name: BgmManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &907283671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907283670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48da43861c324a342bf32b46c3d36a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgmClip: {fileID: 8300000, guid: e4f96eb458b4bc64187cc1d2f22ae0ee, type: 3}
+  fadeOutDuration: 1
+  fadeInDuration: 1
+  volume: 1
+  restartIfSameClip: 0
+--- !u!4 &907283672
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907283670}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.009725401, y: 0.5274628, z: 1366.2848}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &985597422
 GameObject:
   m_ObjectHideFlags: 0
@@ -4573,7 +4622,7 @@ Transform:
   m_GameObject: {fileID: 1625645182}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.6197596, y: 1.3744347, z: 0}
+  m_LocalPosition: {x: -4.6197596, y: 1.3744347, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4687,6 +4736,17 @@ MonoBehaviour:
     know much about Jeff.
   - Anyway, find some clues about Jeff is the only thing you can do for your team
     right now.
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    lineSfx: {fileID: 0}
+    lineSfxVolume: 1
 --- !u!61 &1625645189
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5433,6 +5493,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 589911008920275296, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 980536457221070690, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.3813709
@@ -5472,6 +5540,14 @@ PrefabInstance:
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167586844562587051, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3171236740293333972, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3974275403115473221, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_Camera
@@ -5655,3 +5731,4 @@ SceneRoots:
   - {fileID: 1913702136}
   - {fileID: 1999931943}
   - {fileID: 1838058741}
+  - {fileID: 907283672}

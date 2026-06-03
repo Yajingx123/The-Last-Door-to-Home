@@ -24,6 +24,9 @@ public class PagerPhoneController : MonoBehaviour
     [TextArea(2, 8)]
     public string[] dontCallDialogues;
 
+    [Header("Pager 对话音频")]
+    public DialogueAudioSettings dialogueAudioSettings;
+
     private bool callMenuOpen;
 
     void Update()
@@ -76,6 +79,6 @@ public class PagerPhoneController : MonoBehaviour
     {
         if (DialogueManager.Instance == null) return;
         if (lines == null || lines.Length == 0) return;
-        DialogueManager.Instance.ShowDialogue(lines);
+        DialogueManager.Instance.ShowDialogue(lines, null, null, null, dialogueAudioSettings);
     }
 }

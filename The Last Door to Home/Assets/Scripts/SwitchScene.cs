@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
 public class SwitchScene : MonoBehaviour
 {
     [Header("目标场景")]
@@ -14,6 +12,10 @@ public class SwitchScene : MonoBehaviour
 
     [Header("拦截后再次触发冷却（秒）")]
     public float reTriggerCooldown = 0.25f;
+
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     private bool handledThisStay;
     private float nextAllowedTriggerTime;
@@ -60,10 +62,16 @@ public class SwitchScene : MonoBehaviour
     private void SwitchNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
+        if (sceneSwitchSfx != null)
+        {
+            AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+        }
 
-        PlayerSpawn.SPAWN_POSITION = spawnPosition;
-        PlayerSpawn.NEED_SPAWN = true;
-        SceneManager.LoadScene(targetSceneName);
+        SceneTransition.LoadScene(targetSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = spawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 
     private void OnTriggerExit2D(Collider2D other)

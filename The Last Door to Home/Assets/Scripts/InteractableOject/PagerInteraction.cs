@@ -21,6 +21,9 @@ public class PagerInteraction : MonoBehaviour, IInteractable
     [TextArea(2, 8)]
     public string[] afterPlayRecordingDialogues;
 
+    [Header("Pager 对话音频")]
+    public DialogueAudioSettings dialogueAudioSettings;
+
     private bool pickupInProgress;
 
     void Start()
@@ -43,7 +46,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
 
         if (foundDialogues != null && foundDialogues.Length > 0)
         {
-            DialogueManager.Instance.ShowDialogue(foundDialogues, null, ShowFirstChoiceMenu);
+            DialogueManager.Instance.ShowDialogue(foundDialogues, null, ShowFirstChoiceMenu, null, dialogueAudioSettings);
             return;
         }
 
@@ -80,7 +83,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
 
         if (lines != null && lines.Length > 0)
         {
-            DialogueManager.Instance.ContinueDialogueAfterOption(lines);
+            DialogueManager.Instance.ContinueDialogueAfterOption(lines, null, null, null, dialogueAudioSettings);
             StartCoroutine(FinalizePickupAfterDialogueClosed());
             return;
         }

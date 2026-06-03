@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
 
@@ -38,6 +37,10 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
 
     [Header("选项配置")]
     public ChoiceOption[] choices;
+
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     public void OnInteract()
     {
@@ -103,9 +106,16 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
     {
         if (choice.actionType == ChoiceActionType.LoadScene && !string.IsNullOrWhiteSpace(choice.targetSceneName))
         {
-            PlayerSpawn.SPAWN_POSITION = choice.spawnPosition;
-            PlayerSpawn.NEED_SPAWN = true;
-            SceneManager.LoadScene(choice.targetSceneName);
+            if (sceneSwitchSfx != null)
+            {
+                AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+            }
+
+            SceneTransition.LoadScene(choice.targetSceneName, () =>
+            {
+                PlayerSpawn.SPAWN_POSITION = choice.spawnPosition;
+                PlayerSpawn.NEED_SPAWN = true;
+            });
         }
     }
 }

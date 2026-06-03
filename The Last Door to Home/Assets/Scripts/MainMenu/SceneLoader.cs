@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
@@ -9,7 +8,7 @@ public class SceneLoader : MonoBehaviour
     // 跳转到指定场景（通过场景名）
     public void LoadScene(string sceneName)
     {
-        SceneManager.LoadScene(sceneName);
+        SceneTransition.LoadScene(sceneName);
     }
 
     // MainMenu 的 New Game 调用这个
@@ -21,7 +20,8 @@ public class SceneLoader : MonoBehaviour
             return;
         }
 
-        SceneManager.LoadScene(newGameSceneName);
+        Inventory.Clear();
+        SceneTransition.LoadScene(newGameSceneName);
     }
 
     // 退出游戏（仅打包后生效，编辑器中无效果）
