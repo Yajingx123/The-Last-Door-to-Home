@@ -1,4 +1,14 @@
 using UnityEngine;
+/*
+Purpose: Manages s wi tc hs ce ne behavior for this part of the game.
+Attached GameObject: Relevant scene controller GameObject.
+Main responsibilities: Coordinate inspector data, runtime checks, and the main behaviour handled by this script.
+Inputs: Inspector configuration, scene references, and runtime method calls.
+Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class SwitchScene : MonoBehaviour
 {
     [Header("目标场景")]
@@ -20,6 +30,7 @@ public class SwitchScene : MonoBehaviour
     private bool handledThisStay;
     private float nextAllowedTriggerTime;
 
+    // Handles trigger entry events for this gameplay object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
@@ -42,6 +53,7 @@ public class SwitchScene : MonoBehaviour
         SwitchNow();
     }
 
+    // Stops the player immediately before a forced scene transition.
     private void ForceStopPlayer(GameObject playerObj)
     {
         if (playerObj == null) return;
@@ -59,6 +71,7 @@ public class SwitchScene : MonoBehaviour
         }
     }
 
+    // Performs the actual scene switch once trigger conditions are satisfied.
     private void SwitchNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
@@ -74,6 +87,7 @@ public class SwitchScene : MonoBehaviour
         });
     }
 
+    // Handles trigger exit events for this gameplay object.
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;

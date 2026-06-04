@@ -1,6 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/*
+Purpose: Manages p ic ka bl ei te m behavior for this part of the game.
+Attached GameObject: Interactable scene object with collider and interaction logic.
+Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
+Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
+Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class PickableItem : MonoBehaviour, IInteractable
 {
     [Header("物品唯一ID")]
@@ -28,6 +38,7 @@ public class PickableItem : MonoBehaviour, IInteractable
     [TextArea(2, 6)]
     public string[] afterLeaveOptionDialogues;
 
+    // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
         // 只在本次游戏里判断是否拾取
@@ -37,6 +48,7 @@ public class PickableItem : MonoBehaviour, IInteractable
         }
     }
 
+    // Executes this object interaction when the player activates it.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null) return;
@@ -55,6 +67,7 @@ public class PickableItem : MonoBehaviour, IInteractable
         ShowPickOptionsMenu();
     }
 
+    // Performs the pickup logic for this collectible item.
     public void PickUp()
     {
         if (Inventory.HasCollected(itemUniqueID)) return;
@@ -63,6 +76,7 @@ public class PickableItem : MonoBehaviour, IInteractable
         gameObject.SetActive(false);
     }
 
+    // Shows the pickup option menu for this collectible item.
     public void ShowPickOptionsMenu()
     {
         if (OptionMenu.Instance == null || DialogueManager.Instance == null) return;
@@ -92,6 +106,7 @@ public class PickableItem : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
+    // Shows follow-up dialogue after an option result or closes the flow when needed.
     private void ShowDialogueAfterOptionOrClose(string[] lines)
     {
         if (DialogueManager.Instance == null) return;

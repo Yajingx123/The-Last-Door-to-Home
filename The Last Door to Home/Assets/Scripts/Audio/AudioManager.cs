@@ -1,6 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
+/*
+Purpose: Centralizes background music, one-shot audio, and looping dialogue or footstep sounds.
+Attached GameObject: Persistent audio manager GameObject.
+Main responsibilities: Configure or play audio content while keeping scene and UI feedback in sync.
+Inputs: Assigned clips, volume settings, and playback requests from other systems.
+Outputs or effects: Starts, stops, or configures audible feedback in the scene.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
@@ -18,6 +28,7 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip CurrentBgmClip => bgmSource != null ? bgmSource.clip : null;
 
+    // Returns the shared singleton instance, creating it if needed.
     public static AudioManager EnsureInstance()
     {
         if (Instance != null) return Instance;
@@ -35,6 +46,7 @@ public class AudioManager : MonoBehaviour
         return Instance;
     }
 
+    // Initializes cached references and one-time component state before gameplay begins.
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -47,6 +59,7 @@ public class AudioManager : MonoBehaviour
         Initialize();
     }
 
+    // Initializes the runtime resources needed by this manager.
     private void Initialize()
     {
         if (bgmSource != null && sfxSource != null && typingSource != null && footstepSource != null)
@@ -68,6 +81,7 @@ public class AudioManager : MonoBehaviour
         footstepSource.volume = defaultSfxVolume;
     }
 
+    // Returns an audio source for the requested purpose, creating one if needed.
     private AudioSource GetOrCreateSource(string childName, bool loop)
     {
         Transform child = transform.Find(childName);
@@ -86,6 +100,7 @@ public class AudioManager : MonoBehaviour
         return source;
     }
 
+    // Starts or switches background music playback with the configured fade settings.
     public void PlayBgm(AudioClip clip, float fadeOutDuration = -1f, float fadeInDuration = -1f, float targetVolume = -1f, bool restartIfSameClip = false)
     {
         Initialize();
@@ -107,6 +122,7 @@ public class AudioManager : MonoBehaviour
         bgmRoutine = StartCoroutine(SwitchBgmRoutine(clip, resolvedFadeOut, resolvedVolume));
     }
 
+    // Stops the active background music with the requested fade-out.
     public void StopBgm(float fadeOutDuration = -1f)
     {
         Initialize();
@@ -120,6 +136,7 @@ public class AudioManager : MonoBehaviour
         bgmRoutine = StartCoroutine(SwitchBgmRoutine(null, resolvedFadeOut, 0f));
     }
 
+    // Plays a one-shot sound effect through the shared audio manager.
     public void PlaySfx(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
     {
         Initialize();
@@ -131,6 +148,7 @@ public class AudioManager : MonoBehaviour
         sfxSource.pitch = 1f;
     }
 
+    // Starts the looping typing audio used during text reveal.
     public void PlayTypingLoop(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
     {
         Initialize();
@@ -154,6 +172,7 @@ public class AudioManager : MonoBehaviour
         typingSource.Play();
     }
 
+    // Stops the looping typing audio if it is currently playing.
     public void StopTypingLoop()
     {
         Initialize();
@@ -165,6 +184,7 @@ public class AudioManager : MonoBehaviour
         typingSource.pitch = 1f;
     }
 
+    // Plays the configured footstep sound effect.
     public void PlayFootstep(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
     {
         Initialize();
@@ -179,6 +199,7 @@ public class AudioManager : MonoBehaviour
         footstepSource.Play();
     }
 
+    // Stops the active footstep playback channel.
     public void StopFootstep()
     {
         Initialize();
@@ -190,6 +211,7 @@ public class AudioManager : MonoBehaviour
         footstepSource.pitch = 1f;
     }
 
+    // Runs the music switch routine between two background tracks.
     private IEnumerator SwitchBgmRoutine(AudioClip nextClip, float fadeOutDuration, float targetVolume)
     {
         if (bgmSource.isPlaying && bgmSource.clip != null)
@@ -211,6 +233,7 @@ public class AudioManager : MonoBehaviour
         bgmRoutine = null;
     }
 
+    // Fades the current background music source toward the target volume.
     private IEnumerator FadeBgm(float from, float to, float duration)
     {
         float safeDuration = Mathf.Max(0.01f, duration);

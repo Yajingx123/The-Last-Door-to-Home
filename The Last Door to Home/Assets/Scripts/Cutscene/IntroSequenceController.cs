@@ -4,6 +4,16 @@ using TMPro;
 using System;
 using System.Collections;
 
+/*
+Purpose: Manages i nt ro se qu en ce co nt ro ll er behavior for this part of the game.
+Attached GameObject: Cutscene controller GameObject.
+Main responsibilities: Sequence cutscene presentation, timing, and related audiovisual cues.
+Inputs: Inspector configuration, scene references, and runtime method calls.
+Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class IntroSequenceController : MonoBehaviour
 {
     [Serializable]
@@ -25,6 +35,7 @@ public class IntroSequenceController : MonoBehaviour
     [Header("Flow")]
     public string nextSceneName;
     [SerializeField] private float fadeDuration = 0.35f;
+    [SerializeField] private float imageFadeDuration = 0.45f;
     [SerializeField] private bool useTypewriterEffect = true;
     [SerializeField] private float charactersPerSecond = 28f;
 
@@ -35,6 +46,7 @@ public class IntroSequenceController : MonoBehaviour
     private float configuredImageHeight = -1f;
     private Coroutine captionTypeRoutine;
 
+    // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
         sceneStartFrame = Time.frameCount;
@@ -52,11 +64,14 @@ public class IntroSequenceController : MonoBehaviour
             contentCanvasGroup.alpha = 0f;
         }
 
+        SetSlideImageAlpha(0f);
+
         currentIndex = 0;
         ApplySlide(currentIndex);
-        StartCoroutine(FadeContent(0f, 1f));
+        StartCoroutine(FadeInOpeningSlide());
     }
 
+    // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
         if (isTransitioning) return;
@@ -74,11 +89,12 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
+    // Advances the intro sequence to the next configured slide.
     private IEnumerator AdvanceSlide()
     {
         isTransitioning = true;
 
-        yield return FadeContent(1f, 0f);
+        yield return FadeOutCurrentSlide();
 
         currentIndex++;
         if (currentIndex >= slides.Length)
@@ -88,11 +104,12 @@ public class IntroSequenceController : MonoBehaviour
         }
 
         ApplySlide(currentIndex);
-        yield return FadeContent(0f, 1f);
+        yield return FadeInCurrentSlide();
 
         isTransitioning = false;
     }
 
+    // Applies the current slide visuals, text, and related presentation state.
     private void ApplySlide(int index)
     {
         IntroSlide slide = slides[index];
@@ -110,6 +127,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
+    // Fades the cutscene content group over the requested duration.
     private IEnumerator FadeContent(float from, float to)
     {
         if (contentCanvasGroup == null)
@@ -132,6 +150,73 @@ public class IntroSequenceController : MonoBehaviour
         contentCanvasGroup.alpha = to;
     }
 
+    // Fades in the opening slide content and image together.
+    private IEnumerator FadeInOpeningSlide()
+    {
+        yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
+    }
+
+    // Fades out the currently displayed slide before switching to the next one.
+    private IEnumerator FadeOutCurrentSlide()
+    {
+        yield return StartCoroutine(FadeCurrentSlide(1f, 0f));
+    }
+
+    // Fades in the newly applied slide after the sprite and caption have updated.
+    private IEnumerator FadeInCurrentSlide()
+    {
+        yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
+    }
+
+    // Fades the slide image and content alpha together for a smoother scene transition.
+    private IEnumerator FadeCurrentSlide(float from, float to)
+    {
+        IEnumerator contentFade = FadeContent(from, to);
+        IEnumerator imageFade = FadeSlideImage(from, to);
+
+        while (contentFade.MoveNext() | imageFade.MoveNext())
+        {
+            yield return null;
+        }
+    }
+
+    // Fades only the slide image alpha to create a visible dimming effect during image changes.
+    private IEnumerator FadeSlideImage(float from, float to)
+    {
+        if (slideImage == null)
+        {
+            yield break;
+        }
+
+        float duration = Mathf.Max(0.01f, imageFadeDuration);
+        float elapsed = 0f;
+        SetSlideImageAlpha(from);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            SetSlideImageAlpha(Mathf.Lerp(from, to, t));
+            yield return null;
+        }
+
+        SetSlideImageAlpha(to);
+    }
+
+    // Applies the requested alpha directly to the current slide image color.
+    private void SetSlideImageAlpha(float alpha)
+    {
+        if (slideImage == null)
+        {
+            return;
+        }
+
+        Color color = slideImage.color;
+        color.a = Mathf.Clamp01(alpha);
+        slideImage.color = color;
+    }
+
+    // Loads the next configured scene after the intro sequence finishes.
     private void LoadNextScene()
     {
         if (string.IsNullOrWhiteSpace(nextSceneName))
@@ -143,6 +228,7 @@ public class IntroSequenceController : MonoBehaviour
         SceneTransition.LoadScene(nextSceneName);
     }
 
+    // Refreshes layout-sensitive visuals after the rect transform changes size.
     private void OnRectTransformDimensionsChange()
     {
         if (slideImage != null && slideImage.sprite != null)
@@ -155,6 +241,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
+    // Fits the intro image to the currently available layout height.
     private void FitImageToAvailableHeight()
     {
         if (slideImage == null || slideImage.sprite == null)
@@ -184,6 +271,7 @@ public class IntroSequenceController : MonoBehaviour
         imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
     }
 
+    // Caches the configured image height used by the cutscene layout.
     private void CacheConfiguredImageHeight()
     {
         if (slideImage == null)
@@ -198,6 +286,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
+    // Shows the current intro caption and starts its reveal flow.
     private void ShowCaption(string caption)
     {
         if (captionText == null)
@@ -225,6 +314,7 @@ public class IntroSequenceController : MonoBehaviour
         captionTypeRoutine = StartCoroutine(TypeCaptionRoutine(caption));
     }
 
+    // Reveals the intro caption text over time with the configured typing effect.
     private IEnumerator TypeCaptionRoutine(string caption)
     {
         isTypingCaption = true;
@@ -252,6 +342,7 @@ public class IntroSequenceController : MonoBehaviour
         captionTypeRoutine = null;
     }
 
+    // Completes the current caption immediately without waiting for typing.
     private void CompleteCaptionInstantly()
     {
         if (!isTypingCaption || captionText == null)

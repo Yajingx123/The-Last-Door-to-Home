@@ -385,16 +385,31 @@ MonoBehaviour:
   slides:
   - image: {fileID: 21300000, guid: 7d6c32a73d9a78342a88bf270e06a66c, type: 3}
     caption: You and your colleagues work in a dangerous world full of strange creatures,
-      where it is perilous and desolate, and inhabited by alien creatures that cannot
-      be precisely defined.
-  - image: {fileID: 21300000, guid: 8f03b3733259a6041b5b08f59b3b1c5b, type: 3}
-    caption: After a long exploration, you have finally completed the research. All
-      the materials have been successfully sent back to the headquarters.
+      where it is perilous and desolate, and inhabited by alien creatures that are
+      not been precisely defined.
+  - image: {fileID: 21300000, guid: 1b7edbdfcac37d84f98f075e1ee797d2, type: 3}
+    caption: After a long exploration, you have finally completed the research.
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+    caption: 'Then, you received that message from headquarters: You could finally
+      go home.'
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+    caption: You and your wife are standing in front of the teleportation door. You
+      all pressed the start button together.
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+    caption: ... That was the last scene in your memory.
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+    caption: When you wake up, there is no one around you. No colleagues, no wife,
+      and no response at all.
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+    caption: Despite all the doubts, there is only one thing in your heart - to go
+      home.
   slideImage: {fileID: 1315758910}
   captionText: {fileID: 653627596}
   contentCanvasGroup: {fileID: 0}
   nextSceneName: Dormitory
   fadeDuration: 0.35
+  useTypewriterEffect: 1
+  charactersPerSecond: 28
 --- !u!4 &1163297214
 Transform:
   m_ObjectHideFlags: 0

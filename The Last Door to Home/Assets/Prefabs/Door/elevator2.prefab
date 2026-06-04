@@ -157,14 +157,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   preDialogues:
-  - 'This is an elevator.
+  - 'An elevator.
 
-    It can take you to ground floor.'
-  - Go to GF?
+    You are now in L1.'
   options:
-  - optionText: Yes
+  - optionText: L3
+    targetSceneName: Gate
+    spawnPosition: {x: 0, y: 0}
+  - optionText: L2
     targetSceneName: Corridor1
     spawnPosition: {x: 12.5, y: 4}
-  - optionText: No
+  - optionText: Cancel
     targetSceneName: 
     spawnPosition: {x: 0, y: 0}
+  sceneSwitchSfx: {fileID: 0}
+  sceneSwitchSfxVolume: 1

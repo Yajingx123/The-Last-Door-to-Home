@@ -20,19 +20,33 @@ MonoBehaviour:
   blockedItemUniqueIDs: []
   dialogues:
   - "\u201CKi\u2014... an...\u201D"
-  - "\u201DCan you... hear...\u201C"
-  - "\u201DStay... with... voice...\nDon\u2019t... sink...\u201C"
+  - "\u201DCan you... hear...\nStay... with... voice...\nDon\u2019t... sink...\u201C"
   - ...
   - The signal is completely broken. It's hard to tell which of your colleagues this
     voice is from.
   - But you are not worried. In fact, the signal at the base has been fluctuating
     frequently recently. You believe it will be back to normal in a while.
   - But, what does that mean?
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 0}
+    quotedTypingSfxVolume: 0.25
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay: []
   blockDefaultAction: 0
   useAttemptNarration: 0
+  allowRepeatForAttemptNarration: 0
   attemptCounterKey: 
   attemptDialogues: []
   clampToLastAttemptLine: 0

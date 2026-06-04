@@ -1,6 +1,16 @@
 using System;
 using UnityEngine;
 
+/*
+Purpose: Manages d ia lo gu ea ud io se tt in gs behavior for this part of the game.
+Attached GameObject: Scene-level audio controller GameObject.
+Main responsibilities: Configure or play audio content while keeping scene and UI feedback in sync.
+Inputs: Assigned clips, volume settings, and playback requests from other systems.
+Outputs or effects: Starts, stops, or configures audible feedback in the scene.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 [Serializable]
 public class DialogueAudioSettings
 {

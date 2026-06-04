@@ -4,6 +4,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/*
+Purpose: Manages s ce ne tr an si ti on behavior for this part of the game.
+Attached GameObject: Relevant scene controller GameObject.
+Main responsibilities: Coordinate inspector data, runtime checks, and the main behaviour handled by this script.
+Inputs: Inspector configuration, scene references, and runtime method calls.
+Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class SceneTransition : MonoBehaviour
 {
     private static SceneTransition instance;
@@ -21,6 +31,7 @@ public class SceneTransition : MonoBehaviour
 
     public static bool IsTransitioning => instance != null && instance.isTransitioning;
 
+    // Starts loading the requested scene through the transition flow.
     public static void LoadScene(string sceneName, Action beforeSceneLoad = null)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -34,6 +45,7 @@ public class SceneTransition : MonoBehaviour
         instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad));
     }
 
+    // Returns the shared singleton instance, creating it if needed.
     private static void EnsureInstance()
     {
         if (instance != null) return;
@@ -50,6 +62,7 @@ public class SceneTransition : MonoBehaviour
         instance.Initialize();
     }
 
+    // Initializes cached references and one-time component state before gameplay begins.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -62,16 +75,19 @@ public class SceneTransition : MonoBehaviour
         Initialize();
     }
 
+    // Resets transient state whenever this component becomes active again.
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    // Stops transient behaviour when this component becomes disabled.
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // Initializes the runtime resources needed by this manager.
     private void Initialize()
     {
         if (transitionCanvas != null)
@@ -130,6 +146,7 @@ public class SceneTransition : MonoBehaviour
         canvasGroup.interactable = false;
     }
 
+    // Runs the asynchronous scene load and transition timing sequence.
     private IEnumerator LoadSceneRoutine(string sceneName, Action beforeSceneLoad)
     {
         isTransitioning = true;
@@ -142,12 +159,14 @@ public class SceneTransition : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
+    // Handles scene-loaded callbacks needed after a transition completes.
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!shouldFadeInAfterLoad) return;
         StartCoroutine(FadeInAfterLoad());
     }
 
+    // Fades the transition back in after the next scene finishes loading.
     private IEnumerator FadeInAfterLoad()
     {
         shouldFadeInAfterLoad = false;
@@ -165,6 +184,7 @@ public class SceneTransition : MonoBehaviour
         isTransitioning = false;
     }
 
+    // Animates the transition canvas toward the requested fade value.
     private IEnumerator Fade(float from, float to, float duration, bool easeOut)
     {
         if (canvasGroup == null) yield break;

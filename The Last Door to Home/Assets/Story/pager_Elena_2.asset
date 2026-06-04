@@ -16,6 +16,7 @@ MonoBehaviour:
   priority: 0
   requiredFlags:
   - archive_done
+  - pager_Amelia_2_done
   blockedFlags: []
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
@@ -23,6 +24,20 @@ MonoBehaviour:
   - '"Kian, we found an energy trace outside the main gate. However, obtaining it
     is somewhat difficult. We need more manpower.'
   - If you're feeling better now, come and help us."
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 0}
+    quotedTypingSfxVolume: 0.25
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay: []
