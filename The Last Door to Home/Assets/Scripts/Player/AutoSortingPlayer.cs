@@ -98,16 +98,45 @@ public class AutoSortingPlayer : MonoBehaviour
         if (col == null) return false;
         if (decorationTags == null || decorationTags.Length == 0) return false;
 
-        string currentTag = col.tag;
-        for (int i = 0; i < decorationTags.Length; i++)
+        if (HasAnyConfiguredTag(col.transform))
         {
-            string tagName = decorationTags[i];
-            if (string.IsNullOrWhiteSpace(tagName)) continue;
+            return true;
+        }
 
-            if (string.Equals(currentTag, tagName, StringComparison.Ordinal))
+        if (col.attachedRigidbody != null && HasAnyConfiguredTag(col.attachedRigidbody.transform))
+        {
+            return true;
+        }
+
+        SpriteRenderer sr = col.GetComponent<SpriteRenderer>();
+        if (sr == null) sr = col.GetComponentInParent<SpriteRenderer>();
+        if (sr != null && HasAnyConfiguredTag(sr.transform))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Checks whether the supplied transform or any of its parents uses one of the configured decoration tags.
+    private bool HasAnyConfiguredTag(Transform targetTransform)
+    {
+        Transform current = targetTransform;
+        while (current != null)
+        {
+            string currentTag = current.tag;
+            for (int i = 0; i < decorationTags.Length; i++)
             {
-                return true;
+                string tagName = decorationTags[i];
+                if (string.IsNullOrWhiteSpace(tagName)) continue;
+
+                if (string.Equals(currentTag, tagName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
             }
+
+            current = current.parent;
         }
 
         return false;

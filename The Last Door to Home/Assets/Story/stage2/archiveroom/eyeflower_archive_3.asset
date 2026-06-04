@@ -14,18 +14,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventId: eyeflower_archive_3
   priority: 0
-  requiredFlags: []
+  requiredFlags:
+  - read_note_done
   blockedFlags: []
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
   - 333
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 0}
+    quotedTypingSfxVolume: 0.25
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay:
   - archive_done
   blockDefaultAction: 0
   useAttemptNarration: 0
+  allowRepeatForAttemptNarration: 0
   attemptCounterKey: 
   attemptDialogues: []
   clampToLastAttemptLine: 1

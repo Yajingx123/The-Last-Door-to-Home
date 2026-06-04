@@ -153,24 +153,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstDialogues:
-  - Wait?! Why!!!!
-  - Amelia!!!!
+  - ...qait, why my body...?
+  - Oh no no no no
+  - Ameli----!
   - ...
   firstDialogueImage: {fileID: 0}
   endingDialogues:
+  - ...
   - 'Ending 1: You Died
 
 
     Those with unstable minds are like small boats, easily
     swallowed by the whirlpools of the sea.
 
-
     Like Jeff, like you.'
-  - 'Luckily, this is just a game. You have thoundsands of chances to go home with
+  - Luckily, this is just a game. You have thoundsands of chances to go home with
     Amelia.
-
-
-    See you in the next round.'
+  - Amelia is waiting for you in the next round.
   endingImage: {fileID: 21300000, guid: 5657b0e86d4587746b9c3556db91b61d, type: 3}
   endingDialogueAudioSettings:
     bgmOnStart: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}
@@ -188,7 +187,7 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   mainMenuSceneName: MainMenu
   clearInventoryOnFinish: 1
-  playerFadeDuration: 1.2
+  playerFadeDuration: 4
   postFadeDelay: 0.15
   blackoutFadeDuration: 0.8
   blackoutColor: {r: 0, g: 0, b: 0, a: 1}

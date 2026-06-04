@@ -67,7 +67,7 @@ MonoBehaviour:
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay:
-  - archive_note_done
+  - read_note_done
   blockDefaultAction: 0
   useAttemptNarration: 0
   allowRepeatForAttemptNarration: 0

@@ -15,12 +15,11 @@ MonoBehaviour:
   eventId: archive_note
   priority: 0
   requiredFlags:
-  - archive_note_done
+  - read_note_done
   blockedFlags: []
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
-  dialogues:
-  - The experimental record pages are missing. Are they on shelves?
+  dialogues: []
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1
@@ -39,8 +38,9 @@ MonoBehaviour:
   dialogueImageSprite: {fileID: 0}
   setFlagsOnPlay: []
   blockDefaultAction: 0
-  useAttemptNarration: 0
-  allowRepeatForAttemptNarration: 0
-  attemptCounterKey: 
-  attemptDialogues: []
+  useAttemptNarration: 1
+  allowRepeatForAttemptNarration: 1
+  attemptCounterKey: archive_note
+  attemptDialogues:
+  - The experimental record pages are missing. Are they on shelves?
   clampToLastAttemptLine: 1

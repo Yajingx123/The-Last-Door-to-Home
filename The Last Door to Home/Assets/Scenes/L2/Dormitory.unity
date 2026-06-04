@@ -2694,11 +2694,6 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 3
   m_ColliderType: 1
---- !u!4 &728024243 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-  m_PrefabInstance: {fileID: 1730595337}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &804135055
 GameObject:
   m_ObjectHideFlags: 0
@@ -5042,92 +5037,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1001 &1730595337
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1999931943}
-    m_Modifications:
-    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: dialogues.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: dialogues.Array.data[0]
-      value: A bunch of eye flowers.
-      objectReference: {fileID: 0}
-    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: dialogues.Array.data[1]
-      value: In fact, you can see eye flowers in the base everywhere. They are all
-        placed by Jeff.
-      objectReference: {fileID: 0}
-    - target: {fileID: -2562356799011869283, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: dialogues.Array.data[2]
-      value: Looking at them for a long time makes you feel a bit creepy.
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.49475953
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 5.3431845
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 916132433952736716, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2705836639129023899, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
-    - target: {fileID: 2965926302923172719, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_Name
-      value: flower
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468183410532427115, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 0.625
-      objectReference: {fileID: 0}
-    - target: {fileID: 8468183410532427115, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 0.84375
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: be7e7ca3338cd5642b488d6aad284c5b, type: 3}
 --- !u!1 &1823307918
 GameObject:
   m_ObjectHideFlags: 0
@@ -5570,7 +5479,6 @@ Transform:
   - {fileID: 1625645183}
   - {fileID: 1646473446}
   - {fileID: 1942549429}
-  - {fileID: 728024243}
   - {fileID: 1080931759}
   - {fileID: 517538981}
   - {fileID: 1544284859}
