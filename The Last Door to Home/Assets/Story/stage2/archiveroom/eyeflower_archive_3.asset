@@ -20,7 +20,23 @@ MonoBehaviour:
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - 333
+  - '...
+
+    ...
+
+    You find one more paper.'
+  - '---
+
+    Test 017-E: Energy field proximity reaction
+
+    Result:*%^&%$#&^#&%^$*%$
+
+    ---'
+  - "...\nThe result part was blackened, but without any doubt, Jeff is the prime
+    suspect. \nThis guess makes you angry, since the day you arrived here, everyone
+    has sworn that humans will unite as one when they are in a foreign land. Now
+    someone broke it."
+  - Things are clearer noew, but you think you still need more clues.
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1

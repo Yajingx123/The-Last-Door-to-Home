@@ -10,31 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
-  m_Name: eyeflower_archive_2
+  m_Name: pager_Elena_2
   m_EditorClassIdentifier: 
-  eventId: eyeflower_archive_2
+  eventId: pager_Elena_2
   priority: 0
   requiredFlags:
-  - read_note_done
-  blockedFlags: []
+  - pager_Amelia_2_done
+  blockedFlags:
+  - pager_Elena_2_done
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - '...
-
-    ...
-
-    Another paper.'
-  - "---\nTest 017-C: Group Synchronous response\r\nResult: After one specimen was
-    stimulated, three nearby specimens showed eye-opening responses within 2.7 seconds.
-    The reason is unknown.\r"
-  - 'Test 017-D: Prolonged visual contact
-
-    Result: The experimenter reported
-    mild headaches, decreased attention and brief illusions. It is necessary to further
-    confirm whether it is related to fatigue.
-
-    ---'
+  - '"...[You got a message from *l*a]"'
+  - "\" Your *** is still here.\n\nThe **** won\u2019t let go.\""
+  - "\"Listen for what doesn\u2019t fit.\""
+  - ...
+  - "This time the signal is better, you can reognize the voice is from one of your
+    female colleagues . \nThe message is still quite confused. Anyway, you will stay
+    vigilant."
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1
@@ -47,11 +40,12 @@ MonoBehaviour:
     typingSfx: {fileID: 0}
     typingSfxVolume: 0.25
     typingSfxEveryNCharacters: 2
-    quotedTypingSfx: {fileID: 0}
-    quotedTypingSfxVolume: 0.25
-  showDialogueImage: 1
-  dialogueImageSprite: {fileID: 21300000, guid: fa08d21e40f3d8447b3a107cd4561a88, type: 3}
-  setFlagsOnPlay: []
+    quotedTypingSfx: {fileID: 8300000, guid: 194650fbfe1fa574785dab080a7a42b2, type: 3}
+    quotedTypingSfxVolume: 1
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}
+  setFlagsOnPlay:
+  - pager_Elena_2_done
   blockDefaultAction: 0
   useAttemptNarration: 0
   allowRepeatForAttemptNarration: 0

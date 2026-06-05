@@ -122,6 +122,38 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &416986789
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 416986790}
+  m_Layer: 0
+  m_Name: StoryTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &416986790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416986789}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.447873, y: 0.16937754, z: -0.09821113}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 918247015}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &432015758
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -132,7 +164,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: noKeyMessage
-      value: You need something to open it.
+      value: Of course it is locked. You need something to open it.
       objectReference: {fileID: 0}
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: sceneSwitchSfx
@@ -147,8 +179,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: preDialogues.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: preDialogues.Array.data[0]
+      value: 'The door of control room. The portal room is in it.
+
+        You have
+        a sense of feeling that the truth is behind this door.'
       objectReference: {fileID: 0}
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: preDialogues.Array.data[1]
@@ -158,12 +201,60 @@ PrefabInstance:
         door.'
       objectReference: {fileID: 0}
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[1].optionText
+      value: Energy stone
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[2].optionText
+      value: Your ID card
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: keyOptions.Array.data[0].keyUniqueID
       value: ID_card_Jeff
       objectReference: {fileID: 0}
     - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[1].keyUniqueID
+      value: stone
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[2].keyUniqueID
+      value: ID_card_Kian
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[0].isCorrectKey
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[1].isCorrectKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[2].isCorrectKey
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: keyOptions.Array.data[0].wrongKeyMessage
+      value: 'Insufficient authority.Jeff''s ID card is no longer working.
+
+        ...you
+        really wanted to smash the door violently, but unfortunately, the only thing
+        harder than this door is the energy stone.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[1].wrongKeyMessage
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1091691144172387594, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: keyOptions.Array.data[2].wrongKeyMessage
       value: Insufficient authority.
+      objectReference: {fileID: 0}
+    - target: {fileID: 1754708816591358783, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 3.40625
+      objectReference: {fileID: 0}
+    - target: {fileID: 1754708816591358783, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2.6875
       objectReference: {fileID: 0}
     - target: {fileID: 4251321431594716719, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
       propertyPath: m_LocalScale.y
@@ -217,10 +308,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 7586186, guid: 134e0615c39c1684a97b818e552cdffc, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1754708816591358783, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5421991014627497470, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2078733761}
   m_SourcePrefab: {fileID: 100100000, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
 --- !u!4 &432015759 stripped
 Transform:
@@ -296,6 +391,97 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+--- !u!1 &918247014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 918247015}
+  - component: {fileID: 918247017}
+  - component: {fileID: 918247016}
+  m_Layer: 0
+  m_Name: pager_Elena_2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &918247015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918247014}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -9.027873, y: -5.909377, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 416986790}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &918247016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918247014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf493ccb3b9f0ce49bd2f97da0579bd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventId: pager_Elena_2
+--- !u!61 &918247017
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918247014}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 5, y: 4}
+  m_EdgeRadius: 0
 --- !u!1 &939380228
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,97 +573,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
---- !u!1 &966509037
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 966509040}
-  - component: {fileID: 966509039}
-  - component: {fileID: 966509038}
-  m_Layer: 0
-  m_Name: after_archiveroom
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &966509038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966509037}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf493ccb3b9f0ce49bd2f97da0579bd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventId: pager_Elena_2
---- !u!61 &966509039
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966509037}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.5446409}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 2.0892818}
-  m_EdgeRadius: 0
---- !u!4 &966509040
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966509037}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.33, y: -1.47, z: 287.38654}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1116015178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -539,6 +634,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 596278716, guid: 134e0615c39c1684a97b818e552cdffc, type: 3}
     - target: {fileID: 8803074210248707412, guid: 3af3c8a63de78db4e9c4d20f22988a05, type: 3}
+      propertyPath: noKeyMessage
+      value: Seems that you need an ID card with enough authroity. Seems that Jeff
+        was the data administrator, wasn't he?
+      objectReference: {fileID: 0}
+    - target: {fileID: 8803074210248707412, guid: 3af3c8a63de78db4e9c4d20f22988a05, type: 3}
       propertyPath: sceneSwitchSfx
       value: 
       objectReference: {fileID: 8300000, guid: c2860eef12a1b5f4eba1163f802e55e5, type: 3}
@@ -599,6 +699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   beats:
   - {fileID: 11400000, guid: af3de3aa322fd124cb4ecdcd853a0652, type: 2}
+  - {fileID: 11400000, guid: ab80857499e7fea40a5eca128ea886f7, type: 2}
   beatSets: []
   persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 0
@@ -7633,6 +7734,56 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 58aca674f7c83d048955f509cb1338b1, type: 3}
+--- !u!1 &2078733760 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5421991014627497470, guid: 7ac717d327287b24c86eb20a493a8f1a, type: 3}
+  m_PrefabInstance: {fileID: 432015758}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &2078733761
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078733760}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.40625, y: 2.6875}
+    newSize: {x: 3, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 3.40625, y: 2.6875}
+  m_EdgeRadius: 0
 --- !u!1001 &7058763916188726472
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7705,6 +7856,6 @@ SceneRoots:
   - {fileID: 1967665937}
   - {fileID: 1731622548}
   - {fileID: 1121533959}
-  - {fileID: 966509040}
   - {fileID: 939380229}
   - {fileID: 1650426152}
+  - {fileID: 416986790}

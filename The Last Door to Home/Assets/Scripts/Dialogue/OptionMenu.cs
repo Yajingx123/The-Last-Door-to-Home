@@ -153,9 +153,20 @@ public class OptionMenu : MonoBehaviour
             return;
         }
 
-        EnsureOptionSlots(entries.Count);
+        int clampedCount = Mathf.Min(entries.Count, Mathf.Max(1, maxOptions));
+        if (entries.Count > clampedCount)
+        {
+            Debug.LogWarning($"OptionMenu: 收到 {entries.Count} 个选项，但当前最多只显示 {clampedCount} 个。多余选项将被忽略。", this);
+        }
 
-        currentEntries = new List<OptionEntry>(entries);
+        EnsureOptionSlots(clampedCount);
+
+        currentEntries = new List<OptionEntry>(clampedCount);
+        for (int i = 0; i < clampedCount; i++)
+        {
+            currentEntries.Add(entries[i]);
+        }
+
         closeDialogueWhenConfirmed = closeDialogueOnConfirm;
         onClose = onMenuClosed;
         optionPanel.SetActive(true);

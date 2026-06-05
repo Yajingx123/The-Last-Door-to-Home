@@ -210,6 +210,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 258460298966431375, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1056330080138183782, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
       propertyPath: m_Camera
       value: 
@@ -223,8 +227,36 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6955280290917856244, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 6955280290917856244, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 350
+      objectReference: {fileID: 0}
+    - target: {fileID: 6955280290917856244, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6955280290917856244, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 92
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672603568891304795, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672603568891304795, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672603568891304795, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8672603568891304795, guid: 4542a7e936cc783489e84eaf1a160dbe, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -177
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -387,20 +419,20 @@ MonoBehaviour:
     caption: You and your colleagues work in a dangerous world full of strange creatures,
       where it is perilous and desolate, and inhabited by alien creatures that are
       not been precisely defined.
-  - image: {fileID: 21300000, guid: 1b7edbdfcac37d84f98f075e1ee797d2, type: 3}
+  - image: {fileID: 21300000, guid: ca58f16d2ecd2394da8e6a60f050c2c3, type: 3}
     caption: After a long exploration, you have finally completed the research.
   - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
     caption: 'Then, you received that message from headquarters: You could finally
       go home.'
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+  - image: {fileID: 21300000, guid: 9f69d3aa06ef9d545ae1dbdabb6e8a3a, type: 3}
     caption: You and your wife are standing in front of the teleportation door. You
       all pressed the start button together.
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+  - image: {fileID: 21300000, guid: 9283b75879954bf47811b9fc279c2bbb, type: 3}
     caption: ... That was the last scene in your memory.
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+  - image: {fileID: 21300000, guid: eea34a264accd7241ac94ff46937d45e, type: 3}
     caption: When you wake up, there is no one around you. No colleagues, no wife,
       and no response at all.
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+  - image: {fileID: 21300000, guid: c58e53f662422d04fb8d95016e038413, type: 3}
     caption: Despite all the doubts, there is only one thing in your heart - to go
       home.
   slideImage: {fileID: 1315758910}
@@ -408,6 +440,7 @@ MonoBehaviour:
   contentCanvasGroup: {fileID: 0}
   nextSceneName: Dormitory
   fadeDuration: 0.35
+  imageFadeDuration: 0.45
   useTypewriterEffect: 1
   charactersPerSecond: 28
 --- !u!4 &1163297214

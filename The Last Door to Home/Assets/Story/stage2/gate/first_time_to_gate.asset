@@ -10,20 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
-  m_Name: pager_Elena_2
+  m_Name: first_time_to_gate
   m_EditorClassIdentifier: 
-  eventId: pager_Elena_2
+  eventId: first_time_to_gate
   priority: 0
-  requiredFlags:
-  - archive_done
-  - pager_Amelia_2_done
+  requiredFlags: []
   blockedFlags: []
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
-  dialogues:
-  - '"Kian, we found an energy trace outside the main gate. However, obtaining it
-    is somewhat difficult. We need more manpower.'
-  - If you're feeling better now, come and help us."
+  dialogues: []
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1
@@ -40,10 +35,11 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   showDialogueImage: 0
   dialogueImageSprite: {fileID: 0}
-  setFlagsOnPlay: []
+  setFlagsOnPlay:
+  - first_time_to_gate
   blockDefaultAction: 0
   useAttemptNarration: 0
   allowRepeatForAttemptNarration: 0
   attemptCounterKey: 
   attemptDialogues: []
-  clampToLastAttemptLine: 0
+  clampToLastAttemptLine: 1

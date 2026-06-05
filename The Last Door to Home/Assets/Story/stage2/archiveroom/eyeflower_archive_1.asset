@@ -20,7 +20,15 @@ MonoBehaviour:
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - 111
+  - '...
+
+    ...
+
+    You find one old pager hiding in the dark place of this shelf.'
+  - "---\nTest 017-A: Strong light exposure\r\nResult: The ocular organ is closed,
+    and the stem is slightly contracted. No aggressive behavior.\r"
+  - "Test 017-B: Low light environment\r\nResult: The ocular organs are fully open.
+    The specimen is slightly deflected towards the heat source. No aggressive behavior.\n---\r"
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1
