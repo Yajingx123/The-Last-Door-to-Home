@@ -1,6 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/*
+Purpose: Manages p la ye ri nt er ac ti on behavior for this part of the game.
+Attached GameObject: Player GameObject or a player-specific child object.
+Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
+Inputs: Inspector references, Unity input, and state from linked gameplay managers.
+Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class PlayerInteraction : MonoBehaviour
 {
     [Header("交互设置")]
@@ -11,6 +21,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private Vector2 faceDir = Vector2.right;
 
+    // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
         UpdateFaceDirection();
@@ -22,6 +33,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // Refreshes the facing direction used for interaction checks.
     void UpdateFaceDirection()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -32,6 +44,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // Attempts to interact with the best matching target in range.
     void TryInteract()
     {
         if (DialogueManager.Instance == null)
@@ -83,6 +96,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // Returns the best interaction point for the supplied target component.
     Vector2 GetInteractionPoint(MonoBehaviour item)
     {
         Collider2D col = item.GetComponent<Collider2D>();

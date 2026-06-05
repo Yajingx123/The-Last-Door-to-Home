@@ -1,7 +1,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
+/*
+Purpose: Manages e le va to ri nt er ac ti on behavior for this part of the game.
+Attached GameObject: Interactable scene object with collider and interaction logic.
+Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
+Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
+Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
 
 public class ElevatorInteraction : MonoBehaviour, IInteractable
 {
@@ -20,6 +29,11 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
     [Header("电梯选项")]
     public ElevatorOption[] options;
 
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
+
+    // Executes this object interaction when the player activates it.
     public void OnInteract()
     {
         if (OptionMenu.Instance == null) return;
@@ -40,6 +54,7 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
+    // Builds the option entries that should be shown to the player.
     private List<OptionMenu.OptionEntry> BuildEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -59,11 +74,19 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
         return entries;
     }
 
+    // Starts loading the requested scene through the transition flow.
     private void LoadScene(ElevatorOption option)
     {
         if (string.IsNullOrWhiteSpace(option.targetSceneName)) return;
-        PlayerSpawn.SPAWN_POSITION = option.spawnPosition;
-        PlayerSpawn.NEED_SPAWN = true;
-        SceneManager.LoadScene(option.targetSceneName);
+        if (sceneSwitchSfx != null)
+        {
+            AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+        }
+
+        SceneTransition.LoadScene(option.targetSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = option.spawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 }

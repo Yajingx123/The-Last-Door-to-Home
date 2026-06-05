@@ -2,6 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+Purpose: Manages p ag er in te ra ct io n behavior for this part of the game.
+Attached GameObject: Interactable scene object with collider and interaction logic.
+Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
+Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
+Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class PagerInteraction : MonoBehaviour, IInteractable
 {
     [Header("Pager 物品信息")]
@@ -21,8 +31,12 @@ public class PagerInteraction : MonoBehaviour, IInteractable
     [TextArea(2, 8)]
     public string[] afterPlayRecordingDialogues;
 
+    [Header("Pager 对话音频")]
+    public DialogueAudioSettings dialogueAudioSettings;
+
     private bool pickupInProgress;
 
+    // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
         if (Inventory.HasCollected(pagerUniqueID))
@@ -31,6 +45,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         }
     }
 
+    // Executes this object interaction when the player activates it.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null || OptionMenu.Instance == null) return;
@@ -43,13 +58,14 @@ public class PagerInteraction : MonoBehaviour, IInteractable
 
         if (foundDialogues != null && foundDialogues.Length > 0)
         {
-            DialogueManager.Instance.ShowDialogue(foundDialogues, null, ShowFirstChoiceMenu);
+            DialogueManager.Instance.ShowDialogue(foundDialogues, null, ShowFirstChoiceMenu, null, dialogueAudioSettings);
             return;
         }
 
         ShowFirstChoiceMenu();
     }
 
+    // Shows the first pager choice menu for this interaction.
     private void ShowFirstChoiceMenu()
     {
         if (OptionMenu.Instance == null || DialogueManager.Instance == null) return;
@@ -70,6 +86,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
+    // Continues the pager interaction flow and then grants the pickup.
     private void ContinueAndPickup(string[] lines)
     {
         if (DialogueManager.Instance == null)
@@ -80,7 +97,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
 
         if (lines != null && lines.Length > 0)
         {
-            DialogueManager.Instance.ContinueDialogueAfterOption(lines);
+            DialogueManager.Instance.ContinueDialogueAfterOption(lines, null, null, null, dialogueAudioSettings);
             StartCoroutine(FinalizePickupAfterDialogueClosed());
             return;
         }
@@ -89,6 +106,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         DialogueManager.Instance.CloseDialogueAfterOption();
     }
 
+    // Finalizes the pickup after the related dialogue has fully closed.
     private IEnumerator FinalizePickupAfterDialogueClosed()
     {
         while (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
@@ -99,6 +117,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         FinalizePickup();
     }
 
+    // Finalizes the pickup flow and applies the collected-item state.
     private void FinalizePickup()
     {
         if (!Inventory.HasCollected(pagerUniqueID))
@@ -110,6 +129,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         pickupInProgress = false;
     }
 
+    // Hides the pager object in the scene after it is collected.
     private void HidePagerInScene()
     {
         GameObject hideTarget = pickupHideTarget != null ? pickupHideTarget : gameObject;

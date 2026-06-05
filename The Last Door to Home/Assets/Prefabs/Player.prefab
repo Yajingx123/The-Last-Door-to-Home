@@ -248,6 +248,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2.5
   stopFreezeDelay: 0.08
+  footstepClip: {fileID: 8300000, guid: 08d5e27dcd6a9a04bb85e8e6f798846e, type: 3}
+  footstepInterval: 0.5
+  footstepVolume: 1
 --- !u!114 &5113282963952080773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,3 +274,17 @@ MonoBehaviour:
   callCDialogues: []
   dontCallOptionText: D
   dontCallDialogues: []
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 0}
+    quotedTypingSfxVolume: 0.25

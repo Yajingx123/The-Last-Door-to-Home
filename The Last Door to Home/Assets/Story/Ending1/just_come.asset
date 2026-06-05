@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 888524553f5b6364cae78dbf6d58f0fe, type: 3}
+  m_Name: just_come
+  m_EditorClassIdentifier: 
+  eventId: just_come
+  priority: 0
+  requiredFlags: []
+  blockedFlags: []
+  requiredItemUniqueIDs: []
+  blockedItemUniqueIDs: []
+  dialogues:
+  - ...what the hell are these???
+  dialogueAudioSettings:
+    bgmOnStart: {fileID: 0}
+    bgmOnStartFadeOutDuration: 1
+    bgmOnStartFadeInDuration: 1
+    bgmOnStartVolume: 1
+    bgmOnComplete: {fileID: 0}
+    bgmOnCompleteFadeOutDuration: 1
+    bgmOnCompleteFadeInDuration: 1
+    bgmOnCompleteVolume: 1
+    typingSfx: {fileID: 0}
+    typingSfxVolume: 0.25
+    typingSfxEveryNCharacters: 2
+    quotedTypingSfx: {fileID: 0}
+    quotedTypingSfxVolume: 0.25
+  showDialogueImage: 0
+  dialogueImageSprite: {fileID: 0}
+  setFlagsOnPlay: []
+  blockDefaultAction: 0
+  useAttemptNarration: 0
+  allowRepeatForAttemptNarration: 0
+  attemptCounterKey: 
+  attemptDialogues: []
+  clampToLastAttemptLine: 1

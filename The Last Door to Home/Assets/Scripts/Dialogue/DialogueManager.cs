@@ -4,9 +4,22 @@ using System;
 using System.Collections;
 using UnityEngine.UI;
 
+/*
+Purpose: Coordinates dialogue flow, typing effects, player locking, and dialogue-related UI.
+Attached GameObject: Dialogue UI manager or option menu GameObject in the scene canvas.
+Main responsibilities: Control dialogue UI state, react to input, and notify dependent gameplay systems.
+Inputs: UI references, dialogue content arrays, callbacks, and player input.
+Outputs or effects: Shows or hides UI, locks controls, and triggers dialogue-related side effects.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
+    public static event Action DialogueStarted;
+    public static event Action<string, int, int> DialogueLineShown;
+    public static event Action DialogueEnded;
 
     [Header("UI")]
     public GameObject dialoguePanel;
@@ -15,6 +28,18 @@ public class DialogueManager : MonoBehaviour
     [Header("对话框开关动画")]
     [SerializeField] private float panelAnimDuration = 0.18f;
     [SerializeField] private AnimationCurve panelAnimCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    [Header("打字机效果")]
+    [SerializeField] private bool useTypewriterEffect = true;
+    [SerializeField] private float charactersPerSecond = 20f;
+    [SerializeField] private float commaPauseSeconds = 0.12f;
+    [SerializeField] private float periodPauseSeconds = 0.22f;
+    [SerializeField] private float ellipsisDotPauseSeconds = 0.16f;
+    [SerializeField] private float ellipsisEndPauseSeconds = 0.4f;
+    [SerializeField] private AudioClip defaultTypingSfx;
+    [SerializeField] [Range(0f, 1f)] private float defaultTypingSfxVolume = 0.2f;
+    [SerializeField] private AudioClip defaultQuotedTypingSfx;
+    [SerializeField] [Range(0f, 1f)] private float defaultQuotedTypingSfxVolume = 0.2f;
 
     [Header("玩家控制（拖Player物体）")]
     public GameObject player;
@@ -41,6 +66,7 @@ public class DialogueManager : MonoBehaviour
         Time.frameCount != dialogueEndFrame;
 
     private Action pendingOptionAction;
+    private Action pendingDialogueCompleteAction;
     private RectTransform dialoguePanelRect;
     private Vector3 dialoguePanelBaseScale = Vector3.one;
     private Coroutine panelAnimRoutine;
@@ -48,11 +74,15 @@ public class DialogueManager : MonoBehaviour
     private RectTransform dialogueImageRect;
     private CanvasGroup dialogueImageCanvasGroup;
     private Coroutine imageAnimRoutine;
+    private Coroutine typewriterRoutine;
     private Vector2 imageBaseAnchoredPos;
     private bool hasImageBaseAnchoredPos;
     private bool isDialogueImageActive;
     private MonoBehaviour[] cachedMovementScripts;
+    private DialogueAudioSettings activeDialogueAudioSettings;
+    private bool isTypingLine;
 
+    // Initializes cached references and one-time component state before gameplay begins.
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -79,20 +109,25 @@ public class DialogueManager : MonoBehaviour
         CachePlayerMovementScripts();
     }
 
+    // Prepares runtime state after the scene finishes its initial setup.
     IEnumerator Start()
     {
         yield return null;
         PrewarmDialogueUI();
     }
 
+    // Cleans up cached state and running effects during teardown.
     void OnDestroy()
     {
+        StopTypingSfxImmediate();
+
         if (Instance == this)
         {
             Instance = null;
         }
     }
 
+    // Finds and caches the player reference used by the dialogue system.
     private void ResolvePlayerReference()
     {
         if (player == null)
@@ -113,12 +148,14 @@ public class DialogueManager : MonoBehaviour
         Debug.LogWarning("DialogueManager：未赋值Player物体，且未找到Tag=Player的对象。", this);
     }
 
+    // Caches movement-related scripts so player control can be toggled efficiently.
     private void CachePlayerMovementScripts()
     {
         if (player == null) return;
         cachedMovementScripts = player.GetComponents<MonoBehaviour>();
     }
 
+    // Prepares dialogue UI elements to avoid first-use layout hiccups.
     private void PrewarmDialogueUI()
     {
         if (dialogueText != null)
@@ -137,20 +174,28 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
         if (isDialogueActive && !isWaitingForOptionChoice && Input.GetKeyDown(KeyCode.Return))
         {
             if (Time.frameCount == dialogueStartFrame) return;
+            if (isTypingLine)
+            {
+                CompleteCurrentLineInstantly();
+                return;
+            }
             AdvanceDialogue();
         }
     }
 
-    public void ShowDialogue(string[] texts, PickableItem item = null, Action onLastLineOption = null)
+    // Starts a new dialogue sequence with the provided content and callbacks.
+    public void ShowDialogue(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
         if (isDialogueActive) return;
         if (texts == null || texts.Length == 0) return;
 
+        pendingDialogueCompleteAction = onDialogueComplete;
         pendingOptionAction = onLastLineOption;
         if (pendingOptionAction == null && item != null)
         {
@@ -164,13 +209,26 @@ public class DialogueManager : MonoBehaviour
         dialogueIndex = 0;
         isDialogueActive = true;
         dialogueStartFrame = Time.frameCount;
+        activeDialogueAudioSettings = audioSettings;
+
+        if (audioSettings != null && audioSettings.bgmOnStart != null)
+        {
+            AudioManager.EnsureInstance().PlayBgm(
+                audioSettings.bgmOnStart,
+                audioSettings.bgmOnStartFadeOutDuration,
+                audioSettings.bgmOnStartFadeInDuration,
+                audioSettings.bgmOnStartVolume
+            );
+        }
 
         PlayPanelOpenAnim();
         EnsureDialoguePanelInFrontOfImage();
-        dialogueText.text = currentDialogues[dialogueIndex];
+        ShowCurrentDialogueLine();
         LockPlayer(true);
+        DialogueStarted?.Invoke();
     }
 
+    // Moves the dialogue flow to the next line or finishing action.
     void AdvanceDialogue()
     {
         if (dialogueIndex >= currentDialogues.Length - 1)
@@ -186,15 +244,11 @@ public class DialogueManager : MonoBehaviour
         else
         {
             dialogueIndex++;
-            dialogueText.text = currentDialogues[dialogueIndex];
-
-            if (dialogueIndex == currentDialogues.Length - 1 && pendingOptionAction != null)
-            {
-                ShowOptionWithLastLine();
-            }
+            ShowCurrentDialogueLine();
         }
     }
 
+    // Opens the option menu once the final dialogue line has been reached.
     void ShowOptionWithLastLine()
     {
         if (isWaitingForOptionChoice) return;
@@ -210,6 +264,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Closes the dialogue flow and restores normal gameplay state.
     void EndDialogue()
     {
         isDialogueActive = false;
@@ -220,10 +275,29 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
         LockPlayer(false);
         HideDialogueImage();
+        StopTypingSfxImmediate();
 
         pendingOptionAction = null;
+        Action dialogueCompleteAction = pendingDialogueCompleteAction;
+        pendingDialogueCompleteAction = null;
+        DialogueAudioSettings completedAudioSettings = activeDialogueAudioSettings;
+        activeDialogueAudioSettings = null;
+
+        if (completedAudioSettings != null && completedAudioSettings.bgmOnComplete != null)
+        {
+            AudioManager.EnsureInstance().PlayBgm(
+                completedAudioSettings.bgmOnComplete,
+                completedAudioSettings.bgmOnCompleteFadeOutDuration,
+                completedAudioSettings.bgmOnCompleteFadeInDuration,
+                completedAudioSettings.bgmOnCompleteVolume
+            );
+        }
+
+        DialogueEnded?.Invoke();
+        dialogueCompleteAction?.Invoke();
     }
 
+    // Finishes the current dialogue after the option menu resolves.
     public void CloseDialogueAfterOption()
     {
         if (isWaitingForOptionChoice)
@@ -232,7 +306,8 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    public void ContinueDialogueAfterOption(string[] texts, PickableItem item = null, Action onLastLineOption = null)
+    // Continues the dialogue with a follow-up sequence after an option is chosen.
+    public void ContinueDialogueAfterOption(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
         if (texts == null || texts.Length == 0)
         {
@@ -242,10 +317,11 @@ public class DialogueManager : MonoBehaviour
 
         if (!isDialogueActive)
         {
-            ShowDialogue(texts, item, onLastLineOption);
+            ShowDialogue(texts, item, onLastLineOption, onDialogueComplete, audioSettings);
             return;
         }
 
+        pendingDialogueCompleteAction = onDialogueComplete;
         pendingOptionAction = onLastLineOption;
         if (pendingOptionAction == null && item != null)
         {
@@ -256,12 +332,27 @@ public class DialogueManager : MonoBehaviour
         }
 
         isWaitingForOptionChoice = false;
+        if (audioSettings != null)
+        {
+            activeDialogueAudioSettings = audioSettings;
+            if (audioSettings.bgmOnStart != null)
+            {
+                AudioManager.EnsureInstance().PlayBgm(
+                    audioSettings.bgmOnStart,
+                    audioSettings.bgmOnStartFadeOutDuration,
+                    audioSettings.bgmOnStartFadeInDuration,
+                    audioSettings.bgmOnStartVolume
+                );
+            }
+        }
+
         currentDialogues = texts;
         dialogueIndex = 0;
         dialogueStartFrame = Time.frameCount;
-        dialogueText.text = currentDialogues[dialogueIndex];
+        ShowCurrentDialogueLine();
     }
 
+    // Displays the requested dialogue illustration panel and sprite.
     public void ShowDialogueImage(Sprite sprite)
     {
         if (sprite == null)
@@ -286,6 +377,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(true);
     }
 
+    // Hides the active dialogue illustration if one is being shown.
     public void HideDialogueImage()
     {
         if (dialogueImagePanel == null || dialogueImage == null) return;
@@ -293,6 +385,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(false);
     }
 
+    // Locks or unlocks player movement while dialogue is active.
     public void LockPlayer(bool lockIt)
     {
         if (playerRb == null || player == null) return;
@@ -320,6 +413,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // Starts the panel opening animation for the dialogue window.
     void PlayPanelOpenAnim()
     {
         if (dialoguePanel == null) return;
@@ -334,6 +428,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(0f, 1f, false));
     }
 
+    // Starts the panel closing animation and stops typing playback.
     void PlayPanelCloseAnim()
     {
         if (dialoguePanel == null) return;
@@ -344,6 +439,15 @@ public class DialogueManager : MonoBehaviour
             panelAnimRoutine = null;
         }
 
+        if (typewriterRoutine != null)
+        {
+            StopCoroutine(typewriterRoutine);
+            typewriterRoutine = null;
+        }
+
+        isTypingLine = false;
+        StopTypingSfxImmediate();
+
         if (!dialoguePanel.activeSelf)
         {
             dialoguePanel.SetActive(false);
@@ -353,6 +457,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(1f, 0f, true));
     }
 
+    // Animates the dialogue panel scale on the vertical axis over time.
     IEnumerator AnimatePanelScaleY(float fromY, float toY, bool deactivateOnFinish)
     {
         if (dialoguePanelRect == null)
@@ -386,6 +491,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = null;
     }
 
+    // Applies the current vertical scale value to the dialogue panel.
     void SetPanelScaleY(float scaleY01)
     {
         if (dialoguePanelRect == null) return;
@@ -397,6 +503,7 @@ public class DialogueManager : MonoBehaviour
         );
     }
 
+    // Keeps the dialogue panel layered above the optional dialogue image.
     void EnsureDialoguePanelInFrontOfImage()
     {
         if (dialoguePanel == null || dialogueImagePanel == null) return;
@@ -404,6 +511,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.transform.SetAsLastSibling();
     }
 
+    // Caches and prepares the optional dialogue image UI elements.
     void SetupDialogueImageUI()
     {
         if (dialogueImagePanel == null)
@@ -440,6 +548,7 @@ public class DialogueManager : MonoBehaviour
         isDialogueImageActive = false;
     }
 
+    // Launches the show or hide animation for the dialogue image.
     void PlayDialogueImageAnim(bool show)
     {
         if (dialogueImagePanel == null || dialogueImageRect == null || dialogueImageCanvasGroup == null) return;
@@ -453,6 +562,7 @@ public class DialogueManager : MonoBehaviour
         imageAnimRoutine = StartCoroutine(AnimateDialogueImage(show));
     }
 
+    // Animates the dialogue image position and fade state over time.
     IEnumerator AnimateDialogueImage(bool show)
     {
         if (show) dialogueImagePanel.SetActive(true);
@@ -496,6 +606,299 @@ public class DialogueManager : MonoBehaviour
         }
 
         imageAnimRoutine = null;
+    }
+
+    // Broadcasts an event for the currently visible dialogue line.
+    private void NotifyLineShown()
+    {
+        if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
+        {
+            return;
+        }
+
+        DialogueLineShown?.Invoke(currentDialogues[dialogueIndex], dialogueIndex, currentDialogues.Length);
+    }
+
+    // Displays the current dialogue line and starts the typewriter effect if enabled.
+    private void ShowCurrentDialogueLine()
+    {
+        if (dialogueText == null || currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
+        {
+            return;
+        }
+
+        if (typewriterRoutine != null)
+        {
+            StopCoroutine(typewriterRoutine);
+            typewriterRoutine = null;
+        }
+
+        string line = currentDialogues[dialogueIndex] ?? string.Empty;
+        dialogueText.text = line;
+        dialogueText.maxVisibleCharacters = 0;
+        dialogueText.ForceMeshUpdate();
+        NotifyLineShown();
+
+        if (!useTypewriterEffect || string.IsNullOrEmpty(line))
+        {
+            dialogueText.maxVisibleCharacters = int.MaxValue;
+            isTypingLine = false;
+            StopTypingSfxImmediate();
+
+            if (dialogueIndex == currentDialogues.Length - 1 && pendingOptionAction != null)
+            {
+                ShowOptionWithLastLine();
+            }
+
+            return;
+        }
+
+        typewriterRoutine = StartCoroutine(TypeCurrentLineRoutine(line));
+    }
+
+    // Reveals the active dialogue line over time with punctuation-aware pauses.
+    private IEnumerator TypeCurrentLineRoutine(string line)
+    {
+        isTypingLine = true;
+        StartTypingSfx();
+        int visibleCount = 0;
+        int totalCharacters = line.Length;
+        float interval = 1f / Mathf.Max(1f, charactersPerSecond);
+        float elapsed = 0f;
+        float pendingPause = 0f;
+
+        while (visibleCount < totalCharacters)
+        {
+            if (pendingPause > 0f)
+            {
+                pendingPause -= Time.unscaledDeltaTime;
+                yield return null;
+                continue;
+            }
+
+            elapsed += Time.unscaledDeltaTime;
+
+            while (elapsed >= interval && visibleCount < totalCharacters)
+            {
+                elapsed -= interval;
+                visibleCount++;
+                dialogueText.maxVisibleCharacters = visibleCount;
+
+                float punctuationPause = GetPauseAfterCharacter(line, visibleCount - 1);
+                if (punctuationPause > 0f)
+                {
+                    pendingPause = punctuationPause;
+                    break;
+                }
+            }
+
+            yield return null;
+        }
+
+        dialogueText.maxVisibleCharacters = int.MaxValue;
+        isTypingLine = false;
+        typewriterRoutine = null;
+        StopTypingSfxImmediate();
+
+        if (dialogueIndex == currentDialogues.Length - 1 && pendingOptionAction != null)
+        {
+            ShowOptionWithLastLine();
+        }
+    }
+
+    // Finishes the current typewriter line immediately.
+    private void CompleteCurrentLineInstantly()
+    {
+        if (!isTypingLine) return;
+
+        if (typewriterRoutine != null)
+        {
+            StopCoroutine(typewriterRoutine);
+            typewriterRoutine = null;
+        }
+
+        dialogueText.maxVisibleCharacters = int.MaxValue;
+        isTypingLine = false;
+        StopTypingSfxImmediate();
+
+        if (dialogueIndex == currentDialogues.Length - 1 && pendingOptionAction != null)
+        {
+            ShowOptionWithLastLine();
+        }
+    }
+
+    // Starts the correct looping typing sound for the active dialogue line.
+    private void StartTypingSfx()
+    {
+        bool isQuotedLine = IsQuotedLine(GetCurrentDialogueLine());
+        AudioClip clip = ResolveTypingClip(isQuotedLine);
+
+        if (clip == null) return;
+
+        float volume = ResolveTypingVolume(isQuotedLine);
+
+        AudioManager.EnsureInstance().PlayTypingLoop(clip, volume);
+    }
+
+    // Stops any active looping typing sound right away.
+    private void StopTypingSfxImmediate()
+    {
+        if (AudioManager.Instance == null) return;
+        AudioManager.Instance.StopTypingLoop();
+    }
+
+    // Returns the currently selected dialogue line text safely.
+    private string GetCurrentDialogueLine()
+    {
+        if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
+        {
+            return string.Empty;
+        }
+
+        return currentDialogues[dialogueIndex] ?? string.Empty;
+    }
+
+    // Checks whether the supplied dialogue line should use quoted-line audio settings.
+    private bool IsQuotedLine(string line)
+    {
+        if (string.IsNullOrEmpty(line)) return false;
+
+        return line.Contains("\"") ||
+               line.Contains("“") ||
+               line.Contains("”") ||
+               line.Contains("「") ||
+               line.Contains("」") ||
+               line.Contains("『") ||
+               line.Contains("』");
+    }
+
+    // Chooses the correct typing sound clip for the current dialogue context.
+    private AudioClip ResolveTypingClip(bool isQuotedLine)
+    {
+        if (isQuotedLine)
+        {
+            if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.quotedTypingSfx != null)
+            {
+                return activeDialogueAudioSettings.quotedTypingSfx;
+            }
+
+            if (defaultQuotedTypingSfx != null)
+            {
+                return defaultQuotedTypingSfx;
+            }
+        }
+
+        if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null)
+        {
+            return activeDialogueAudioSettings.typingSfx;
+        }
+
+        return defaultTypingSfx;
+    }
+
+    // Chooses the correct typing sound volume for the current dialogue context.
+    private float ResolveTypingVolume(bool isQuotedLine)
+    {
+        if (isQuotedLine)
+        {
+            if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.quotedTypingSfx != null)
+            {
+                return activeDialogueAudioSettings.quotedTypingSfxVolume;
+            }
+
+            if (defaultQuotedTypingSfx != null)
+            {
+                return defaultQuotedTypingSfxVolume;
+            }
+        }
+
+        if (activeDialogueAudioSettings != null && activeDialogueAudioSettings.typingSfx != null)
+        {
+            return activeDialogueAudioSettings.typingSfxVolume;
+        }
+
+        return defaultTypingSfxVolume;
+    }
+
+    // Returns any extra typewriter pause that should follow the given character.
+    private float GetPauseAfterCharacter(string line, int charIndex)
+    {
+        if (string.IsNullOrEmpty(line) || charIndex < 0 || charIndex >= line.Length)
+        {
+            return 0f;
+        }
+
+        char current = line[charIndex];
+
+        if (IsEllipsisDot(line, charIndex, out bool isEllipsisEnd))
+        {
+            return Mathf.Max(0f, isEllipsisEnd ? ellipsisEndPauseSeconds : ellipsisDotPauseSeconds);
+        }
+
+        if (current == ',' || current == '，')
+        {
+            return Mathf.Max(0f, commaPauseSeconds);
+        }
+
+        if (IsStandalonePeriod(line, charIndex))
+        {
+            return Mathf.Max(0f, periodPauseSeconds);
+        }
+
+        return 0f;
+    }
+
+    // Determines whether the current period should count as sentence punctuation.
+    private bool IsStandalonePeriod(string line, int charIndex)
+    {
+        char current = line[charIndex];
+        if (current != '.' && current != '。')
+        {
+            return false;
+        }
+
+        if (current == '.')
+        {
+            bool prevIsDot = charIndex > 0 && line[charIndex - 1] == '.';
+            bool nextIsDot = charIndex < line.Length - 1 && line[charIndex + 1] == '.';
+            if (prevIsDot || nextIsDot)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Checks whether the current character belongs to an ellipsis sequence.
+    private bool IsEllipsisDot(string line, int charIndex, out bool isEllipsisEnd)
+    {
+        isEllipsisEnd = false;
+        char current = line[charIndex];
+
+        if (current == '…')
+        {
+            bool nextIsEllipsis = charIndex < line.Length - 1 && line[charIndex + 1] == '…';
+            isEllipsisEnd = !nextIsEllipsis;
+            return true;
+        }
+
+        if (current != '.')
+        {
+            return false;
+        }
+
+        bool prevIsDot = charIndex > 0 && line[charIndex - 1] == '.';
+        bool nextIsDot = charIndex < line.Length - 1 && line[charIndex + 1] == '.';
+        bool isPartOfEllipsis = prevIsDot || nextIsDot;
+
+        if (!isPartOfEllipsis)
+        {
+            return false;
+        }
+
+        isEllipsisEnd = !nextIsDot;
+        return true;
     }
 
 }

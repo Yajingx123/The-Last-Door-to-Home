@@ -1,8 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections.Generic;
+
+/*
+Purpose: Displays interactive option choices and routes the player selection to callbacks.
+Attached GameObject: Dialogue UI manager or option menu GameObject in the scene canvas.
+Main responsibilities: Control dialogue UI state, react to input, and notify dependent gameplay systems.
+Inputs: UI references, dialogue content arrays, callbacks, and player input.
+Outputs or effects: Shows or hides UI, locks controls, and triggers dialogue-related side effects.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
 
 public class OptionMenu : MonoBehaviour
 {
@@ -25,6 +35,7 @@ public class OptionMenu : MonoBehaviour
     [SerializeField] private float minPanelHeight = 120f;
     [SerializeField] private float panelPaddingTop = 20f;
     [SerializeField] private float panelPaddingBottom = 20f;
+    [SerializeField] private float optionLineGap = 20f;
 
     [Header("玩家物体（拖Player）")]
     public GameObject player;
@@ -41,9 +52,11 @@ public class OptionMenu : MonoBehaviour
     private RectTransform optionPanelRect;
     private Vector2 optionPanelBaseAnchoredPos;
     private bool hasPanelBaseAnchoredPos;
+    private TextMeshProUGUI optionTemplate;
     private float optionSlotsBaseCenterY;
     private bool hasOptionSlotsBaseCenterY;
 
+    // Initializes cached references and one-time component state before gameplay begins.
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -67,9 +80,10 @@ public class OptionMenu : MonoBehaviour
             cursorFixedX = cursorRect.anchoredPosition.x;
         }
 
-        BuildOptionSlots();
+        InitializeOptionTemplate();
     }
 
+    // Cleans up cached state and running effects during teardown.
     void OnDestroy()
     {
         if (Instance == this)
@@ -78,6 +92,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
+    // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
         if (optionPanel == null || !optionPanel.activeSelf) return;
@@ -100,6 +115,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
+    // Shows the available pick options for this interaction.
     public void ShowPickOptions(PickableItem item)
     {
         if (item == null) return;
@@ -122,6 +138,7 @@ public class OptionMenu : MonoBehaviour
         ShowOptions(entries, true, null);
     }
 
+    // Shows the supplied option entries in the dialogue option menu.
     public void ShowOptions(List<OptionEntry> entries, bool closeDialogueOnConfirm = true, Action onMenuClosed = null)
     {
         if (optionPanel == null)
@@ -136,16 +153,9 @@ public class OptionMenu : MonoBehaviour
             return;
         }
 
-        BuildOptionSlots();
+        EnsureOptionSlots(entries.Count);
 
-        int supportedCount = Mathf.Clamp(maxOptions, 1, 4);
-        if (entries.Count > supportedCount)
-        {
-            Debug.LogWarning($"OptionMenu: 收到 {entries.Count} 个选项，最多支持 {supportedCount} 个，超出部分将被忽略。", this);
-        }
-
-        int showCount = Mathf.Min(entries.Count, supportedCount);
-        currentEntries = entries.GetRange(0, showCount);
+        currentEntries = new List<OptionEntry>(entries);
         closeDialogueWhenConfirmed = closeDialogueOnConfirm;
         onClose = onMenuClosed;
         optionPanel.SetActive(true);
@@ -163,6 +173,7 @@ public class OptionMenu : MonoBehaviour
         UpdateCursor();
     }
 
+    // Updates the visual cursor position for the currently selected option.
     void UpdateCursor()
     {
         if (cursorRect == null || currentEntries == null || currentEntries.Count == 0) return;
@@ -178,64 +189,62 @@ public class OptionMenu : MonoBehaviour
         cursorRect.anchoredPosition = pos;
     }
 
-    private void BuildOptionSlots()
+    // Initializes the reusable option UI template reference.
+    private void InitializeOptionTemplate()
     {
         optionSlots.Clear();
         if (options == null || options.Length == 0) return;
 
-        int supportedCount = Mathf.Clamp(maxOptions, 1, 4);
+        for (int i = 0; i < options.Length; i++)
+        {
+            if (options[i] == null) continue;
+            optionTemplate = options[i];
+            optionSlots.Add(optionTemplate);
+            break;
+        }
 
         for (int i = 0; i < options.Length; i++)
         {
-            if (options[i] != null) optionSlots.Add(options[i]);
-            if (optionSlots.Count >= supportedCount) break;
+            if (options[i] == null || options[i] == optionTemplate) continue;
+            options[i].gameObject.SetActive(false);
         }
 
         if (optionSlots.Count == 0) return;
 
-        RectTransform firstRect = optionSlots[0].GetComponent<RectTransform>();
-        if (firstRect != null)
+        RectTransform templateRect = optionTemplate.GetComponent<RectTransform>();
+        if (templateRect != null)
         {
-            optionItemHeight = Mathf.Max(1f, firstRect.sizeDelta.y);
-        }
-
-        if (optionSlots.Count >= 2)
-        {
-            RectTransform secondRect = optionSlots[1].GetComponent<RectTransform>();
-            if (firstRect != null && secondRect != null)
-            {
-                optionSpacing = Mathf.Abs(firstRect.anchoredPosition.y - secondRect.anchoredPosition.y);
-                optionSlotsBaseCenterY = (firstRect.anchoredPosition.y + secondRect.anchoredPosition.y) * 0.5f;
-                hasOptionSlotsBaseCenterY = true;
-            }
-        }
-        else
-        {
-            optionSpacing = Mathf.Max(optionItemHeight, 1f);
-            if (firstRect != null)
-            {
-                optionSlotsBaseCenterY = firstRect.anchoredPosition.y;
-                hasOptionSlotsBaseCenterY = true;
-            }
-        }
-
-        TextMeshProUGUI template = optionSlots[0];
-        if (!hasOptionSlotsBaseCenterY && firstRect != null)
-        {
-            optionSlotsBaseCenterY = firstRect.anchoredPosition.y;
+            optionItemHeight = Mathf.Max(1f, templateRect.sizeDelta.y);
+            optionSpacing = optionItemHeight + Mathf.Max(0f, optionLineGap);
+            optionSlotsBaseCenterY = templateRect.anchoredPosition.y;
             hasOptionSlotsBaseCenterY = true;
         }
-        for (int i = optionSlots.Count; i < supportedCount; i++)
+    }
+
+    // Ensures the option menu has enough UI slots for the current entries.
+    private void EnsureOptionSlots(int requiredCount)
+    {
+        if (requiredCount <= 0) return;
+        if (optionTemplate == null) InitializeOptionTemplate();
+        if (optionTemplate == null) return;
+
+        RectTransform templateRect = optionTemplate.GetComponent<RectTransform>();
+        if (!hasOptionSlotsBaseCenterY && templateRect != null)
         {
-            TextMeshProUGUI slot = Instantiate(template, template.transform.parent);
-            slot.name = $"{template.name}_Auto_{i + 1}";
+            optionSlotsBaseCenterY = templateRect.anchoredPosition.y;
+            hasOptionSlotsBaseCenterY = true;
+        }
+
+        for (int i = optionSlots.Count; i < requiredCount; i++)
+        {
+            TextMeshProUGUI slot = Instantiate(optionTemplate, optionTemplate.transform.parent);
+            slot.name = $"{optionTemplate.name}_Auto_{i + 1}";
 
             RectTransform rect = slot.GetComponent<RectTransform>();
-            if (rect != null && firstRect != null)
+            if (rect != null && templateRect != null)
             {
-                Vector2 anchored = firstRect.anchoredPosition;
-                anchored.y = firstRect.anchoredPosition.y - optionSpacing * i;
-                rect.anchoredPosition = anchored;
+                rect.anchoredPosition = templateRect.anchoredPosition;
+                rect.sizeDelta = templateRect.sizeDelta;
             }
 
             slot.gameObject.SetActive(false);
@@ -243,6 +252,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
+    // Resizes the option panel to fit the active entry count.
     private void ResizeOptionPanel(int count)
     {
         if (optionPanel == null) return;
@@ -267,6 +277,7 @@ public class OptionMenu : MonoBehaviour
         RepositionOptionSlots(count);
     }
 
+    // Repositions option slots so the current menu layout stays aligned.
     private void RepositionOptionSlots(int count)
     {
         if (count <= 0) return;
@@ -284,6 +295,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
+    // Confirms the currently highlighted option and runs its callback.
     void ConfirmSelect()
     {
         if (currentEntries == null || currentEntries.Count == 0) return;

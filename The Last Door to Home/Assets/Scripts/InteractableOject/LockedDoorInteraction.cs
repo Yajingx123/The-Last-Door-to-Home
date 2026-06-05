@@ -1,7 +1,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
+/*
+Purpose: Manages l oc ke dd oo ri nt er ac ti on behavior for this part of the game.
+Attached GameObject: Interactable scene object with collider and interaction logic.
+Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
+Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
+Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
 
 public class LockedDoorInteraction : MonoBehaviour, IInteractable
 {
@@ -42,13 +51,19 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
     [Header("可尝试的Key选项")]
     public DoorKeyOption[] keyOptions;
 
+    [Header("音效")]
+    public AudioClip sceneSwitchSfx;
+    [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
+
     private bool isUnlocked;
 
+    // Initializes cached references and one-time component state before gameplay begins.
     void Awake()
     {
         isUnlocked = Inventory.IsDoorUnlocked(doorUniqueID);
     }
 
+    // Executes this object interaction when the player activates it.
     public void OnInteract()
     {
         if (isUnlocked)
@@ -90,6 +105,7 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         showOptions.Invoke();
     }
 
+    // Builds option entries for the keys the player currently owns.
     private List<OptionMenu.OptionEntry> BuildOwnedKeyEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -112,6 +128,7 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         return entries;
     }
 
+    // Attempts to use the selected key on this locked door.
     private void TryUseKey(DoorKeyOption keyOption)
     {
         if (keyOption.isCorrectKey)
@@ -131,20 +148,30 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         }
     }
 
+    // Unlocks the door and applies its post-unlock state changes.
     private void UnlockDoor()
     {
         isUnlocked = true;
         Inventory.MarkDoorUnlocked(doorUniqueID);
     }
 
+    // Performs the requested scene change immediately.
     private void SwitchSceneNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
-        PlayerSpawn.SPAWN_POSITION = spawnPosition;
-        PlayerSpawn.NEED_SPAWN = true;
-        SceneManager.LoadScene(targetSceneName);
+        if (sceneSwitchSfx != null)
+        {
+            AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+        }
+
+        SceneTransition.LoadScene(targetSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = spawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 
+    // Handles trigger entry events for this gameplay object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isUnlocked) return;

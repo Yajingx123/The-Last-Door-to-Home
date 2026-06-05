@@ -1,6 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
+/*
+Purpose: Selects and plays story beats based on flags, inventory state, and event triggers.
+Attached GameObject: Central story manager GameObject.
+Main responsibilities: Evaluate progression conditions, trigger story responses, and update narrative state.
+Inputs: Event IDs, story flags, inventory state, and serialized story data.
+Outputs or effects: Advances narrative state, launches dialogue, or gates gameplay actions.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class StoryDirector : MonoBehaviour
 {
     private const string BeatPlayedPrefPrefix = "StoryBeatPlayed:";
@@ -21,6 +31,7 @@ public class StoryDirector : MonoBehaviour
     public bool autoPlayFirstBeatOnStart = false;
     public float autoPlayDelaySeconds = 1f;
 
+    // Initializes cached references and one-time component state before gameplay begins.
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -32,6 +43,7 @@ public class StoryDirector : MonoBehaviour
         Instance = this;
     }
 
+    // Cleans up cached state and running effects during teardown.
     void OnDestroy()
     {
         if (Instance == this)
@@ -40,6 +52,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
         if (autoPlayFirstBeatOnStart)
@@ -48,12 +61,14 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // Finds and attempts to play the best story beat for the incoming event ID.
     public bool TryHandleEvent(string eventId)
     {
         StoryBeat best = FindBestBeat(eventId);
         return TryHandleBeat(best);
     }
 
+    // Validates a specific story beat and plays it when allowed.
     public bool TryHandleBeat(StoryBeat beat)
     {
         if (beat == null) return false;
@@ -70,6 +85,7 @@ public class StoryDirector : MonoBehaviour
         return beat.blockDefaultAction;
     }
 
+    // Waits for the dialogue system and then auto-plays the opening story beat.
     private IEnumerator AutoPlayFirstBeatWhenReady()
     {
         while (DialogueManager.Instance == null)
@@ -90,6 +106,7 @@ public class StoryDirector : MonoBehaviour
         TryAutoPlayFirstBeat();
     }
 
+    // Attempts to trigger the first configured beat when startup conditions allow it.
     private void TryAutoPlayFirstBeat()
     {
         if (beats == null || beats.Length == 0) return;
@@ -101,6 +118,7 @@ public class StoryDirector : MonoBehaviour
         TryHandleBeat(first);
     }
 
+    // Finds the highest-priority playable beat for the supplied event ID.
     private StoryBeat FindBestBeat(string eventId)
     {
         if (string.IsNullOrWhiteSpace(eventId)) return null;
@@ -124,6 +142,7 @@ public class StoryDirector : MonoBehaviour
         return best;
     }
 
+    // Checks whether the supplied beat passes all playback requirements.
     private bool CanPlay(StoryBeat beat)
     {
         if (IsOneShotEnabled(beat) && IsBeatAlreadyPlayed(beat)) return false;
@@ -134,6 +153,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // Verifies that every required story flag is currently set.
     private bool HasAllFlags(string[] flags)
     {
         if (flags == null) return true;
@@ -148,6 +168,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // Checks whether any blocking story flag is currently set.
     private bool HasAnyFlag(string[] flags)
     {
         if (flags == null) return false;
@@ -162,6 +183,7 @@ public class StoryDirector : MonoBehaviour
         return false;
     }
 
+    // Verifies that all required inventory items are currently collected.
     private bool HasAllItems(string[] itemIDs)
     {
         if (itemIDs == null) return true;
@@ -176,6 +198,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // Checks whether any blocked inventory item is currently collected.
     private bool HasAnyItem(string[] itemIDs)
     {
         if (itemIDs == null) return false;
@@ -190,6 +213,7 @@ public class StoryDirector : MonoBehaviour
         return false;
     }
 
+    // Applies the story flags granted when this beat plays.
     private void ApplyFlags(string[] flags)
     {
         if (flags == null) return;
@@ -202,6 +226,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // Chooses the dialogue lines that should be used for this story beat.
     private string[] ResolveDialogues(StoryBeat beat)
     {
         if (beat == null) return null;
@@ -229,6 +254,7 @@ public class StoryDirector : MonoBehaviour
         return beat.dialogues;
     }
 
+    // Advances the attempt counter used for repeat narration variants.
     private void IncreaseAttemptCounter(StoryBeat beat)
     {
         if (beat == null) return;
@@ -238,6 +264,7 @@ public class StoryDirector : MonoBehaviour
         StoryFlags.IncrementCounter(beat.attemptCounterKey);
     }
 
+    // Asks the dialogue system to play the supplied story dialogue lines.
     private bool PlayDialogues(StoryBeat beat, string[] lines)
     {
         if (DialogueManager.Instance == null) return false;
@@ -250,10 +277,11 @@ public class StoryDirector : MonoBehaviour
             DialogueManager.Instance.ShowDialogueImage(beat.dialogueImageSprite);
         }
 
-        DialogueManager.Instance.ShowDialogue(lines);
+        DialogueManager.Instance.ShowDialogue(lines, null, null, null, beat != null ? beat.dialogueAudioSettings : null);
         return true;
     }
 
+    // Checks runtime and saved data to see whether this beat already fired.
     private bool IsBeatAlreadyPlayed(StoryBeat beat)
     {
         string key = GetBeatKey(beat);
@@ -263,6 +291,7 @@ public class StoryDirector : MonoBehaviour
         return PlayerPrefs.GetInt(BeatPlayedPrefPrefix + key, 0) == 1;
     }
 
+    // Records this beat as played so one-shot content does not repeat.
     private void MarkBeatPlayed(StoryBeat beat)
     {
         if (!IsOneShotEnabled(beat)) return;
@@ -278,6 +307,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // Determines whether the supplied beat should only play once.
     private bool IsOneShotEnabled(StoryBeat beat)
     {
         if (beat == null) return true;
@@ -285,6 +315,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // Builds a stable key used to track story beat completion.
     private string GetBeatKey(StoryBeat beat)
     {
         if (beat == null) return string.Empty;

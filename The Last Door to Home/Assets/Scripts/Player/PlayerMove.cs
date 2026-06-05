@@ -1,11 +1,25 @@
 using UnityEngine;
 
+/*
+Purpose: Handles player movement input, facing animation, and footstep playback.
+Attached GameObject: Player GameObject or a player-specific child object.
+Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
+Inputs: Inspector references, Unity input, and state from linked gameplay managers.
+Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
+Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
+Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+*/
+
 public class PlayerMove : MonoBehaviour
 {
     [Header("移动速度")]
     public float moveSpeed = 2.5f;
     [Header("松键后动画缓冲时间（秒）")]
     public float stopFreezeDelay = 0.08f;
+    [Header("脚步音效")]
+    public AudioClip footstepClip;
+    public float footstepInterval = 0.38f;
+    [Range(0f, 1f)] public float footstepVolume = 0.55f;
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -13,7 +27,12 @@ public class PlayerMove : MonoBehaviour
     private Vector2 inputMoveDir = Vector2.zero;
     private bool isMoving;
     private float stopTimer;
+    private float footstepTimer;
+    private bool wasMovingThisFrame;
 
+    public bool IsCurrentlyMoving => inputMoveDir.sqrMagnitude > 0.01f;
+
+    // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -23,6 +42,7 @@ public class PlayerMove : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
+    // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
         // 对话锁定
@@ -30,6 +50,9 @@ public class PlayerMove : MonoBehaviour
         {
             inputMoveDir = Vector2.zero;
             stopTimer = 0f;
+            footstepTimer = 0f;
+            wasMovingThisFrame = false;
+            StopFootstepAudio();
             FreezeAtCurrentDirection();
             return;
         }
@@ -50,6 +73,8 @@ public class PlayerMove : MonoBehaviour
             inputMoveDir = new Vector2(h, 0);
         }
 
+        wasMovingThisFrame = inputMoveDir.sqrMagnitude > 0.01f;
+
         if (inputMoveDir.sqrMagnitude > 0.01f)
         {
             // 有输入：更新朝向并正常播放动画
@@ -62,6 +87,7 @@ public class PlayerMove : MonoBehaviour
             // 让短按也能在本帧立刻评估方向切换，避免“点一下来不及转向”
             anim.Update(0f);
             isMoving = true;
+            UpdateFootstepAudio();
         }
         else
         {
@@ -72,27 +98,58 @@ public class PlayerMove : MonoBehaviour
                 anim.SetFloat("MoveX", lastMoveDir.x);
                 anim.SetFloat("MoveY", lastMoveDir.y);
                 anim.speed = 1f;
+                StopFootstepAudio();
             }
             else
             {
                 // 缓冲结束后，停在最后朝向的第1帧
+                footstepTimer = 0f;
+                StopFootstepAudio();
                 FreezeAtCurrentDirection();
             }
         }
     }
 
+    // Applies physics-driven updates on the fixed timestep.
     void FixedUpdate()
     {
         rb.velocity = inputMoveDir * moveSpeed;
     }
 
+    // Immediately cancels movement and freezes the player in the current facing direction.
     public void ForceStopImmediate()
     {
         inputMoveDir = Vector2.zero;
         stopTimer = 0f;
+        footstepTimer = 0f;
+        wasMovingThisFrame = false;
+        StopFootstepAudio();
         FreezeAtCurrentDirection();
     }
 
+    // Updates timed footstep playback while the player is moving.
+    private void UpdateFootstepAudio()
+    {
+        if (footstepClip == null || !wasMovingThisFrame)
+        {
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer > 0f) return;
+
+        AudioManager.EnsureInstance().PlayFootstep(footstepClip, footstepVolume);
+        footstepTimer = Mathf.Max(0.05f, footstepInterval);
+    }
+
+    // Stops the active footstep loop or one-shot playback when movement ends.
+    private void StopFootstepAudio()
+    {
+        if (AudioManager.Instance == null) return;
+        AudioManager.Instance.StopFootstep();
+    }
+
+    // Freezes movement while preserving the current facing animation frame.
     private void FreezeAtCurrentDirection()
     {
         rb.velocity = Vector2.zero;
