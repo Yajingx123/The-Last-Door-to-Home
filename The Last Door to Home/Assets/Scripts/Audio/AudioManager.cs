@@ -106,6 +106,7 @@ public class AudioManager : MonoBehaviour
         Initialize();
 
         float resolvedFadeOut = fadeOutDuration >= 0f ? fadeOutDuration : defaultBgmFadeOutDuration;
+        float resolvedFadeIn = fadeInDuration >= 0f ? fadeInDuration : defaultBgmFadeOutDuration;
         float resolvedVolume = targetVolume >= 0f ? targetVolume : defaultBgmVolume;
 
         if (!restartIfSameClip && bgmSource.clip == clip && bgmSource.isPlaying)
@@ -119,7 +120,7 @@ public class AudioManager : MonoBehaviour
             StopCoroutine(bgmRoutine);
         }
 
-        bgmRoutine = StartCoroutine(SwitchBgmRoutine(clip, resolvedFadeOut, resolvedVolume));
+        bgmRoutine = StartCoroutine(SwitchBgmRoutine(clip, resolvedFadeOut, resolvedFadeIn, resolvedVolume));
     }
 
     // Stops the active background music with the requested fade-out.
@@ -133,7 +134,7 @@ public class AudioManager : MonoBehaviour
         }
 
         float resolvedFadeOut = fadeOutDuration >= 0f ? fadeOutDuration : defaultBgmFadeOutDuration;
-        bgmRoutine = StartCoroutine(SwitchBgmRoutine(null, resolvedFadeOut, 0f));
+        bgmRoutine = StartCoroutine(SwitchBgmRoutine(null, resolvedFadeOut, 0f, 0f));
     }
 
     // Plays a one-shot sound effect through the shared audio manager.
@@ -212,7 +213,7 @@ public class AudioManager : MonoBehaviour
     }
 
     // Runs the music switch routine between two background tracks.
-    private IEnumerator SwitchBgmRoutine(AudioClip nextClip, float fadeOutDuration, float targetVolume)
+    private IEnumerator SwitchBgmRoutine(AudioClip nextClip, float fadeOutDuration, float fadeInDuration, float targetVolume)
     {
         if (bgmSource.isPlaying && bgmSource.clip != null)
         {
@@ -228,8 +229,14 @@ public class AudioManager : MonoBehaviour
         }
 
         bgmSource.clip = nextClip;
-        bgmSource.volume = targetVolume;
+        bgmSource.volume = fadeInDuration > 0f ? 0f : targetVolume;
         bgmSource.Play();
+
+        if (fadeInDuration > 0f)
+        {
+            yield return FadeBgm(0f, targetVolume, fadeInDuration);
+        }
+
         bgmRoutine = null;
     }
 
