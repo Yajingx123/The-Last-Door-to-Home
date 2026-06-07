@@ -218,12 +218,14 @@ MonoBehaviour:
       \nJeff is standing behind you, carrying the materials and some specimens, including
       the eye flowers."
   - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
-    narration: Just as the colleague was taking out the energy stone from the box,
-      Jeff's eye flowers suddenly became active and rushed out.
+    narration: 'Just as the colleague was taking out the energy stone from the box,
+      Jeff''s eye flowers suddenly became active and rushed out.
+
+      All of this
+      was unexpected. Its leaves, like vines, tightly wrapped around the energy stone,
+      began to rapidly absorb energy and then changed..'
   - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
-    narration: All of this was unexpected. Its leaves, like vines, tightly wrapped
-      around the energy stone, began to rapidly absorb energy and then changed...
-      became a huge aggressive creature.
+    narration: ... became a huge aggressive creature.
   - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
     narration: "Everyone was caught off guard. You and Amelia were also attacked.
       \n...and that is what happened before you woke up."
@@ -245,19 +247,19 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   bgmLineCues:
   - lineNumber: 0
-    bgmClip: {fileID: 8300000, guid: e4f96eb458b4bc64187cc1d2f22ae0ee, type: 3}
-    fadeOutDuration: 0
-    fadeInDuration: 0
-    volume: 1
-    restartIfSameClip: 0
-  - lineNumber: 1
-    bgmClip: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}
+    bgmClip: {fileID: 8300000, guid: 33a3a0dbe4ddbd7488e1cb9d46429609, type: 3}
     fadeOutDuration: 0
     fadeInDuration: 0
     volume: 1
     restartIfSameClip: 0
   - lineNumber: 2
-    bgmClip: {fileID: 8300000, guid: 33a3a0dbe4ddbd7488e1cb9d46429609, type: 3}
+    bgmClip: {fileID: 8300000, guid: a722d7fbfafa25f4a8e3b529291f2c78, type: 3}
+    fadeOutDuration: 0
+    fadeInDuration: 0
+    volume: 1
+    restartIfSameClip: 0
+  - lineNumber: 3
+    bgmClip: {fileID: 8300000, guid: eb09a1d2f5badfc4e800f0d883dfa38f, type: 3}
     fadeOutDuration: 0
     fadeInDuration: 0
     volume: 1
