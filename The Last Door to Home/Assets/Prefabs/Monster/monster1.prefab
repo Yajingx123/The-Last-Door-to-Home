@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2975129669049981179
 Transform:
   m_ObjectHideFlags: 0
@@ -179,8 +179,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
-  vineRowPrefab: {fileID: 7046168179983847338}
   horizontalAlignment: 0
+  verticalPattern: 0
   spawnOffset: {x: 0, y: 0}
   rowVisibleDuration: 2
   gapBetweenRows: 1
