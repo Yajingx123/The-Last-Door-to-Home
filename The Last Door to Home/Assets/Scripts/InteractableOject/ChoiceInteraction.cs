@@ -24,7 +24,8 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
     public enum ChoiceActionType
     {
         None,
-        LoadScene
+        LoadScene,
+        LoadTemporaryCutscene
     }
 
     [Serializable]
@@ -131,6 +132,17 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
                 PlayerSpawn.SPAWN_POSITION = choice.spawnPosition;
                 PlayerSpawn.NEED_SPAWN = true;
             });
+        }
+
+        if (choice.actionType == ChoiceActionType.LoadTemporaryCutscene && !string.IsNullOrWhiteSpace(choice.targetSceneName))
+        {
+            if (sceneSwitchSfx != null)
+            {
+                AudioManager.EnsureInstance().PlaySfx(sceneSwitchSfx, sceneSwitchSfxVolume);
+            }
+
+            CutsceneReturnContext.SaveCurrentSceneAndPlayerPosition();
+            SceneTransition.LoadScene(choice.targetSceneName);
         }
     }
 }

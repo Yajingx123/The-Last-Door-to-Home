@@ -20,7 +20,21 @@ MonoBehaviour:
   requiredItemUniqueIDs: []
   blockedItemUniqueIDs: []
   dialogues:
-  - 222
+  - '...
+
+    ...
+
+    Another paper.'
+  - "---\nTest 017-C: Group Synchronous response\r\nResult: After one specimen was
+    stimulated, three nearby specimens showed eye-opening responses within 2.7 seconds.
+    The reason is unknown.\r"
+  - 'Test 017-D: Prolonged visual contact
+
+    Result: The experimenter reported
+    mild headaches, decreased attention and brief illusions. It is necessary to further
+    confirm whether it is related to fatigue.
+
+    ---'
   dialogueAudioSettings:
     bgmOnStart: {fileID: 0}
     bgmOnStartFadeOutDuration: 1
