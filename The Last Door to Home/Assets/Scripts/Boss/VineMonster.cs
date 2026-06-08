@@ -30,6 +30,7 @@ public class VineMonster : MonoBehaviour
     }
 
     [Header("区域设置")]
+    [SerializeField] private bool useArenaSettings = true;
     [SerializeField] private MonsterController controller;
     [SerializeField] private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
     [SerializeField] private VerticalPattern verticalPattern = VerticalPattern.TopToBottomThenBack;
@@ -77,7 +78,7 @@ public class VineMonster : MonoBehaviour
             StopCoroutine(patternRoutine);
         }
 
-        patternRoutine = StartCoroutine(PlayFirstPatternRoutine());
+        patternRoutine = StartCoroutine(useArenaSettings ? PlayFirstPatternRoutine() : PlayStaticPatternRoutine());
     }
 
     // Stops the active pattern immediately.
@@ -132,6 +133,31 @@ public class VineMonster : MonoBehaviour
                 {
                     yield return PlayRow(rowIndex, topLeftPosition, arenaWidth, safeCellSize, safeVisibleDuration, safeGap);
                 }
+            }
+
+            RoundCompleted?.Invoke(this);
+        }
+        while (loopForever && isAttackEnabled);
+
+        patternRoutine = null;
+    }
+
+    // Repeats the same visible and gap timing without moving the vine away from its placed position.
+    private IEnumerator PlayStaticPatternRoutine()
+    {
+        float safeVisibleDuration = Mathf.Max(0.01f, rowVisibleDuration);
+        float safeGap = Mathf.Max(0f, gapBetweenRows);
+
+        do
+        {
+            RestartAnimation(animator);
+            SetActiveState(true);
+            yield return new WaitForSeconds(safeVisibleDuration);
+            SetActiveState(false);
+
+            if (safeGap > 0f)
+            {
+                yield return new WaitForSeconds(safeGap);
             }
 
             RoundCompleted?.Invoke(this);
@@ -229,6 +255,15 @@ public class VineMonster : MonoBehaviour
     // Reads shared arena values from the scene config.
     private bool TryGetArenaValues(out Vector2 topLeftPosition, out int safeColumns, out int safeRows, out float safeCellSize)
     {
+        if (!useArenaSettings)
+        {
+            topLeftPosition = Vector2.zero;
+            safeColumns = 1;
+            safeRows = 1;
+            safeCellSize = 1f;
+            return false;
+        }
+
         ResolveController();
 
         if (controller == null)
@@ -287,9 +322,44 @@ public class VineMonster : MonoBehaviour
         }
     }
 
+    // Lets vines without arena movement enabled still damage the player while staying in place.
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        TryDamagePlayerOnContact(other);
+    }
+
+    // Keeps stationary vines hazardous while the player remains inside the trigger.
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        TryDamagePlayerOnContact(other);
+    }
+
+    // Applies contact damage for static vines that do not use arena row movement.
+    private void TryDamagePlayerOnContact(Collider2D other)
+    {
+        if (useArenaSettings || !isAttackEnabled)
+        {
+            return;
+        }
+
+        ResolveController();
+        PlayerMove playerMove = other.GetComponentInParent<PlayerMove>();
+        if (playerMove == null || controller == null)
+        {
+            return;
+        }
+
+        controller.TryDamagePlayer("VineMonster", this);
+    }
+
     // Draws the configured arena bounds in the editor for easier placement.
     private void OnDrawGizmosSelected()
     {
+        if (!useArenaSettings)
+        {
+            return;
+        }
+
         if (!TryGetArenaValues(out Vector2 topLeftPosition, out int safeColumns, out int safeRows, out float safeCellSize))
         {
             return;
