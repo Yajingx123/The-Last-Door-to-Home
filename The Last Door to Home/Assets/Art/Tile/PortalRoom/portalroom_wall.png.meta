@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 682e0565516b2ee47b8f8b99cebf1244
+guid: 31cbb6ffc0bd59c4393c578554e35a25
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,13 +97,76 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: monster2-Sheet_0
+      name: portalroom_wall_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 085b0e510ec330643afb92b1a45ff190
+      internalID: -531765587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: portalroom_wall_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a79f1978df54a2b4b88f0073011f3786
+      internalID: -1244514312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: portalroom_wall_2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46576c30f744ba849b9d0b5c74525b38
+      internalID: -308794343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: portalroom_wall_3
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 96
-        height: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -111,20 +174,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0d0b6266ea2350349830063aaf83f219
-      internalID: 1013493401
+      spriteID: c7f4ff5b01343964f9bfb79a28d2e2b4
+      internalID: -960369259
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster2-Sheet_1
+      name: portalroom_wall_4
       rect:
         serializedVersion: 2
-        x: 96
+        x: 32
         y: 0
-        width: 96
-        height: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -132,20 +195,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2ee1485eb58b7b24792bfc1aef0ca5a7
-      internalID: -604378740
+      spriteID: df437272875210f45a7d90deeb02cbc1
+      internalID: 481256790
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster2-Sheet_2
+      name: portalroom_wall_5
       rect:
         serializedVersion: 2
-        x: 192
+        x: 64
         y: 0
-        width: 96
-        height: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,92 +216,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a685fdf92469e9d4cb1b34d422ac4242
-      internalID: 1568935758
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: monster2-Sheet_3
-      rect:
-        serializedVersion: 2
-        x: 288
-        y: 0
-        width: 96
-        height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 53bcac709538ecd48ba6f494b6e5d302
-      internalID: -755912869
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: monster2-Sheet_4
-      rect:
-        serializedVersion: 2
-        x: 384
-        y: 0
-        width: 96
-        height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 50c0d8155914f2847b7ed7853afb0d6d
-      internalID: -1787893644
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: monster2-Sheet_5
-      rect:
-        serializedVersion: 2
-        x: 480
-        y: 0
-        width: 96
-        height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d93fef40e59d4be47bbecdc68fd781d1
-      internalID: 1619118500
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: monster2-Sheet_6
-      rect:
-        serializedVersion: 2
-        x: 576
-        y: 0
-        width: 96
-        height: 96
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5b6e21ea19a4a764885a30482dafaa4f
-      internalID: 2079849690
+      spriteID: ea0c8daf26ff99240bbcdf920946b93a
+      internalID: -1022483692
       vertices: []
       indices: 
       edges: []
@@ -254,13 +233,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      monster2-Sheet_0: 1013493401
-      monster2-Sheet_1: -604378740
-      monster2-Sheet_2: 1568935758
-      monster2-Sheet_3: -755912869
-      monster2-Sheet_4: -1787893644
-      monster2-Sheet_5: 1619118500
-      monster2-Sheet_6: 2079849690
+      portalroom_wall_0: -531765587
+      portalroom_wall_1: -1244514312
+      portalroom_wall_2: -308794343
+      portalroom_wall_3: -960369259
+      portalroom_wall_4: 481256790
+      portalroom_wall_5: -1022483692
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

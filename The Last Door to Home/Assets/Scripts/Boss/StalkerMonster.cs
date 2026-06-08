@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 
 /*
-Purpose: Controls a boss minion that spawns away from the player, periodically locks a target point, and dashes to it.
+Purpose: Controls a boss minion that periodically locks the player's position and slides straight toward it.
 Attached GameObject: The enemy prefab or a scene enemy object with a Collider2D and optional Animator.
-Main responsibilities: Choose a valid spawn cell, wait, snapshot the player's position, move in a straight line, pause, and repeat.
+Main responsibilities: Wait, snapshot the player's position, move in a straight line, pause, and repeat.
 Inputs: Arena settings, player reference or auto-discovery, and timing or movement values from the Inspector.
 Outputs or effects: Repositions and moves the enemy within the arena, and logs when it collides with the player.
 Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
@@ -15,8 +15,6 @@ public class StalkerMonster : MonoBehaviour
 {
     [Header("区域设置")]
     [SerializeField] private MonsterController controller;
-    [SerializeField] private int minColumnDifference = 3;
-    [SerializeField] private int minRowDifference = 3;
 
     [Header("行为")]
     [SerializeField] private float lockDelay = 3f;
@@ -73,7 +71,6 @@ public class StalkerMonster : MonoBehaviour
         ResolveController();
         isAttackEnabled = true;
         SetIdleVisualState(true);
-        PlaceAtRandomValidSpawn();
 
         if (behaviorRoutine != null)
         {
@@ -104,7 +101,28 @@ public class StalkerMonster : MonoBehaviour
         SetIdleVisualState(visibleWhenIdle);
     }
 
-    // Runs the repeated delay, lock, dash, and wait sequence.
+    // Keeps the monster stationary at its placed idle point while leaving contact damage active.
+    public void EnableIdleDamage()
+    {
+        isAttackEnabled = false;
+
+        if (behaviorRoutine != null)
+        {
+            StopCoroutine(behaviorRoutine);
+            behaviorRoutine = null;
+        }
+
+        transform.position = initialPosition;
+
+        if (hitbox != null)
+        {
+            hitbox.enabled = true;
+        }
+
+        SetIdleVisualState(visibleWhenIdle);
+    }
+
+    // Runs the repeated delay, lock, slide, and wait sequence.
     private IEnumerator BehaviorRoutine()
     {
         if (hitbox != null)
@@ -124,8 +142,7 @@ public class StalkerMonster : MonoBehaviour
                 continue;
             }
 
-            Vector2Int targetCell = controller.GetClosestCellToPlayer();
-            Vector2 targetPosition = controller.GetCellCenter(targetCell.x, targetCell.y);
+            Vector2 targetPosition = GetLockedPlayerPosition();
             yield return MoveToTarget(targetPosition);
             yield return new WaitForSeconds(Mathf.Max(0f, stayDuration));
         }
@@ -145,35 +162,17 @@ public class StalkerMonster : MonoBehaviour
         transform.position = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
     }
 
-    // Places the enemy on a random grid cell that is far enough from the player.
-    private void PlaceAtRandomValidSpawn()
+    // Locks the player's current grid position before the monster starts moving.
+    private Vector2 GetLockedPlayerPosition()
     {
         ResolveController();
-
-        if (controller == null)
+        if (controller == null || controller.Player == null)
         {
-            return;
+            return transform.position;
         }
 
-        int safeColumns = controller.Columns;
-        int safeRows = controller.Rows;
-        Vector2Int playerCell = controller.Player != null ? controller.GetClosestCellToPlayer() : controller.GetCenterCell();
-
-        const int maxAttempts = 64;
-
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
-        {
-            Vector2Int candidateCell = GetRandomCell(safeColumns, safeRows);
-            if (IsSpawnCellValid(candidateCell, playerCell))
-            {
-                Vector2 candidatePosition = controller.GetCellCenter(candidateCell.x, candidateCell.y);
-                transform.position = new Vector3(candidatePosition.x, candidatePosition.y, transform.position.z);
-                return;
-            }
-        }
-
-        Vector2 fallbackPosition = GetFallbackSpawnCellCenter(safeColumns, safeRows, playerCell);
-        transform.position = new Vector3(fallbackPosition.x, fallbackPosition.y, transform.position.z);
+        Vector2Int targetCell = controller.GetClosestCellToPlayer();
+        return controller.GetCellCenter(targetCell.x, targetCell.y);
     }
 
     // Finds the shared arena config when not explicitly assigned.
@@ -183,52 +182,6 @@ public class StalkerMonster : MonoBehaviour
         {
             controller = FindObjectOfType<MonsterController>();
         }
-    }
-
-    // Returns a random cell inside the configured arena.
-    private Vector2Int GetRandomCell(int safeColumns, int safeRows)
-    {
-        int randomColumn = Random.Range(0, safeColumns);
-        int randomRow = Random.Range(0, safeRows);
-        return new Vector2Int(randomColumn, randomRow);
-    }
-
-    // Returns the cell center farthest from the player when random attempts fail.
-    private Vector2 GetFallbackSpawnCellCenter(int safeColumns, int safeRows, Vector2Int playerCell)
-    {
-        Vector2 bestPosition = controller != null ? controller.GetArenaCenter() : Vector2.zero;
-        float bestDistance = -1f;
-
-        for (int rowIndex = 0; rowIndex < safeRows; rowIndex++)
-        {
-            for (int columnIndex = 0; columnIndex < safeColumns; columnIndex++)
-            {
-                Vector2Int candidateCell = new Vector2Int(columnIndex, rowIndex);
-                if (!IsSpawnCellValid(candidateCell, playerCell))
-                {
-                    continue;
-                }
-
-                Vector2 candidate = controller.GetCellCenter(columnIndex, rowIndex);
-                float distance = Vector2.Distance(candidate, controller.GetCellCenter(playerCell.x, playerCell.y));
-                if (distance > bestDistance)
-                {
-                    bestDistance = distance;
-                    bestPosition = candidate;
-                }
-            }
-        }
-
-        return bestPosition;
-    }
-
-    // Validates the requested spawn cell using separate column or row distance rules.
-    private bool IsSpawnCellValid(Vector2Int candidateCell, Vector2Int playerCell)
-    {
-        int columnDifference = Mathf.Abs(candidateCell.x - playerCell.x);
-        int rowDifference = Mathf.Abs(candidateCell.y - playerCell.y);
-        return columnDifference >= Mathf.Max(0, minColumnDifference)
-            || rowDifference >= Mathf.Max(0, minRowDifference);
     }
 
     // Applies damage when this monster collides with the player.

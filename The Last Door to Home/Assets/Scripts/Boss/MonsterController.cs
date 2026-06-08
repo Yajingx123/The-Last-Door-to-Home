@@ -45,6 +45,7 @@ public class MonsterController : MonoBehaviour
     [SerializeField] private VineMonster primaryVineMonster;
     [SerializeField] private StalkerMonster stalkerMonster;
     [SerializeField] private VineMonster secondaryVineMonster;
+    [SerializeField] private float stalkerOpeningIdleDuration = 20f;
 
     private int currentHearts;
     private bool isInvulnerable;
@@ -54,9 +55,7 @@ public class MonsterController : MonoBehaviour
     private Color[] originalRendererColors;
     private GameObject heartsUiObject;
     private Image[] heartImages;
-    private readonly HashSet<int> damagedSourceIdsThisFrame = new HashSet<int>();
-    private int lastDamageFrame = -1;
-    private int completedPrimaryRounds;
+    private Coroutine openingStalkerRoutine;
 
     public Transform Player
     {
@@ -111,32 +110,12 @@ public class MonsterController : MonoBehaviour
     public bool TryDamagePlayer(string sourceName, Object damageSource = null)
     {
         ResolvePlayerReference();
-        if (isDeathSequenceActive || Player == null)
-        {
-            return false;
-        }
-
-        int currentFrame = Time.frameCount;
-        int sourceId = damageSource != null ? damageSource.GetInstanceID() : sourceName.GetHashCode();
-        bool isSameDamageFrame = currentFrame == lastDamageFrame;
-
-        if (!isSameDamageFrame)
-        {
-            damagedSourceIdsThisFrame.Clear();
-
-            if (isInvulnerable)
-            {
-                return false;
-            }
-        }
-        else if (damagedSourceIdsThisFrame.Contains(sourceId))
+        if (isDeathSequenceActive || isInvulnerable || Player == null)
         {
             return false;
         }
 
         CachePlayerRenderers();
-        damagedSourceIdsThisFrame.Add(sourceId);
-        lastDamageFrame = currentFrame;
         currentHearts = Mathf.Max(0, currentHearts - 1);
         RefreshHeartUI();
         Debug.Log($"{sourceName} hit player. Hearts remaining: {currentHearts}", damageSource != null ? damageSource : this);
@@ -149,6 +128,7 @@ public class MonsterController : MonoBehaviour
                 invulnerabilityRoutine = null;
             }
 
+            RestorePlayerVisualAlpha(1f);
             BeginDeathSequence();
             return true;
         }
@@ -162,48 +142,68 @@ public class MonsterController : MonoBehaviour
         return true;
     }
 
-    // Sets up the opening monster states and listens for round progression from the primary vine.
+    // Sets up the opening monster states so the stalker can wait briefly before joining the fight.
     private void SetupBattlePhases()
     {
         if (primaryVineMonster != null)
         {
-            primaryVineMonster.RoundCompleted -= HandlePrimaryVineRoundCompleted;
-            primaryVineMonster.RoundCompleted += HandlePrimaryVineRoundCompleted;
             primaryVineMonster.ActivateMonster();
         }
 
         if (stalkerMonster != null)
         {
-            stalkerMonster.DeactivateMonster();
+            stalkerMonster.EnableIdleDamage();
+            StartOpeningStalkerRoutine();
         }
 
         if (secondaryVineMonster != null)
         {
-            secondaryVineMonster.DeactivateMonster();
+            secondaryVineMonster.ActivateMonster();
         }
-
-        completedPrimaryRounds = 0;
     }
 
-    // Advances the encounter phases after each full primary-vine round.
-    private void HandlePrimaryVineRoundCompleted(VineMonster source)
+    // Starts the delayed opening activation for the stalker monster.
+    private void StartOpeningStalkerRoutine()
     {
-        completedPrimaryRounds++;
+        StopOpeningStalkerRoutine();
 
-        if (completedPrimaryRounds == 1)
+        if (stalkerMonster == null)
         {
-            if (stalkerMonster != null)
-            {
-                stalkerMonster.ActivateMonster();
-            }
+            return;
         }
-        else if (completedPrimaryRounds == 2)
+
+        if (stalkerOpeningIdleDuration <= 0f)
         {
-            if (secondaryVineMonster != null)
-            {
-                secondaryVineMonster.ActivateMonster();
-            }
+            stalkerMonster.ActivateMonster();
+            return;
         }
+
+        openingStalkerRoutine = StartCoroutine(OpeningStalkerRoutine());
+    }
+
+    // Cancels the pending stalker startup when the controller is torn down.
+    private void StopOpeningStalkerRoutine()
+    {
+        if (openingStalkerRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(openingStalkerRoutine);
+        openingStalkerRoutine = null;
+    }
+
+    // Waits the configured time, then starts the stalker movement loop.
+    private IEnumerator OpeningStalkerRoutine()
+    {
+        yield return new WaitForSeconds(Mathf.Max(0f, stalkerOpeningIdleDuration));
+
+        if (stalkerMonster != null)
+        {
+            stalkerMonster.ActivateMonster();
+        }
+
+        openingStalkerRoutine = null;
     }
 
     // Returns the center of the requested grid cell.
@@ -444,6 +444,7 @@ public class MonsterController : MonoBehaviour
 
         isInvulnerable = true;
         isDeathSequenceActive = true;
+        RestorePlayerVisualAlpha(1f);
         ResolveEndingSequence();
         if (endingSequence != null && Player != null)
         {
@@ -489,10 +490,7 @@ public class MonsterController : MonoBehaviour
     // Cleans up runtime UI if this controller is destroyed.
     private void OnDestroy()
     {
-        if (primaryVineMonster != null)
-        {
-            primaryVineMonster.RoundCompleted -= HandlePrimaryVineRoundCompleted;
-        }
+        StopOpeningStalkerRoutine();
 
         if (heartsUiObject != null)
         {
