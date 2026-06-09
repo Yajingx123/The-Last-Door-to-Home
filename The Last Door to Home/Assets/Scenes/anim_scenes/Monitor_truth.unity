@@ -209,26 +209,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beats:
-  - image: {fileID: 21300000, guid: 7d6c32a73d9a78342a88bf270e06a66c, type: 3}
+  - image: {fileID: 21300000, guid: 0dcecfbbf38e9ae4aaefc19de1fed392, type: 3}
     narration: ...time goes back to the day when you all gathered in front of the
       teleportation portal together.
-  - image: {fileID: 21300000, guid: ca58f16d2ecd2394da8e6a60f050c2c3, type: 3}
+  - image: {fileID: 21300000, guid: 3803ea97023ca37488630b752ee42fbf, type: 3}
     narration: "You and your wife stood together, waiting for the other colleagues
       to place the energy stones in place so that the portal could be activated.
       \nJeff is standing behind you, carrying the materials and some specimens, including
       the eye flowers."
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
+  - image: {fileID: 21300000, guid: bf09b392e1f0baa4193b59544b4f0057, type: 3}
     narration: 'Just as the colleague was taking out the energy stone from the box,
       Jeff''s eye flowers suddenly became active and rushed out.
 
       All of this
       was unexpected. Its leaves, like vines, tightly wrapped around the energy stone,
       began to rapidly absorb energy and then changed..'
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
-    narration: ... became a huge aggressive creature.
-  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
-    narration: "Everyone was caught off guard. You and Amelia were also attacked.
-      \n...and that is what happened before you woke up."
+  - image: {fileID: 21300000, guid: 50f23e87380b2a2468f5acf317075541, type: 3}
+    narration: '... became a huge aggressive creature.
+
+      Everyone was caught
+      off guard. You and Amelia were also attacked. '
+  - image: {fileID: 21300000, guid: 862faf0b6448fa041ada2922f278a6dc, type: 3}
+    narration: ...and that is what happened before you woke up.
   slideImage: {fileID: 2057543414}
   contentCanvasGroup: {fileID: 2057543413}
   dialogueAudioSettings:
