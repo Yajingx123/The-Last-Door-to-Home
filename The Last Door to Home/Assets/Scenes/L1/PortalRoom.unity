@@ -6566,7 +6566,7 @@ GameObject:
   - component: {fileID: 1449405354}
   - component: {fileID: 1449405353}
   m_Layer: 0
-  m_Name: DoorToEnding
+  m_Name: DoorToMidCut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6659,7 +6659,7 @@ MonoBehaviour:
     requiredItemUniqueID: 
     noItemMessage: 
     actionType: 2
-    targetSceneName: 
+    targetSceneName: Portal_check
     spawnPosition: {x: 0, y: 0}
   sceneSwitchSfx: {fileID: 0}
   sceneSwitchSfxVolume: 1
