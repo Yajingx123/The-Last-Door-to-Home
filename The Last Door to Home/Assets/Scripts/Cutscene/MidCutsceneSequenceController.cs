@@ -50,6 +50,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
 
     [Header("Fallback")]
     public string fallbackSceneName;
+    public Vector2 fallbackSpawnPosition;
 
     [SerializeField] private float fadeDuration = 0.35f;
     [SerializeField] private float imageFadeDuration = 0.45f;
@@ -333,7 +334,11 @@ public class MidCutsceneSequenceController : MonoBehaviour
             return;
         }
 
-        SceneTransition.LoadScene(fallbackSceneName);
+        SceneTransition.LoadScene(fallbackSceneName, () =>
+        {
+            PlayerSpawn.SPAWN_POSITION = fallbackSpawnPosition;
+            PlayerSpawn.NEED_SPAWN = true;
+        });
     }
 
     // Refreshes layout-sensitive visuals after the rect transform changes size.

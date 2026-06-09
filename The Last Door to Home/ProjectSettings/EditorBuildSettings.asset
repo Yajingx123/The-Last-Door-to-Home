@@ -38,5 +38,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/L1/PortalRoom.unity
     guid: 51ac49d91215d954185fb248dbe81d3d
+  - enabled: 1
+    path: Assets/Scenes/anim_scenes/Portal_check.unity
+    guid: c4130eca5a9e4314a93aa80ce4ed8c25
+  - enabled: 1
+    path: Assets/Scenes/L1/PortalRoom_Monster.unity
+    guid: c3c3af94b0dbdfb4cac1595e1ad62813
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 085e6ac5f6cc16346bde96e8293f71b3, type: 3}
