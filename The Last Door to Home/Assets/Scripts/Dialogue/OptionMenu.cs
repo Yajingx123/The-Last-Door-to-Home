@@ -95,6 +95,8 @@ public class OptionMenu : MonoBehaviour
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
+        if (EscapeMenuController.IsMenuOpen) return;
+        if (InventoryMenuController.IsOpen) return;
         if (optionPanel == null || !optionPanel.activeSelf) return;
 
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))

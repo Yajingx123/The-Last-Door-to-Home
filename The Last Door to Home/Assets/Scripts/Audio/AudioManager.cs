@@ -25,8 +25,15 @@ public class AudioManager : MonoBehaviour
     private AudioSource typingSource;
     private AudioSource footstepSource;
     private Coroutine bgmRoutine;
+    private bool hasCapturedInitialDefaults;
+    private float initialBgmVolume;
+    private float initialSfxVolume;
 
     public AudioClip CurrentBgmClip => bgmSource != null ? bgmSource.clip : null;
+    public float BgmVolume => defaultBgmVolume;
+    public float SfxVolume => defaultSfxVolume;
+    public float DefaultBgmVolume => initialBgmVolume;
+    public float DefaultSfxVolume => initialSfxVolume;
 
     // Returns the shared singleton instance, creating it if needed.
     public static AudioManager EnsureInstance()
@@ -62,6 +69,13 @@ public class AudioManager : MonoBehaviour
     // Initializes the runtime resources needed by this manager.
     private void Initialize()
     {
+        if (!hasCapturedInitialDefaults)
+        {
+            initialBgmVolume = Mathf.Clamp01(defaultBgmVolume);
+            initialSfxVolume = Mathf.Clamp01(defaultSfxVolume);
+            hasCapturedInitialDefaults = true;
+        }
+
         if (bgmSource != null && sfxSource != null && typingSource != null && footstepSource != null)
         {
             DontDestroyOnLoad(gameObject);
@@ -137,6 +151,52 @@ public class AudioManager : MonoBehaviour
         bgmRoutine = StartCoroutine(SwitchBgmRoutine(null, resolvedFadeOut, 0f, 0f));
     }
 
+    // Updates the shared background music volume and applies it to the active channel.
+    public void SetBgmVolume(float volume)
+    {
+        Initialize();
+
+        defaultBgmVolume = Mathf.Clamp01(volume);
+        if (bgmSource != null)
+        {
+            bgmSource.volume = defaultBgmVolume;
+        }
+    }
+
+    // Updates the shared non-BGM volume and applies it to all related channels.
+    public void SetSfxVolume(float volume)
+    {
+        Initialize();
+
+        defaultSfxVolume = Mathf.Clamp01(volume);
+        if (sfxSource != null)
+        {
+            sfxSource.volume = defaultSfxVolume;
+        }
+
+        if (typingSource != null)
+        {
+            typingSource.volume = defaultSfxVolume;
+        }
+
+        if (footstepSource != null)
+        {
+            footstepSource.volume = defaultSfxVolume;
+        }
+    }
+
+    // Restores the background music volume to its configured default value.
+    public void ResetBgmVolumeToDefault()
+    {
+        SetBgmVolume(initialBgmVolume);
+    }
+
+    // Restores the shared non-BGM volume to its configured default value.
+    public void ResetSfxVolumeToDefault()
+    {
+        SetSfxVolume(initialSfxVolume);
+    }
+
     // Plays a one-shot sound effect through the shared audio manager.
     public void PlaySfx(AudioClip clip, float volumeScale = 1f, float pitch = 1f)
     {
@@ -156,7 +216,7 @@ public class AudioManager : MonoBehaviour
 
         if (clip == null) return;
 
-        float resolvedVolume = Mathf.Clamp01(volumeScale);
+        float resolvedVolume = Mathf.Clamp01(volumeScale) * defaultSfxVolume;
 
         if (typingSource.isPlaying && typingSource.clip == clip)
         {
@@ -194,7 +254,7 @@ public class AudioManager : MonoBehaviour
         if (footstepSource.isPlaying) return;
 
         footstepSource.clip = clip;
-        footstepSource.volume = Mathf.Clamp01(volumeScale);
+        footstepSource.volume = Mathf.Clamp01(volumeScale) * defaultSfxVolume;
         footstepSource.pitch = pitch;
         footstepSource.loop = false;
         footstepSource.Play();

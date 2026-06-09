@@ -13,8 +13,6 @@ Testing notes: Verify inspector references, expected play-mode behavior, and any
 
 public class StoryDirector : MonoBehaviour
 {
-    private const string BeatPlayedPrefPrefix = "StoryBeatPlayed:";
-
     public static StoryDirector Instance;
 
     [Header("剧情条目（按优先级从高到低匹配）")]
@@ -23,10 +21,6 @@ public class StoryDirector : MonoBehaviour
     [Header("剧情条目组（可选）")]
     public StoryBeatSet[] beatSets;
 
-    [Header("一次性记忆范围")]
-    [Tooltip("关闭=仅当前Play运行期有效（跨场景有效，停止Play后重置）；开启=写入PlayerPrefs，跨多次运行也记住。")]
-    public bool persistBeatPlayedToPlayerPrefs = false;
-    
     [Header("开场自动播放")]
     public bool autoPlayFirstBeatOnStart = false;
     public float autoPlayDelaySeconds = 1f;
@@ -287,8 +281,7 @@ public class StoryDirector : MonoBehaviour
         string key = GetBeatKey(beat);
         if (string.IsNullOrWhiteSpace(key)) return false;
         if (StoryFlags.Has(key)) return true;
-        if (!persistBeatPlayedToPlayerPrefs) return false;
-        return PlayerPrefs.GetInt(BeatPlayedPrefPrefix + key, 0) == 1;
+        return false;
     }
 
     // Records this beat as played so one-shot content does not repeat.
@@ -300,11 +293,6 @@ public class StoryDirector : MonoBehaviour
         if (string.IsNullOrWhiteSpace(key)) return;
 
         StoryFlags.Set(key);
-        if (persistBeatPlayedToPlayerPrefs)
-        {
-            PlayerPrefs.SetInt(BeatPlayedPrefPrefix + key, 1);
-            PlayerPrefs.Save();
-        }
     }
 
     // Determines whether the supplied beat should only play once.

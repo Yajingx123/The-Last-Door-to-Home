@@ -42,6 +42,9 @@ public class PagerPhoneController : MonoBehaviour
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
+        if (EscapeMenuController.IsMenuOpen) return;
+        if (InventoryMenuController.IsOpen) return;
+
         if (!Input.GetKeyDown(openMenuKey)) return;
         TryOpenCallMenu();
     }

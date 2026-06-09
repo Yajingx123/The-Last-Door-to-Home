@@ -31,6 +31,8 @@ public class MenuNavigation : MonoBehaviour
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
+        if (MainMenuLoadPanelController.IsOpen) return;
+
         // 监听上下键/WASD的上下（W=上，S=下；上箭头=上，下箭头=下）
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {

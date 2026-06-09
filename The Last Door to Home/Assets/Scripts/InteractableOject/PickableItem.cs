@@ -22,6 +22,13 @@ public class PickableItem : MonoBehaviour, IInteractable
     [Header("物品类型")]
     public ItemType itemType;
 
+    [Header("物品详情")]
+    [TextArea(2, 6)]
+    public string itemDescription = "No description yet.";
+    public Sprite itemIcon;
+    [Tooltip("可选：若图标放在 Resources 目录下，填入不带扩展名的路径，读档后也能恢复图标。")]
+    public string itemIconResourcePath = "";
+
     [Header("拾取前对白（最后一句会出现拾取选项）")]
     [TextArea(3, 10)]
     public string[] prePickDialogues;
@@ -72,7 +79,7 @@ public class PickableItem : MonoBehaviour, IInteractable
     {
         if (Inventory.HasCollected(itemUniqueID)) return;
 
-        Inventory.AddItem(itemName, itemType, itemUniqueID);
+        Inventory.AddItem(itemName, itemType, itemUniqueID, itemDescription, itemIconResourcePath, itemIcon);
         gameObject.SetActive(false);
     }
 

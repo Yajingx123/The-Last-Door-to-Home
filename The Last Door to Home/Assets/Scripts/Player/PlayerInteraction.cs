@@ -24,6 +24,9 @@ public class PlayerInteraction : MonoBehaviour
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
+        if (EscapeMenuController.IsMenuOpen) return;
+        if (InventoryMenuController.IsOpen) return;
+
         UpdateFaceDirection();
 
         if (Input.GetKeyDown(KeyCode.Return))

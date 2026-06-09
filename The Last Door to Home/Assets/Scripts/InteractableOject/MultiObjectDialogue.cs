@@ -188,7 +188,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         if (DialogueManager.Instance.IsDialogueActive) return "当前已有对话在播放中。";
 
         string beatKey = $"StoryBeat:{(string.IsNullOrWhiteSpace(beat.eventId) ? "NoEvent" : beat.eventId.Trim())}:{(string.IsNullOrWhiteSpace(beat.name) ? "UnnamedBeat" : beat.name.Trim())}";
-        if (StoryFlags.Has(beatKey) || PlayerPrefs.GetInt("StoryBeatPlayed:" + beatKey, 0) == 1)
+        if (StoryFlags.Has(beatKey))
         {
             return $"Beat 已播放（全局一次性拦截）: {beatKey}";
         }
