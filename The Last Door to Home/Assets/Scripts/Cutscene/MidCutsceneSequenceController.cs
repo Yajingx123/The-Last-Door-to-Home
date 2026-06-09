@@ -16,6 +16,12 @@ Testing notes: Verify dialogue progression, line-based BGM changes, and scene re
 
 public class MidCutsceneSequenceController : MonoBehaviour
 {
+    public enum ReturnSceneMode
+    {
+        SavedSceneIfAvailable,
+        ExplicitScene
+    }
+
     [Serializable]
     public class CutsceneBeat
     {
@@ -48,7 +54,8 @@ public class MidCutsceneSequenceController : MonoBehaviour
     [Header("BGM Line Cues")]
     public BgmLineCue[] bgmLineCues;
 
-    [Header("Fallback")]
+    [Header("Scene Return")]
+    [SerializeField] private ReturnSceneMode returnSceneMode = ReturnSceneMode.SavedSceneIfAvailable;
     public string fallbackSceneName;
     public Vector2 fallbackSpawnPosition;
 
@@ -314,10 +321,10 @@ public class MidCutsceneSequenceController : MonoBehaviour
         );
     }
 
-    // Returns to the saved gameplay scene, or falls back to an explicitly configured scene.
+    // Returns either to the saved gameplay scene or to an explicitly configured scene, depending on the selected mode.
     private void LoadReturnScene()
     {
-        if (CutsceneReturnContext.HasSavedContext)
+        if (returnSceneMode == ReturnSceneMode.SavedSceneIfAvailable && CutsceneReturnContext.HasSavedContext)
         {
             string returnSceneName = CutsceneReturnContext.GetReturnSceneName();
             SceneTransition.LoadScene(returnSceneName, () =>
@@ -330,10 +337,11 @@ public class MidCutsceneSequenceController : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(fallbackSceneName))
         {
-            Debug.LogWarning("MidCutsceneSequenceController: 没有可返回的场景，也没有配置 fallbackSceneName。", this);
+            Debug.LogWarning("MidCutsceneSequenceController: 没有配置可用的返回场景。", this);
             return;
         }
 
+        CutsceneReturnContext.Clear();
         SceneTransition.LoadScene(fallbackSceneName, () =>
         {
             PlayerSpawn.SPAWN_POSITION = fallbackSpawnPosition;

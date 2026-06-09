@@ -294,7 +294,7 @@ MonoBehaviour:
   - image: {fileID: 21300000, guid: 4410bf2950513be40ad11f3688bf47ac, type: 3}
     narration: "...\nOverall, there are no abnorma \u2014\u2014"
   - image: {fileID: 21300000, guid: 8416a1a0f2010fa4080ce3112d8a29eb, type: 3}
-    narration: '? !'
+    narration: ......? !
   - image: {fileID: 21300000, guid: b650cd7ab456d5d4a83922856aa5dde4, type: 3}
     narration: RUN ! ! ! ! ! ! ! !
   slideImage: {fileID: 1804350469}
@@ -314,12 +314,13 @@ MonoBehaviour:
     quotedTypingSfx: {fileID: 0}
     quotedTypingSfxVolume: 0.25
   bgmLineCues:
-  - lineNumber: 0
-    bgmClip: {fileID: 0}
+  - lineNumber: 4
+    bgmClip: {fileID: 8300000, guid: 32251211e8d24a5448663cd35254d1bd, type: 3}
     fadeOutDuration: 0
     fadeInDuration: 0
-    volume: 0
+    volume: 0.454
     restartIfSameClip: 0
+  returnSceneMode: 1
   fallbackSceneName: PortalRoom_Monster
   fallbackSpawnPosition: {x: 0, y: 14}
   fadeDuration: 0.35

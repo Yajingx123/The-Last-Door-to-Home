@@ -1,14 +1,15 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /*
-Purpose: Keeps an eye monster always visible and teleports it to a new legal cell whenever the player touches it.
+Purpose: Teleports an eye monster around the arena, and after every two player touches removes one configured target in sequence.
 Attached GameObject: The eye monster object with its visual renderers and a trigger collider.
-Main responsibilities: Choose valid spawn cells, stay visible, detect player contact, and relocate instantly.
-Inputs: Shared arena settings from MonsterController and inspector spawn distance values.
-Outputs or effects: Moves this eye monster between grid cells without damaging the player.
+Main responsibilities: Choose valid spawn cells, fade in, detect player contact, relocate, and remove linked monsters in order.
+Inputs: Shared arena settings from MonsterController, timing values, and an ordered list of target GameObjects to remove.
+Outputs or effects: Moves this eye monster between grid cells without damaging the player and disables linked targets over time.
 Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the trigger collider size and the spawn distance rule in Play Mode.
+Testing notes: Verify the trigger collider size, fade timing, and ordered target removal flow in Play Mode.
 */
 
 public class EyeMonster : MonoBehaviour
@@ -26,10 +27,19 @@ public class EyeMonster : MonoBehaviour
     [SerializeField] private float blinkDurationOnTouch = 1f;
     [SerializeField] private int blinkCountOnTouch = 5;
 
+    [Header("消除目标")]
+    [SerializeField] private List<GameObject> targetsToRemove = new List<GameObject>();
+    [SerializeField] private int touchesPerRemoval = 2;
+
     private Collider2D hitbox;
     private SpriteRenderer[] spriteRenderers;
     private Color[] originalColors;
     private bool isRelocating;
+    private bool hasClearedAllTargets;
+    private int touchCount;
+    private int nextTargetIndex;
+
+    public bool HasClearedAllTargets => hasClearedAllTargets;
 
     // Places the eye in the arena and keeps it visible from the start.
     private void Start()
@@ -69,7 +79,7 @@ public class EyeMonster : MonoBehaviour
         StartCoroutine(BlinkAndRelocateRoutine());
     }
 
-    // Plays a short blink, then hides and teleports the eye to its next legal position.
+    // Plays a short blink, then hides and teleports the eye to its next legal position or disappears after removing the last target.
     private IEnumerator BlinkAndRelocateRoutine()
     {
         SetHitboxEnabled(false);
@@ -87,6 +97,13 @@ public class EyeMonster : MonoBehaviour
         }
 
         SetVisibleImmediate(false);
+        bool hasRemovedFinalTarget = TryAdvanceRemovalProgress();
+        if (hasRemovedFinalTarget)
+        {
+            isRelocating = false;
+            yield break;
+        }
+
         MoveToNextSpawnPosition();
         yield return StartCoroutine(FadeInRoutine());
     }
@@ -272,5 +289,89 @@ public class EyeMonster : MonoBehaviour
         {
             hitbox.enabled = enabled;
         }
+    }
+
+    // Counts touches and removes the next configured target whenever the threshold is reached.
+    private bool TryAdvanceRemovalProgress()
+    {
+        touchCount++;
+        int requiredTouches = Mathf.Max(1, touchesPerRemoval);
+        if (touchCount < requiredTouches)
+        {
+            return false;
+        }
+
+        touchCount = 0;
+
+        while (nextTargetIndex < targetsToRemove.Count)
+        {
+            GameObject target = targetsToRemove[nextTargetIndex];
+            nextTargetIndex++;
+
+            if (target == null)
+            {
+                continue;
+            }
+
+            RemoveTarget(target);
+            bool removedLastConfiguredTarget = !HasRemainingValidTargets();
+            if (removedLastConfiguredTarget)
+            {
+                hasClearedAllTargets = true;
+                gameObject.SetActive(false);
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    // Disables one configured target safely, including known monster cleanup hooks.
+    private void RemoveTarget(GameObject target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        VineMonster vineMonster = target.GetComponent<VineMonster>();
+        if (vineMonster == null)
+        {
+            vineMonster = target.GetComponentInChildren<VineMonster>(true);
+        }
+
+        if (vineMonster != null)
+        {
+            vineMonster.DeactivateMonster();
+        }
+
+        StalkerMonster stalkerMonster = target.GetComponent<StalkerMonster>();
+        if (stalkerMonster == null)
+        {
+            stalkerMonster = target.GetComponentInChildren<StalkerMonster>(true);
+        }
+
+        if (stalkerMonster != null)
+        {
+            stalkerMonster.DeactivateMonster();
+        }
+
+        target.SetActive(false);
+    }
+
+    // Returns true when there is still another non-null target left to remove later.
+    private bool HasRemainingValidTargets()
+    {
+        for (int i = nextTargetIndex; i < targetsToRemove.Count; i++)
+        {
+            if (targetsToRemove[i] != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
