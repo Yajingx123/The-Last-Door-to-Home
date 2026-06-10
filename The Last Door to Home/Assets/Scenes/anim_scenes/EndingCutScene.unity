@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 1163297214}
   - component: {fileID: 1163297215}
   m_Layer: 0
-  m_Name: IntroController
+  m_Name: EndingController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -279,7 +279,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slides:
   - image: {fileID: 0}
-    caption: 
+    caption: '...
+
+      ...
+
+      .........Amelia?'
+  - image: {fileID: 0}
+    caption: You really want to give a tight hug to your beloved and feel each other's
+      warmth, but your body is extremely sore. You can only slowly sit up.
+  - image: {fileID: 0}
+    caption: You noticed that a colleague from the same department was waving at
+      you. Her voice makes you feel familiar... Ah, it's Elena, the one who has been
+      guiding you through the pager system.
+  - image: {fileID: 0}
+    caption: As you gradually learned about what happened after losing consciousness,
+      it turned out that after everyone was attacked by the giant eye flowers, Elena
+      was the first to kill the monsters in the illusion and escape. Then she began
+      to try to rescue the others.
+  - image: {fileID: 0}
+    caption: Unfortunately, only a few people survived. Amelia was rescued before
+      you, but she hasn't woken up yet. You are too deeply in a hallucination, so
+      Elena keeps calling out to you in an attempt to help you.
+  - image: {fileID: 0}
+    caption: The backup energy source in the control room was just enough to allow
+      the survivors to return home. This was a fortunate occurrence amid all the
+      misfortunes. You all returned to your home relying on it.
+  - image: {fileID: 0}
+    caption: Amelia won't wait for you in the next round, because you two will spend
+      the rest of your lives together hand in hand.
+  - image: {fileID: 0}
+    caption: ...That is the end of the story.
   slideImage: {fileID: 4070640201669926619}
   captionText: {fileID: 1510080989429682950}
   contentCanvasGroup: {fileID: 4362174103833392802}
