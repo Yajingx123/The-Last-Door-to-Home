@@ -45,8 +45,10 @@ public class PlayerMove : MonoBehaviour
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
     void Update()
     {
-        // 对话锁定
-        if (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked)
+        // 对话或系统菜单打开时，立即停止玩家移动并冻结朝向。
+        if (EscapeMenuController.IsMenuOpen
+            || InventoryMenuController.IsOpen
+            || (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked))
         {
             inputMoveDir = Vector2.zero;
             stopTimer = 0f;

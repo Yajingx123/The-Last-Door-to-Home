@@ -23,19 +23,31 @@ Testing notes: Verify inspector references, expected play-mode behavior, and any
 public static class Inventory
 {
     public static List<string> collectedItemNames = new List<string>();
+    private static List<string> collectedItemOrder = new List<string>();
     private static HashSet<string> collectedIDs = new HashSet<string>();
     private static HashSet<ItemType> collectedTypes = new HashSet<ItemType>();
+    private static Dictionary<string, InventoryItemRecord> collectedItemRecords = new Dictionary<string, InventoryItemRecord>();
     private static HashSet<string> unlockedSafeIDs = new HashSet<string>();
     private static HashSet<string> unlockedDoorIDs = new HashSet<string>();
 
     // Adds the supplied item to the shared inventory state.
-    public static void AddItem(string name, ItemType type, string uniqueID)
+    public static void AddItem(string name, ItemType type, string uniqueID, string description = "", string iconResourcePath = "", Sprite runtimeIcon = null)
     {
         if (!collectedIDs.Contains(uniqueID))
         {
             collectedIDs.Add(uniqueID);
+            collectedItemOrder.Add(uniqueID);
             collectedItemNames.Add(name);
             collectedTypes.Add(type);
+            collectedItemRecords[uniqueID] = new InventoryItemRecord
+            {
+                itemName = name,
+                itemType = type,
+                uniqueID = uniqueID,
+                itemDescription = description ?? string.Empty,
+                itemIconResourcePath = iconResourcePath ?? string.Empty,
+                runtimeIcon = runtimeIcon
+            };
         }
     }
 
@@ -85,14 +97,111 @@ public static class Inventory
         return unlockedDoorIDs.Contains(doorUniqueID);
     }
 
+    // Exports the collected inventory items for save serialization.
+    public static List<InventoryItemRecord> ExportCollectedItems()
+    {
+        var records = new List<InventoryItemRecord>();
+        for (int i = 0; i < collectedItemOrder.Count; i++)
+        {
+            string uniqueID = collectedItemOrder[i];
+            if (string.IsNullOrWhiteSpace(uniqueID)) continue;
+            if (!collectedItemRecords.TryGetValue(uniqueID, out InventoryItemRecord matchedRecord) || matchedRecord == null) continue;
+
+            records.Add(new InventoryItemRecord
+            {
+                uniqueID = matchedRecord.uniqueID,
+                itemName = matchedRecord.itemName,
+                itemType = matchedRecord.itemType,
+                itemDescription = matchedRecord.itemDescription,
+                itemIconResourcePath = matchedRecord.itemIconResourcePath,
+                runtimeIcon = matchedRecord.runtimeIcon
+            });
+        }
+
+        return records;
+    }
+
+    // Exports unlocked safe identifiers for save serialization.
+    public static List<string> ExportUnlockedSafeIds()
+    {
+        return new List<string>(unlockedSafeIDs);
+    }
+
+    // Exports unlocked door identifiers for save serialization.
+    public static List<string> ExportUnlockedDoorIds()
+    {
+        return new List<string>(unlockedDoorIDs);
+    }
+
+    // Restores the shared inventory state from save data.
+    public static void ImportState(List<InventoryItemRecord> items, List<string> safeIds, List<string> doorIds)
+    {
+        collectedIDs.Clear();
+        collectedItemOrder.Clear();
+        collectedItemNames.Clear();
+        collectedTypes.Clear();
+        collectedItemRecords.Clear();
+        unlockedSafeIDs.Clear();
+        unlockedDoorIDs.Clear();
+
+        if (items != null)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                InventoryItemRecord item = items[i];
+                if (item == null || string.IsNullOrWhiteSpace(item.uniqueID)) continue;
+
+                collectedIDs.Add(item.uniqueID);
+                collectedItemOrder.Add(item.uniqueID);
+                collectedItemNames.Add(item.itemName ?? string.Empty);
+                collectedTypes.Add(item.itemType);
+                collectedItemRecords[item.uniqueID] = new InventoryItemRecord
+                {
+                    uniqueID = item.uniqueID,
+                    itemName = item.itemName ?? string.Empty,
+                    itemType = item.itemType,
+                    itemDescription = item.itemDescription ?? string.Empty,
+                    itemIconResourcePath = item.itemIconResourcePath ?? string.Empty,
+                    runtimeIcon = LoadIconFromResources(item.itemIconResourcePath)
+                };
+            }
+        }
+
+        if (safeIds != null)
+        {
+            for (int i = 0; i < safeIds.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(safeIds[i])) continue;
+                unlockedSafeIDs.Add(safeIds[i]);
+            }
+        }
+
+        if (doorIds != null)
+        {
+            for (int i = 0; i < doorIds.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(doorIds[i])) continue;
+                unlockedDoorIDs.Add(doorIds[i]);
+            }
+        }
+    }
+
     // Clears the stored runtime state managed by this utility.
     public static void Clear()
     {
         collectedIDs.Clear();
+        collectedItemOrder.Clear();
         collectedItemNames.Clear();
         collectedTypes.Clear();
+        collectedItemRecords.Clear();
         unlockedSafeIDs.Clear();
         unlockedDoorIDs.Clear();
         StoryFlags.Clear();
+    }
+
+    private static Sprite LoadIconFromResources(string resourcePath)
+    {
+        if (string.IsNullOrWhiteSpace(resourcePath)) return null;
+        return Resources.Load<Sprite>(resourcePath);
     }
 }

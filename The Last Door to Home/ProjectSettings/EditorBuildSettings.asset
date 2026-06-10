@@ -30,7 +30,7 @@ EditorBuildSettings:
     path: Assets/Scenes/L3/Gate.unity
     guid: 0b5f77ed29dd45f4bab404e308692a96
   - enabled: 1
-    path: Assets/Scenes/L3/OutOfGate.unity
+    path: Assets/Scenes/L3/Ending1.unity
     guid: fe81269794030a14cba6e1899577aeba
   - enabled: 1
     path: Assets/Scenes/anim_scenes/Monitor_truth.unity
@@ -44,5 +44,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/L1/PortalRoom_Monster.unity
     guid: c3c3af94b0dbdfb4cac1595e1ad62813
+  - enabled: 1
+    path: Assets/Scenes/L1/Ending2.unity
+    guid: b6356120ec548744ca66f7bc4d95811c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 085e6ac5f6cc16346bde96e8293f71b3, type: 3}

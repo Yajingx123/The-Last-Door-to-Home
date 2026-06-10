@@ -266,7 +266,9 @@ MonoBehaviour:
     fadeInDuration: 0
     volume: 1
     restartIfSameClip: 0
+  returnSceneMode: 0
   fallbackSceneName: ControlRoom
+  fallbackSpawnPosition: {x: 0, y: 0}
   fadeDuration: 0.35
   imageFadeDuration: 0.45
 --- !u!4 &791390164
@@ -292,10 +294,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 521335729448562040, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.3813709

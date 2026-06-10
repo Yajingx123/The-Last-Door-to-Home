@@ -32,7 +32,16 @@ public class SceneLoader : MonoBehaviour
         }
 
         Inventory.Clear();
+        PlayerSpawn.NEED_SPAWN = false;
+        CutsceneReturnContext.Clear();
+        GameSessionTracker.StartNewSession();
         SceneTransition.LoadScene(newGameSceneName);
+    }
+
+    // Opens the manual Continue slot list from the main menu.
+    public void ContinueGame()
+    {
+        MainMenuLoadPanelController.OpenPanel();
     }
 
     // 退出游戏（仅打包后生效，编辑器中无效果）
@@ -43,5 +52,11 @@ public class SceneLoader : MonoBehaviour
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false; // 编辑器中停止运行
         #endif
+    }
+
+    // Alias for UI buttons labeled Exit.
+    public void ExitGame()
+    {
+        QuitGame();
     }
 }

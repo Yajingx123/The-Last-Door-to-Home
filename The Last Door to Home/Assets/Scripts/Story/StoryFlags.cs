@@ -46,6 +46,51 @@ public static class StoryFlags
         return value;
     }
 
+    // Exports the current story flags for save serialization.
+    public static List<string> ExportFlags()
+    {
+        return new List<string>(flags);
+    }
+
+    // Exports the current story counters for save serialization.
+    public static List<StoryCounterRecord> ExportCounters()
+    {
+        var records = new List<StoryCounterRecord>();
+        foreach (KeyValuePair<string, int> pair in counters)
+        {
+            if (string.IsNullOrWhiteSpace(pair.Key)) continue;
+            records.Add(new StoryCounterRecord { key = pair.Key, value = pair.Value });
+        }
+
+        return records;
+    }
+
+    // Restores story flags and counters from save data.
+    public static void ImportState(List<string> savedFlags, List<StoryCounterRecord> savedCounters)
+    {
+        flags.Clear();
+        counters.Clear();
+
+        if (savedFlags != null)
+        {
+            for (int i = 0; i < savedFlags.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(savedFlags[i])) continue;
+                flags.Add(savedFlags[i]);
+            }
+        }
+
+        if (savedCounters != null)
+        {
+            for (int i = 0; i < savedCounters.Count; i++)
+            {
+                StoryCounterRecord record = savedCounters[i];
+                if (record == null || string.IsNullOrWhiteSpace(record.key)) continue;
+                counters[record.key] = record.value;
+            }
+        }
+    }
+
     // Clears the stored runtime state managed by this utility.
     public static void Clear()
     {
