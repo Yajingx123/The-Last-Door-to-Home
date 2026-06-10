@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public enum ItemType
@@ -22,6 +23,8 @@ Testing notes: Verify inspector references, expected play-mode behavior, and any
 
 public static class Inventory
 {
+    public static event Action<string> ItemCollected;
+
     public static List<string> collectedItemNames = new List<string>();
     private static List<string> collectedItemOrder = new List<string>();
     private static HashSet<string> collectedIDs = new HashSet<string>();
@@ -48,6 +51,7 @@ public static class Inventory
                 itemIconResourcePath = iconResourcePath ?? string.Empty,
                 runtimeIcon = runtimeIcon
             };
+            ItemCollected?.Invoke(uniqueID);
         }
     }
 

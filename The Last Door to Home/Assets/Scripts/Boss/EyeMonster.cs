@@ -14,6 +14,10 @@ Testing notes: Verify the trigger collider size, fade timing, and ordered target
 
 public class EyeMonster : MonoBehaviour
 {
+    [Header("道具条件")]
+    [Tooltip("只有拿到这个 PickableItem.itemUniqueID 后，Eye Monster 才会出现并启用机制。留空则总是启用。")]
+    [SerializeField] private string requiredItemUniqueID = "";
+
     [Header("区域设置")]
     [SerializeField] private MonsterController controller;
     [SerializeField] private Vector2 spawnOffset = Vector2.zero;
@@ -41,13 +45,32 @@ public class EyeMonster : MonoBehaviour
 
     public bool HasClearedAllTargets => hasClearedAllTargets;
 
+    private void Awake()
+    {
+        if (!CanAppearWithInventory())
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     // Places the eye in the arena and keeps it visible from the start.
     private void Start()
     {
+        if (!CanAppearWithInventory())
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         ResolveController();
         ResolveComponents();
         MoveToNextSpawnPosition();
         StartCoroutine(FadeInRoutine());
+    }
+
+    private bool CanAppearWithInventory()
+    {
+        return string.IsNullOrWhiteSpace(requiredItemUniqueID) || Inventory.HasCollected(requiredItemUniqueID);
     }
 
     // Detects the player stepping on the visible eye monster.

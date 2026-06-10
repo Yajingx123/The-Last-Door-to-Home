@@ -13,6 +13,11 @@ Testing notes: Verify collider setup, Rigidbody2D trigger events, and arena coor
 
 public class StalkerMonster : MonoBehaviour
 {
+    [Header("道具速度变化")]
+    [Tooltip("拿到这个 PickableItem.itemUniqueID 后，把 Stalker 速度改成下面的数值。留空则不启用。")]
+    [SerializeField] private string speedBoostItemUniqueID = "";
+    [SerializeField] private float speedBoostMoveSpeed = 7f;
+
     [Header("区域设置")]
     [SerializeField] private MonsterController controller;
 
@@ -35,11 +40,15 @@ public class StalkerMonster : MonoBehaviour
         initialPosition = transform.position;
         hitbox = GetComponentInChildren<Collider2D>(true);
         renderersToToggle = GetComponentsInChildren<Renderer>(true);
+        ApplyInventorySpeedEffect();
     }
 
     // Starts the movement loop automatically when requested.
     private void OnEnable()
     {
+        Inventory.ItemCollected += HandleItemCollected;
+        ApplyInventorySpeedEffect();
+
         if (startOnEnable)
         {
             ActivateMonster();
@@ -53,6 +62,8 @@ public class StalkerMonster : MonoBehaviour
     // Stops active routines when the object is disabled.
     private void OnDisable()
     {
+        Inventory.ItemCollected -= HandleItemCollected;
+
         if (behaviorRoutine != null)
         {
             StopCoroutine(behaviorRoutine);
@@ -195,6 +206,22 @@ public class StalkerMonster : MonoBehaviour
         }
 
         controller.TryDamagePlayer("StalkerMonster", this);
+    }
+
+    private void HandleItemCollected(string uniqueID)
+    {
+        if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
+        if (uniqueID != speedBoostItemUniqueID) return;
+
+        moveSpeed = speedBoostMoveSpeed;
+    }
+
+    private void ApplyInventorySpeedEffect()
+    {
+        if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
+        if (!Inventory.HasCollected(speedBoostItemUniqueID)) return;
+
+        moveSpeed = speedBoostMoveSpeed;
     }
 
     // Shows or hides the stalker visuals without changing object activation.

@@ -1681,6 +1681,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce9d3d45093ac5042810a244c20ea4a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  requiredItemUniqueID: helmet
   controller: {fileID: 1143805185}
   spawnOffset: {x: 0, y: 0}
   spawnDistanceInCells: 2
@@ -1857,7 +1858,7 @@ MonoBehaviour:
   columns: 8
   rows: 12
   cellSize: 1
-  maxHearts: 10
+  maxHearts: 5
   invulnerabilityDuration: 1
   flickerInterval: 0.1
   flickerAlpha: 0.25
@@ -8383,6 +8384,14 @@ PrefabInstance:
       propertyPath: moveSpeed
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 7560863497210995078, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
+      propertyPath: speedBoostMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7560863497210995078, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
+      propertyPath: speedBoostItemUniqueID
+      value: boots
+      objectReference: {fileID: 0}
     - target: {fileID: 7587755179790702764, guid: f1c735c3d3f72074f83d38c664a0cce5, type: 3}
       propertyPath: m_Size.x
       value: 0.6455528
@@ -8791,6 +8800,10 @@ PrefabInstance:
     - target: {fileID: 2545639892127118833, guid: e017a4aa169d80142a52f0283f935d5a, type: 3}
       propertyPath: stayDuration
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2545639892127118833, guid: e017a4aa169d80142a52f0283f935d5a, type: 3}
+      propertyPath: speedBoostItemUniqueID
+      value: stone02
       objectReference: {fileID: 0}
     - target: {fileID: 4506186074351642857, guid: e017a4aa169d80142a52f0283f935d5a, type: 3}
       propertyPath: m_Name
