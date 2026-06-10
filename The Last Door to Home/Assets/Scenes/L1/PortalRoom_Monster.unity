@@ -444,7 +444,15 @@ MonoBehaviour:
   firstImageBrightenDuration: 0.45
   firstImageBackgroundDarkAlpha: 1
   endingDialogues:
-  - 222
+  - ...
+  - 'Ending 1: You Died
+
+
+    The monster enveloped your body and burrowed into your
+    protective suit. In the throes of pain, you lost consciousness.'
+  - Luckily, this is just a game. You have thoundsands of chances to go home with
+    Amelia.
+  - Amelia is waiting for you in the next round.
   endingImage: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
   endingDialogueAudioSettings:
     bgmOnStart: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}

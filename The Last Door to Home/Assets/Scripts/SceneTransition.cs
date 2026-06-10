@@ -28,6 +28,7 @@ public class SceneTransition : MonoBehaviour
     private Image fadeImage;
     private bool isTransitioning;
     private bool shouldFadeInAfterLoad;
+    private float activeFadeInDuration;
 
     public static bool IsTransitioning => instance != null && instance.isTransitioning;
 
@@ -42,7 +43,35 @@ public class SceneTransition : MonoBehaviour
 
         EnsureInstance();
         if (instance == null || instance.isTransitioning) return;
-        instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad));
+        instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, instance.fadeColor, instance.fadeOutDuration, instance.fadeInDuration));
+    }
+
+    // Starts loading the requested scene through a transition using a temporary fade color.
+    public static void LoadSceneWithFadeColor(string sceneName, Color transitionFadeColor, Action beforeSceneLoad = null)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("SceneTransition: sceneName is empty.");
+            return;
+        }
+
+        EnsureInstance();
+        if (instance == null || instance.isTransitioning) return;
+        instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, transitionFadeColor, instance.fadeOutDuration, instance.fadeInDuration));
+    }
+
+    // Starts loading the requested scene through a transition using a temporary fade color and custom fade durations.
+    public static void LoadSceneWithFadeColor(string sceneName, Color transitionFadeColor, float customFadeOutDuration, float customFadeInDuration, Action beforeSceneLoad = null)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("SceneTransition: sceneName is empty.");
+            return;
+        }
+
+        EnsureInstance();
+        if (instance == null || instance.isTransitioning) return;
+        instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, transitionFadeColor, customFadeOutDuration, customFadeInDuration));
     }
 
     // Returns the shared singleton instance, creating it if needed.
@@ -144,15 +173,21 @@ public class SceneTransition : MonoBehaviour
         canvasGroup.alpha = 0f;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
+        activeFadeInDuration = fadeInDuration;
     }
 
     // Runs the asynchronous scene load and transition timing sequence.
-    private IEnumerator LoadSceneRoutine(string sceneName, Action beforeSceneLoad)
+    private IEnumerator LoadSceneRoutine(string sceneName, Action beforeSceneLoad, Color transitionFadeColor, float customFadeOutDuration, float customFadeInDuration)
     {
         isTransitioning = true;
         canvasGroup.blocksRaycasts = true;
+        activeFadeInDuration = Mathf.Max(0.01f, customFadeInDuration);
+        if (fadeImage != null)
+        {
+            fadeImage.color = transitionFadeColor;
+        }
 
-        yield return Fade(0f, 1f, fadeOutDuration, false);
+        yield return Fade(0f, 1f, customFadeOutDuration, false);
 
         beforeSceneLoad?.Invoke();
         shouldFadeInAfterLoad = true;
@@ -179,7 +214,7 @@ public class SceneTransition : MonoBehaviour
             yield return new WaitForSecondsRealtime(holdDuration);
         }
 
-        yield return Fade(1f, 0f, fadeInDuration, true);
+        yield return Fade(1f, 0f, activeFadeInDuration, true);
         canvasGroup.blocksRaycasts = false;
         isTransitioning = false;
     }

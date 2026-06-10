@@ -31,6 +31,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
     private readonly List<string> slotLabels = new List<string>();
     private List<SaveSlotSummary> slotSummaries = new List<SaveSlotSummary>();
     private int selectedIndex;
+    private int openedFrame = -1;
     private string footerMessage = "Enter: Load Selected Slot   Esc: Back";
 
     public static bool IsOpen => instance != null && instance.overlayObject != null && instance.overlayObject.activeSelf;
@@ -106,6 +107,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
+            if (Time.frameCount == openedFrame) return;
             TryLoadSelectedSlot();
         }
     }
@@ -132,6 +134,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
             EventSystem.current.SetSelectedGameObject(null);
         }
         overlayObject.SetActive(true);
+        openedFrame = Time.frameCount;
         RefreshSlotList();
     }
 
@@ -291,6 +294,10 @@ public class MainMenuLoadPanelController : MonoBehaviour
         Transform slotOptionsRoot = FindChildRecursive(overlayObject.transform, "SlotOptions");
         Transform optionsRoot = FindChildRecursive(overlayObject.transform, "Options");
         Transform descriptionRoot = FindChildRecursive(overlayObject.transform, "Description");
+        Transform aboutGameRoot = FindChildRecursive(overlayObject.transform, "AboutGameText");
+        Transform musicRoot = FindChildRecursive(overlayObject.transform, "MusicText");
+        Transform backgroundMusicRoot = FindChildRecursive(overlayObject.transform, "BackgroundMusicText");
+        Transform soundEffectsRoot = FindChildRecursive(overlayObject.transform, "SoundEffectsText");
 
         if (titleText == null || footerText == null || (slotOptionsRoot == null && optionsRoot == null))
         {
@@ -309,6 +316,26 @@ public class MainMenuLoadPanelController : MonoBehaviour
         if (optionsRoot != null)
         {
             optionsRoot.gameObject.SetActive(slotOptionsRoot == null);
+        }
+
+        if (aboutGameRoot != null)
+        {
+            aboutGameRoot.gameObject.SetActive(false);
+        }
+
+        if (musicRoot != null)
+        {
+            musicRoot.gameObject.SetActive(false);
+        }
+
+        if (backgroundMusicRoot != null)
+        {
+            backgroundMusicRoot.gameObject.SetActive(false);
+        }
+
+        if (soundEffectsRoot != null)
+        {
+            soundEffectsRoot.gameObject.SetActive(false);
         }
 
         if (slotOptionsRoot != null)
