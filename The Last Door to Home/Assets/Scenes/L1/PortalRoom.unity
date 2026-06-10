@@ -446,7 +446,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bc8c6bb7895774e4e9c936572ed00cc2, type: 2}
   - {fileID: 11400000, guid: f3a9ef42c1f44574996cb5fdcd8b959f, type: 2}
   beatSets: []
-  persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 0
   autoPlayDelaySeconds: 1
 --- !u!1001 &718817806

@@ -17,10 +17,14 @@ public class MenuNavigation : MonoBehaviour
     [Header("菜单按钮列表")]
     public List<Button> menuButtons; // 按顺序存放菜单按钮（如Start、Quit）
     private int currentSelectedIndex = 0; // 当前选中的按钮索引
+    private const float SelectedAlpha = 1f;
+    private const float UnselectedAlpha = 66f / 255f;
 
     // Prepares runtime state after the scene finishes its initial setup.
     void Start()
     {
+        DisableMouseInteraction();
+
         // 初始化：选中第一个按钮
         if (menuButtons.Count > 0)
         {
@@ -72,14 +76,19 @@ public class MenuNavigation : MonoBehaviour
     // Updates the current button selection and visual highlight state.
     void SelectButton(int index)
     {
-        // 重置所有按钮的选中状态（可选：改颜色/缩放区分选中）
-        foreach (var btn in menuButtons)
+        for (int i = 0; i < menuButtons.Count; i++)
         {
-            btn.GetComponent<Image>().color = Color.white; // 未选中为白色
+            if (menuButtons[i] == null) continue;
+
+            Image buttonImage = menuButtons[i].GetComponent<Image>();
+            if (buttonImage == null) continue;
+
+            Color color = buttonImage.color;
+            color.a = i == index ? SelectedAlpha : UnselectedAlpha;
+            buttonImage.color = color;
         }
-        // 设置当前按钮为选中状态
+
         Button selectedBtn = menuButtons[index];
-        selectedBtn.GetComponent<Image>().color = Color.yellow; // 选中为黄色（可自定义）
         selectedBtn.Select(); // UGUI聚焦，保证按钮可触发
     }
 
@@ -90,6 +99,21 @@ public class MenuNavigation : MonoBehaviour
         if (menuButtons.Count > 0)
         {
             menuButtons[currentSelectedIndex].onClick.Invoke();
+        }
+    }
+
+    // Disables pointer raycasts on the configured main-menu buttons so keyboard navigation is the only input path.
+    void DisableMouseInteraction()
+    {
+        foreach (var btn in menuButtons)
+        {
+            if (btn == null) continue;
+
+            Graphic[] graphics = btn.GetComponentsInChildren<Graphic>(true);
+            foreach (var graphic in graphics)
+            {
+                graphic.raycastTarget = false;
+            }
         }
     }
 }

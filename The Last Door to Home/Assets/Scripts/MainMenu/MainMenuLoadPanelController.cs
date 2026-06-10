@@ -323,6 +323,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
             EnsureSlotTextCount(SaveSystem.SlotCount, optionsRoot);
         }
 
+        DisableMouseInteraction();
         return true;
     }
 
@@ -400,6 +401,8 @@ public class MainMenuLoadPanelController : MonoBehaviour
         footerRect.pivot = new Vector2(0.5f, 0f);
         footerRect.anchoredPosition = new Vector2(0f, 20f);
         footerRect.sizeDelta = new Vector2(-60f, 56f);
+
+        DisableMouseInteraction();
     }
 
     private void EnsureSlotTextCount(int requiredCount, Transform parentOverride = null)
@@ -413,6 +416,17 @@ public class MainMenuLoadPanelController : MonoBehaviour
             LayoutElement layoutElement = slotText.gameObject.AddComponent<LayoutElement>();
             layoutElement.preferredHeight = 30f;
             slotTexts.Add(slotText);
+        }
+    }
+
+    private void DisableMouseInteraction()
+    {
+        if (overlayObject == null) return;
+
+        Graphic[] graphics = overlayObject.GetComponentsInChildren<Graphic>(true);
+        for (int i = 0; i < graphics.Length; i++)
+        {
+            graphics[i].raycastTarget = false;
         }
     }
 

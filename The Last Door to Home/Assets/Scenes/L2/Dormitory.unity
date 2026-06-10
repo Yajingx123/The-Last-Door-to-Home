@@ -5730,6 +5730,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 953337898475812395, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -6439852126988906501, guid: 02592c342cdeeeb44a51d76281a777ff, type: 2}
+    - target: {fileID: 953337898475812395, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.3813709
