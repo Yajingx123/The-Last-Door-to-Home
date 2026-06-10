@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,13 +23,13 @@ public class EscapeMenuController : MonoBehaviour
         SaveSlots,
         LoadSlots,
         Music,
-        KeyMapping,
         Information
     }
 
     private const string DefaultMainMenuSceneName = "MainMenu";
     private const string AnimScenesFolderToken = "/anim_scenes/";
     private const string BuiltinFontResourcePath = "LegacyRuntime.ttf";
+    private const string PauseMenuPrefabResourcePath = "SystemMenu/PauseMenu";
     private const float VolumeStep = 0.05f;
     private const int VolumeBarSegmentCount = 12;
 
@@ -38,10 +39,11 @@ public class EscapeMenuController : MonoBehaviour
 
     private Canvas menuCanvas;
     private GameObject overlayObject;
-    private Text titleText;
-    private Text descriptionText;
-    private Text footerText;
-    private readonly List<Text> optionTexts = new List<Text>();
+    private Component titleText;
+    private Component descriptionText;
+    private Component footerText;
+    private readonly List<Component> optionTexts = new List<Component>();
+    private readonly List<Component> slotOptionTexts = new List<Component>();
     private readonly List<string> currentOptionLabels = new List<string>();
     private List<SaveSlotSummary> slotSummaries = new List<SaveSlotSummary>();
 
@@ -119,7 +121,7 @@ public class EscapeMenuController : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        BuildUi();
+        BuildUiFromPrefabOrFallback();
         HideMenuImmediate();
     }
 
@@ -259,7 +261,7 @@ public class EscapeMenuController : MonoBehaviour
             selectedIndex = 0;
         }
 
-        RefreshVisualSelection();
+        RefreshVisualSelection(GetActiveTextPool());
     }
 
     private void ActivateSelectedOption()
@@ -281,7 +283,6 @@ public class EscapeMenuController : MonoBehaviour
                     ShowMainPage();
                 }
                 break;
-            case MenuPage.KeyMapping:
             case MenuPage.Information:
                 ShowMainPage();
                 break;
@@ -305,9 +306,6 @@ public class EscapeMenuController : MonoBehaviour
                 ShowMusicPage();
                 break;
             case 4:
-                ShowKeyMappingPage();
-                break;
-            case 5:
                 ShowInformationPage();
                 break;
         }
@@ -416,14 +414,6 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
-    private void ShowKeyMappingPage()
-    {
-        currentPage = MenuPage.KeyMapping;
-        selectedIndex = 0;
-        footerMessage = "Enter or Esc: Back";
-        RefreshCurrentPage();
-    }
-
     private void ShowInformationPage()
     {
         currentPage = MenuPage.Information;
@@ -437,58 +427,64 @@ public class EscapeMenuController : MonoBehaviour
         if (overlayObject == null) return;
 
         currentOptionLabels.Clear();
+        List<Component> activeTextPool;
         switch (currentPage)
         {
             case MenuPage.Main:
-                titleText.text = "Pause Menu";
-                descriptionText.text = "Choose a system action.";
+                SetTextValue(titleText, "Pause Menu");
+                SetTextValue(descriptionText, "Choose a system action.");
                 currentOptionLabels.Add("Back To Menu");
                 currentOptionLabels.Add("Save");
                 currentOptionLabels.Add("Load");
                 currentOptionLabels.Add("Music");
-                currentOptionLabels.Add("Key Mapping");
                 currentOptionLabels.Add("Information");
+                activeTextPool = optionTexts;
                 break;
             case MenuPage.SaveSlots:
-                titleText.text = "Save";
-                descriptionText.text = "Choose one of the ten save slots. Press Enter to overwrite the selected slot.";
+                SetTextValue(titleText, "Save");
+                SetTextValue(descriptionText, "Choose one of the ten save slots. Press Enter to overwrite the selected slot.");
                 AppendSlotLabels();
+                activeTextPool = GetSlotOptionTextPool();
                 break;
             case MenuPage.LoadSlots:
-                titleText.text = "Load";
-                descriptionText.text = "Choose a save slot to restore. Boss scenes load from their scene start instead of battle state.";
+                SetTextValue(titleText, "Load");
+                SetTextValue(descriptionText, "Choose a save slot to restore. Boss scenes load from their scene start instead of battle state.");
                 AppendSlotLabels();
+                activeTextPool = GetSlotOptionTextPool();
                 break;
             case MenuPage.Music:
-                titleText.text = "Music";
-                descriptionText.text = "Adjust the current audio mix.";
+                SetTextValue(titleText, "Music");
+                SetTextValue(descriptionText, "Adjust the current audio mix.");
                 currentOptionLabels.Add(BuildVolumeLabel("BGM", AudioManager.EnsureInstance().BgmVolume));
                 currentOptionLabels.Add(BuildVolumeLabel("SFX", AudioManager.EnsureInstance().SfxVolume));
                 currentOptionLabels.Add("Back");
-                break;
-            case MenuPage.KeyMapping:
-                titleText.text = "Key Mapping";
-                descriptionText.text = BuildKeyMappingText();
-                currentOptionLabels.Add("Back");
+                activeTextPool = optionTexts;
                 break;
             case MenuPage.Information:
-                titleText.text = "Information";
-                descriptionText.text = BuildInformationText();
+                SetTextValue(titleText, "Information");
+                SetTextValue(descriptionText, BuildInformationText());
                 currentOptionLabels.Add("Back");
+                activeTextPool = optionTexts;
+                break;
+            default:
+                activeTextPool = optionTexts;
                 break;
         }
 
-        EnsureOptionTextCount(Mathf.Max(currentOptionLabels.Count, SaveSystem.SlotCount));
-        for (int i = 0; i < optionTexts.Count; i++)
+        EnsureTextPoolCount(activeTextPool, activeTextPool == slotOptionTexts ? SaveSystem.SlotCount : currentOptionLabels.Count);
+        SetTextPoolVisible(optionTexts, activeTextPool == optionTexts);
+        SetTextPoolVisible(slotOptionTexts, activeTextPool == slotOptionTexts);
+
+        for (int i = 0; i < activeTextPool.Count; i++)
         {
             bool shouldShow = i < currentOptionLabels.Count;
-            optionTexts[i].gameObject.SetActive(shouldShow);
+            activeTextPool[i].gameObject.SetActive(shouldShow);
             if (!shouldShow) continue;
-            optionTexts[i].text = currentOptionLabels[i];
+            SetTextValue(activeTextPool[i], currentOptionLabels[i]);
         }
 
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, currentOptionLabels.Count - 1));
-        RefreshVisualSelection();
+        RefreshVisualSelection(activeTextPool);
         RefreshFooter();
     }
 
@@ -501,15 +497,15 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
-    private void RefreshVisualSelection()
+    private void RefreshVisualSelection(List<Component> activeTextPool)
     {
-        for (int i = 0; i < optionTexts.Count; i++)
+        for (int i = 0; i < activeTextPool.Count; i++)
         {
-            if (!optionTexts[i].gameObject.activeSelf) continue;
+            if (!activeTextPool[i].gameObject.activeSelf) continue;
 
             bool isSelected = i == selectedIndex;
-            optionTexts[i].color = isSelected ? new Color(1f, 0.92f, 0.45f, 1f) : Color.white;
-            optionTexts[i].text = isSelected ? $"> {currentOptionLabels[i]}" : $"  {currentOptionLabels[i]}";
+            SetTextColor(activeTextPool[i], isSelected ? new Color(1f, 0.92f, 0.45f, 1f) : Color.white);
+            SetTextValue(activeTextPool[i], isSelected ? $"> {currentOptionLabels[i]}" : $"  {currentOptionLabels[i]}");
         }
     }
 
@@ -517,7 +513,7 @@ public class EscapeMenuController : MonoBehaviour
     {
         if (footerText != null)
         {
-            footerText.text = footerMessage;
+            SetTextValue(footerText, footerMessage);
         }
     }
 
@@ -550,7 +546,8 @@ public class EscapeMenuController : MonoBehaviour
         int markerIndex = Mathf.RoundToInt(Mathf.Clamp01(volume) * VolumeBarSegmentCount);
         StringBuilder builder = new StringBuilder();
         builder.Append(label);
-        builder.Append("  [");
+        builder.AppendLine();
+        builder.Append("[");
 
         for (int i = 0; i <= VolumeBarSegmentCount; i++)
         {
@@ -563,20 +560,91 @@ public class EscapeMenuController : MonoBehaviour
         return builder.ToString();
     }
 
-    private static string BuildKeyMappingText()
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.AppendLine("W A S D: Move or menu navigation");
-        builder.AppendLine("Arrow Keys: Move or menu navigation");
-        builder.AppendLine("Enter: Confirm or interact");
-        builder.AppendLine("Esc: Pause or back");
-        builder.Append("P: Open pager phone when available");
-        return builder.ToString();
-    }
-
     private static string BuildInformationText()
     {
         return "Save and Load now use ten overwriteable slots. Stored data includes scene, exploration position, inventory, safe and door unlocks, and triggered story progression.";
+    }
+
+    private void BuildUiFromPrefabOrFallback()
+    {
+        if (BuildUiFromPrefab())
+        {
+            return;
+        }
+
+        BuildUi();
+    }
+
+    private bool BuildUiFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>(PauseMenuPrefabResourcePath);
+        if (prefab == null)
+        {
+            return false;
+        }
+
+        overlayObject = Instantiate(prefab, transform);
+        overlayObject.name = prefab.name;
+
+        menuCanvas = overlayObject.GetComponent<Canvas>();
+        if (menuCanvas == null)
+        {
+            menuCanvas = overlayObject.GetComponentInChildren<Canvas>(true);
+        }
+
+        if (menuCanvas == null)
+        {
+            Destroy(overlayObject);
+            overlayObject = null;
+            return false;
+        }
+
+        CanvasScaler scaler = menuCanvas.GetComponent<CanvasScaler>();
+        if (scaler == null)
+        {
+            scaler = menuCanvas.gameObject.AddComponent<CanvasScaler>();
+        }
+
+        if (menuCanvas.GetComponent<GraphicRaycaster>() == null)
+        {
+            menuCanvas.gameObject.AddComponent<GraphicRaycaster>();
+        }
+
+        if (menuCanvas.renderMode == RenderMode.ScreenSpaceCamera && menuCanvas.worldCamera == null)
+        {
+            menuCanvas.worldCamera = Camera.main;
+        }
+
+        titleText = FindRequiredTextComponent(overlayObject.transform, "Title");
+        descriptionText = FindRequiredTextComponent(overlayObject.transform, "Description");
+        footerText = FindRequiredTextComponent(overlayObject.transform, "Footer");
+        Transform optionsRoot = FindChildRecursive(overlayObject.transform, "Options");
+        Transform slotOptionsRoot = FindChildRecursive(overlayObject.transform, "SlotOptions");
+
+        if (titleText == null || footerText == null || optionsRoot == null)
+        {
+            Destroy(overlayObject);
+            overlayObject = null;
+            titleText = null;
+            descriptionText = null;
+            footerText = null;
+            return false;
+        }
+
+        LoadTextPoolFromContainer(optionTexts, optionsRoot);
+
+        if (slotOptionsRoot != null)
+        {
+            LoadTextPoolFromContainer(slotOptionTexts, slotOptionsRoot);
+            EnsureTextPoolCount(slotOptionTexts, SaveSystem.SlotCount, slotOptionsRoot, "SlotOption", 20);
+        }
+        else
+        {
+            slotOptionTexts.Clear();
+        }
+
+        EnsureTextPoolCount(optionTexts, 6, optionsRoot, "Option", 20);
+        return true;
     }
 
     private void BuildUi()
@@ -653,7 +721,24 @@ public class EscapeMenuController : MonoBehaviour
         optionLayout.childForceExpandHeight = false;
         optionLayout.spacing = 8f;
 
-        EnsureOptionTextCount(SaveSystem.SlotCount, optionsRoot.transform);
+        EnsureTextPoolCount(optionTexts, 6, optionsRoot.transform, "Option", 20);
+
+        GameObject slotOptionsRoot = CreateUiObject("SlotOptions", panelObject.transform);
+        RectTransform slotOptionsRect = slotOptionsRoot.GetComponent<RectTransform>();
+        slotOptionsRect.anchorMin = new Vector2(0f, 0f);
+        slotOptionsRect.anchorMax = new Vector2(1f, 1f);
+        slotOptionsRect.offsetMin = new Vector2(28f, 86f);
+        slotOptionsRect.offsetMax = new Vector2(-28f, -176f);
+
+        VerticalLayoutGroup slotOptionLayout = slotOptionsRoot.AddComponent<VerticalLayoutGroup>();
+        slotOptionLayout.childAlignment = TextAnchor.UpperLeft;
+        slotOptionLayout.childControlWidth = true;
+        slotOptionLayout.childControlHeight = false;
+        slotOptionLayout.childForceExpandWidth = true;
+        slotOptionLayout.childForceExpandHeight = false;
+        slotOptionLayout.spacing = 10f;
+
+        EnsureTextPoolCount(slotOptionTexts, SaveSystem.SlotCount, slotOptionsRoot.transform, "SlotOption", 22);
 
         footerText = CreateText("Footer", panelObject.transform, 16, TextAnchor.LowerLeft, FontStyle.Italic);
         RectTransform footerRect = footerText.GetComponent<RectTransform>();
@@ -664,21 +749,65 @@ public class EscapeMenuController : MonoBehaviour
         footerRect.sizeDelta = new Vector2(-60f, 64f);
     }
 
-    private void EnsureOptionTextCount(int requiredCount, Transform parentOverride = null)
+    private List<Component> GetSlotOptionTextPool()
     {
-        Transform parent = parentOverride != null ? parentOverride : (optionTexts.Count > 0 ? optionTexts[0].transform.parent : null);
-        if (parent == null && requiredCount > 0) return;
+        return slotOptionTexts.Count > 0 ? slotOptionTexts : optionTexts;
+    }
 
-        while (optionTexts.Count < requiredCount)
+    private List<Component> GetActiveTextPool()
+    {
+        switch (currentPage)
         {
-            Text optionText = CreateText($"Option_{optionTexts.Count + 1}", parent, 20, TextAnchor.MiddleLeft, FontStyle.Normal);
-            LayoutElement layoutElement = optionText.gameObject.AddComponent<LayoutElement>();
-            layoutElement.preferredHeight = 28f;
-            optionTexts.Add(optionText);
+            case MenuPage.SaveSlots:
+            case MenuPage.LoadSlots:
+                return GetSlotOptionTextPool();
+            default:
+                return optionTexts;
         }
     }
 
-    private Text CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
+    private void LoadTextPoolFromContainer(List<Component> targetPool, Transform parent)
+    {
+        targetPool.Clear();
+        if (parent == null) return;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Component optionText = GetSupportedTextComponent(parent.GetChild(i));
+            if (optionText != null)
+            {
+                targetPool.Add(optionText);
+            }
+        }
+    }
+
+    private void EnsureTextPoolCount(List<Component> targetPool, int requiredCount, Transform parentOverride = null, string objectNamePrefix = "Option", int fontSize = 20)
+    {
+        Transform parent = parentOverride != null ? parentOverride : (targetPool.Count > 0 ? targetPool[0].transform.parent : null);
+        if (parent == null && requiredCount > 0) return;
+
+        while (targetPool.Count < requiredCount)
+        {
+            Component optionText = CreateText($"{objectNamePrefix}_{targetPool.Count + 1}", parent, fontSize, TextAnchor.MiddleLeft, FontStyle.Normal);
+            LayoutElement layoutElement = optionText.gameObject.AddComponent<LayoutElement>();
+            layoutElement.preferredHeight = 28f;
+            targetPool.Add(optionText);
+        }
+    }
+
+    private static void SetTextPoolVisible(List<Component> targetPool, bool visible)
+    {
+        for (int i = 0; i < targetPool.Count; i++)
+        {
+            targetPool[i].gameObject.SetActive(visible && targetPool[i].gameObject.activeSelf);
+            if (!visible)
+            {
+                targetPool[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private Component CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
     {
         GameObject textObject = CreateUiObject(objectName, parent);
         Text text = textObject.AddComponent<Text>();
@@ -711,5 +840,75 @@ public class EscapeMenuController : MonoBehaviour
     private static Font GetBuiltinFont()
     {
         return Resources.GetBuiltinResource<Font>(BuiltinFontResourcePath);
+    }
+
+    private static Component FindRequiredTextComponent(Transform root, string objectName)
+    {
+        Transform target = FindChildRecursive(root, objectName);
+        return target != null ? GetSupportedTextComponent(target) : null;
+    }
+
+    private static Component GetSupportedTextComponent(Transform target)
+    {
+        if (target == null) return null;
+
+        Text legacyText = target.GetComponent<Text>();
+        if (legacyText != null)
+        {
+            return legacyText;
+        }
+
+        TMP_Text tmpText = target.GetComponent<TMP_Text>();
+        if (tmpText != null)
+        {
+            return tmpText;
+        }
+
+        return null;
+    }
+
+    private static void SetTextValue(Component textComponent, string value)
+    {
+        if (textComponent is Text legacyText)
+        {
+            legacyText.text = value;
+            return;
+        }
+
+        if (textComponent is TMP_Text tmpText)
+        {
+            tmpText.text = value;
+        }
+    }
+
+    private static void SetTextColor(Component textComponent, Color color)
+    {
+        if (textComponent is Text legacyText)
+        {
+            legacyText.color = color;
+            return;
+        }
+
+        if (textComponent is TMP_Text tmpText)
+        {
+            tmpText.color = color;
+        }
+    }
+
+    private static Transform FindChildRecursive(Transform parent, string childName)
+    {
+        if (parent == null) return null;
+        if (parent.name == childName) return parent;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform result = FindChildRecursive(parent.GetChild(i), childName);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return null;
     }
 }

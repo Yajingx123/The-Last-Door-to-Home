@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -17,14 +19,15 @@ public class MainMenuLoadPanelController : MonoBehaviour
 {
     private const string MainMenuSceneName = "MainMenu";
     private const string BuiltinFontResourcePath = "LegacyRuntime.ttf";
+    private const string PauseMenuPrefabResourcePath = "SystemMenu/PauseMenu";
 
     private static MainMenuLoadPanelController instance;
 
     private Canvas panelCanvas;
     private GameObject overlayObject;
-    private Text titleText;
-    private Text footerText;
-    private readonly List<Text> slotTexts = new List<Text>();
+    private Component titleText;
+    private Component footerText;
+    private readonly List<Component> slotTexts = new List<Component>();
     private readonly List<string> slotLabels = new List<string>();
     private List<SaveSlotSummary> slotSummaries = new List<SaveSlotSummary>();
     private int selectedIndex;
@@ -114,7 +117,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
             return;
         }
 
-        BuildUi();
+        BuildUiFromPrefabOrFallback();
         ClosePanel();
     }
 
@@ -124,6 +127,10 @@ public class MainMenuLoadPanelController : MonoBehaviour
 
         selectedIndex = 0;
         footerMessage = "Enter: Load Selected Slot   Esc: Back";
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
         overlayObject.SetActive(true);
         RefreshSlotList();
     }
@@ -138,6 +145,13 @@ public class MainMenuLoadPanelController : MonoBehaviour
 
     private void TryLoadSelectedSlot()
     {
+        if (selectedIndex < 0 || selectedIndex >= slotSummaries.Count || !slotSummaries[selectedIndex].hasData)
+        {
+            footerMessage = "This save slot is empty.";
+            RefreshFooter();
+            return;
+        }
+
         if (!SaveSystem.LoadFromSlot(selectedIndex, out string message))
         {
             footerMessage = message;
@@ -175,14 +189,14 @@ public class MainMenuLoadPanelController : MonoBehaviour
             slotLabels.Add(BuildSlotLabel(slotSummaries[i]));
         }
 
-        titleText.text = "Continue";
+        SetTextValue(titleText, "Continue");
         EnsureSlotTextCount(SaveSystem.SlotCount);
         for (int i = 0; i < slotTexts.Count; i++)
         {
             bool shouldShow = i < slotLabels.Count;
             slotTexts[i].gameObject.SetActive(shouldShow);
             if (!shouldShow) continue;
-            slotTexts[i].text = slotLabels[i];
+            SetTextValue(slotTexts[i], slotLabels[i]);
         }
 
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, slotLabels.Count - 1));
@@ -197,8 +211,8 @@ public class MainMenuLoadPanelController : MonoBehaviour
             if (!slotTexts[i].gameObject.activeSelf) continue;
 
             bool isSelected = i == selectedIndex;
-            slotTexts[i].color = isSelected ? new Color(1f, 0.92f, 0.45f, 1f) : Color.white;
-            slotTexts[i].text = isSelected ? $"> {slotLabels[i]}" : $"  {slotLabels[i]}";
+            SetTextColor(slotTexts[i], isSelected ? new Color(1f, 0.92f, 0.45f, 1f) : Color.white);
+            SetTextValue(slotTexts[i], isSelected ? $"> {slotLabels[i]}" : $"  {slotLabels[i]}");
         }
     }
 
@@ -206,7 +220,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
     {
         if (footerText != null)
         {
-            footerText.text = footerMessage;
+            SetTextValue(footerText, footerMessage);
         }
     }
 
@@ -225,6 +239,91 @@ public class MainMenuLoadPanelController : MonoBehaviour
         string sceneName = string.IsNullOrWhiteSpace(summary.sceneName) ? "Unknown" : summary.sceneName;
         string playTime = SaveSystem.FormatPlayTime(summary.playTimeSeconds);
         return $"Slot {summary.slotIndex + 1:00}   {sceneName}   {playTime}";
+    }
+
+    private void BuildUiFromPrefabOrFallback()
+    {
+        if (BuildUiFromPrefab())
+        {
+            return;
+        }
+
+        BuildUi();
+    }
+
+    private bool BuildUiFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>(PauseMenuPrefabResourcePath);
+        if (prefab == null)
+        {
+            return false;
+        }
+
+        overlayObject = Instantiate(prefab, transform);
+        overlayObject.name = $"{prefab.name}_Continue";
+
+        panelCanvas = overlayObject.GetComponent<Canvas>();
+        if (panelCanvas == null)
+        {
+            panelCanvas = overlayObject.GetComponentInChildren<Canvas>(true);
+        }
+
+        if (panelCanvas == null)
+        {
+            Destroy(overlayObject);
+            overlayObject = null;
+            return false;
+        }
+
+        if (panelCanvas.GetComponent<GraphicRaycaster>() == null)
+        {
+            panelCanvas.gameObject.AddComponent<GraphicRaycaster>();
+        }
+
+        if (panelCanvas.renderMode == RenderMode.ScreenSpaceCamera && panelCanvas.worldCamera == null)
+        {
+            panelCanvas.worldCamera = Camera.main;
+        }
+
+        titleText = FindRequiredTextComponent(overlayObject.transform, "Title");
+        footerText = FindRequiredTextComponent(overlayObject.transform, "Footer");
+
+        Transform slotOptionsRoot = FindChildRecursive(overlayObject.transform, "SlotOptions");
+        Transform optionsRoot = FindChildRecursive(overlayObject.transform, "Options");
+        Transform descriptionRoot = FindChildRecursive(overlayObject.transform, "Description");
+
+        if (titleText == null || footerText == null || (slotOptionsRoot == null && optionsRoot == null))
+        {
+            Destroy(overlayObject);
+            overlayObject = null;
+            titleText = null;
+            footerText = null;
+            return false;
+        }
+
+        if (descriptionRoot != null)
+        {
+            descriptionRoot.gameObject.SetActive(false);
+        }
+
+        if (optionsRoot != null)
+        {
+            optionsRoot.gameObject.SetActive(slotOptionsRoot == null);
+        }
+
+        if (slotOptionsRoot != null)
+        {
+            slotOptionsRoot.gameObject.SetActive(true);
+            LoadTextPoolFromContainer(slotTexts, slotOptionsRoot);
+            EnsureSlotTextCount(SaveSystem.SlotCount, slotOptionsRoot);
+        }
+        else
+        {
+            LoadTextPoolFromContainer(slotTexts, optionsRoot);
+            EnsureSlotTextCount(SaveSystem.SlotCount, optionsRoot);
+        }
+
+        return true;
     }
 
     private void BuildUi()
@@ -310,14 +409,14 @@ public class MainMenuLoadPanelController : MonoBehaviour
 
         while (slotTexts.Count < requiredCount)
         {
-            Text slotText = CreateText($"Slot_{slotTexts.Count + 1}", parent, 21, TextAnchor.MiddleLeft, FontStyle.Normal);
+            Component slotText = CreateText($"Slot_{slotTexts.Count + 1}", parent, 21, TextAnchor.MiddleLeft, FontStyle.Normal);
             LayoutElement layoutElement = slotText.gameObject.AddComponent<LayoutElement>();
             layoutElement.preferredHeight = 30f;
             slotTexts.Add(slotText);
         }
     }
 
-    private Text CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
+    private Component CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
     {
         GameObject textObject = CreateUiObject(objectName, parent);
         Text text = textObject.AddComponent<Text>();
@@ -330,6 +429,21 @@ public class MainMenuLoadPanelController : MonoBehaviour
         text.resizeTextForBestFit = false;
         text.color = Color.white;
         return text;
+    }
+
+    private void LoadTextPoolFromContainer(List<Component> targetPool, Transform parent)
+    {
+        targetPool.Clear();
+        if (parent == null) return;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Component slotText = GetSupportedTextComponent(parent.GetChild(i));
+            if (slotText != null)
+            {
+                targetPool.Add(slotText);
+            }
+        }
     }
 
     private static GameObject CreateUiObject(string objectName, Transform parent)
@@ -345,5 +459,75 @@ public class MainMenuLoadPanelController : MonoBehaviour
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
+    }
+
+    private static Component FindRequiredTextComponent(Transform root, string objectName)
+    {
+        Transform target = FindChildRecursive(root, objectName);
+        return target != null ? GetSupportedTextComponent(target) : null;
+    }
+
+    private static Transform FindChildRecursive(Transform parent, string childName)
+    {
+        if (parent == null) return null;
+        if (parent.name == childName) return parent;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform result = FindChildRecursive(parent.GetChild(i), childName);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return null;
+    }
+
+    private static Component GetSupportedTextComponent(Transform target)
+    {
+        if (target == null) return null;
+
+        Text legacyText = target.GetComponent<Text>();
+        if (legacyText != null)
+        {
+            return legacyText;
+        }
+
+        TMP_Text tmpText = target.GetComponent<TMP_Text>();
+        if (tmpText != null)
+        {
+            return tmpText;
+        }
+
+        return null;
+    }
+
+    private static void SetTextValue(Component textComponent, string value)
+    {
+        if (textComponent is Text legacyText)
+        {
+            legacyText.text = value;
+            return;
+        }
+
+        if (textComponent is TMP_Text tmpText)
+        {
+            tmpText.text = value;
+        }
+    }
+
+    private static void SetTextColor(Component textComponent, Color color)
+    {
+        if (textComponent is Text legacyText)
+        {
+            legacyText.color = color;
+            return;
+        }
+
+        if (textComponent is TMP_Text tmpText)
+        {
+            tmpText.color = color;
+        }
     }
 }
