@@ -60,6 +60,7 @@ public class DialogueManager : MonoBehaviour
 
     public bool IsDialogueActive => isDialogueActive;
     public bool IsPlayerControlLocked => isDialogueActive || isWaitingForOptionChoice;
+    public float DialogueImageAnimDuration => imageAnimDuration;
     public bool CanStartInteraction =>
         !isDialogueActive &&
         !isWaitingForOptionChoice &&

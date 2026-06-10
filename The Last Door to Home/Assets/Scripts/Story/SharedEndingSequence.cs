@@ -18,6 +18,16 @@ public abstract class SharedEndingSequence : MonoBehaviour
     [TextArea(2, 8)]
     public string[] firstDialogues;
     public Sprite firstDialogueImage;
+    [Min(1)]
+    public int firstDialogueImageStartLine = 1;
+    [Tooltip("第一段配图从第几句开始时关闭。若大于第一段对话数量，则第一段播完后关闭。")]
+    [Min(1)]
+    public int firstDialogueImageHideLine = 2;
+    [Header("第一段配图出场背景渐变")]
+    [SerializeField] private float firstImageDarkenDuration = 0.35f;
+    [SerializeField] private float firstImageBrightenDuration = 0.45f;
+    [Range(0f, 1f)]
+    [SerializeField] private float firstImageBackgroundDarkAlpha = 1f;
 
     [Header("第二段结局对话")]
     [TextArea(2, 8)]
@@ -30,6 +40,9 @@ public abstract class SharedEndingSequence : MonoBehaviour
     public bool clearInventoryOnFinish = false;
 
     [Header("玩家消失效果")]
+    [Tooltip("Player 从第一段对话的第几句开始消失。若大于第一段对话数量，则第一段播完后再消失，然后进入黑屏。")]
+    [Min(1)]
+    [SerializeField] private int playerFadeStartLine = 1;
     [SerializeField] private float playerFadeDuration = 1.2f;
     [SerializeField] private float postFadeDelay = 0.15f;
 
@@ -39,8 +52,16 @@ public abstract class SharedEndingSequence : MonoBehaviour
 
     private bool triggered;
     private bool isPlayerFadeComplete;
+    private bool isPlayerFadeStarted;
+    private bool isWaitingToShowFirstDialogueImage;
+    private bool isWaitingToHideFirstDialogueImage;
+    private bool isFirstDialogueImageVisible;
+    private bool isWaitingToStartPlayerFade;
+    private GameObject pendingPlayerObject;
     private GameObject blackoutOverlay;
     private CanvasGroup blackoutCanvasGroup;
+    private Coroutine firstDialogueImageRevealRoutine;
+    private Coroutine firstDialogueImageCloseRoutine;
 
     // Starts the shared ending flow once and ignores repeat triggers.
     protected void StartEnding(GameObject playerObject)
@@ -87,25 +108,47 @@ public abstract class SharedEndingSequence : MonoBehaviour
         }
 
         isPlayerFadeComplete = false;
-        StartCoroutine(FadeOutPlayer(playerObject));
+        isPlayerFadeStarted = false;
+        pendingPlayerObject = playerObject;
 
         if (hasFirstDialogue)
         {
-            if (firstDialogueImage != null)
+            if (firstDialogueImage != null && firstDialogueImageStartLine <= 1)
             {
-                dialogueManager.ShowDialogueImage(firstDialogueImage);
+                RevealFirstDialogueImage(dialogueManager);
+            }
+            else if (firstDialogueImage != null)
+            {
+                dialogueManager.HideDialogueImage();
+                RegisterFirstDialogueImageTrigger();
+            }
+
+            if (playerFadeStartLine <= 1)
+            {
+                StartPlayerFadeIfNeeded();
+            }
+            else
+            {
+                RegisterPlayerFadeTrigger();
             }
 
             dialogueManager.ShowDialogue(firstDialogues, null, null, () => StartCoroutine(BeginSecondPhase(dialogueManager)));
             yield break;
         }
 
+        StartPlayerFadeIfNeeded();
         yield return BeginSecondPhase(dialogueManager);
     }
 
     // Starts the blackout transition and then opens the second ending dialogue segment.
     private IEnumerator BeginSecondPhase(DialogueManager dialogueManager)
     {
+        UnregisterFirstDialogueImageTrigger();
+        UnregisterFirstDialogueImageHideTrigger();
+        UnregisterPlayerFadeTrigger();
+        yield return WaitForFirstDialogueImageClose(dialogueManager);
+        StartPlayerFadeIfNeeded();
+
         if (dialogueManager != null)
         {
             dialogueManager.LockPlayer(true);
@@ -141,6 +184,263 @@ public abstract class SharedEndingSequence : MonoBehaviour
         }
 
         dialogueManager.ShowDialogue(endingDialogues, null, null, FinishEnding, endingDialogueAudioSettings);
+    }
+
+    // Starts waiting for the configured first-phase line before revealing the illustration.
+    private void RegisterFirstDialogueImageTrigger()
+    {
+        if (firstDialogueImage == null)
+        {
+            return;
+        }
+
+        UnregisterFirstDialogueImageTrigger();
+        isWaitingToShowFirstDialogueImage = true;
+        DialogueManager.DialogueLineShown += HandleFirstDialogueLineShown;
+    }
+
+    // Stops listening for the first-phase image trigger once it is no longer needed.
+    private void UnregisterFirstDialogueImageTrigger()
+    {
+        if (!isWaitingToShowFirstDialogueImage)
+        {
+            return;
+        }
+
+        DialogueManager.DialogueLineShown -= HandleFirstDialogueLineShown;
+        isWaitingToShowFirstDialogueImage = false;
+    }
+
+    // Reveals the first dialogue image once the configured line index is reached.
+    private void HandleFirstDialogueLineShown(string lineText, int lineIndex, int totalLines)
+    {
+        if (!isWaitingToShowFirstDialogueImage || firstDialogueImage == null)
+        {
+            return;
+        }
+
+        int targetLineIndex = Mathf.Max(0, firstDialogueImageStartLine - 1);
+        if (lineIndex < targetLineIndex)
+        {
+            return;
+        }
+
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager != null)
+        {
+            RevealFirstDialogueImage(dialogueManager);
+        }
+
+        UnregisterFirstDialogueImageTrigger();
+    }
+
+    // Starts waiting for the configured line before hiding the first illustration.
+    private void RegisterFirstDialogueImageHideTrigger()
+    {
+        if (firstDialogueImage == null)
+        {
+            return;
+        }
+
+        UnregisterFirstDialogueImageHideTrigger();
+        isWaitingToHideFirstDialogueImage = true;
+        DialogueManager.DialogueLineShown += HandleFirstDialogueImageHideLineShown;
+    }
+
+    // Stops listening for the first illustration hide line.
+    private void UnregisterFirstDialogueImageHideTrigger()
+    {
+        if (!isWaitingToHideFirstDialogueImage)
+        {
+            return;
+        }
+
+        DialogueManager.DialogueLineShown -= HandleFirstDialogueImageHideLineShown;
+        isWaitingToHideFirstDialogueImage = false;
+    }
+
+    // Hides the first illustration once its configured ending line is reached.
+    private void HandleFirstDialogueImageHideLineShown(string lineText, int lineIndex, int totalLines)
+    {
+        if (!isWaitingToHideFirstDialogueImage)
+        {
+            return;
+        }
+
+        int startLineIndex = Mathf.Max(0, firstDialogueImageStartLine - 1);
+        int hideLineIndex = Mathf.Max(startLineIndex + 1, firstDialogueImageHideLine - 1);
+        if (hideLineIndex >= totalLines)
+        {
+            return;
+        }
+
+        if (lineIndex < hideLineIndex)
+        {
+            return;
+        }
+
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager != null)
+        {
+            StartFirstDialogueImageClose(dialogueManager);
+        }
+    }
+
+    // Darkens the background before showing the first illustration.
+    private void RevealFirstDialogueImage(DialogueManager dialogueManager)
+    {
+        if (dialogueManager == null || firstDialogueImage == null)
+        {
+            return;
+        }
+
+        StopFirstDialogueImageRevealRoutine();
+        StopFirstDialogueImageCloseRoutine();
+        RegisterFirstDialogueImageHideTrigger();
+        firstDialogueImageRevealRoutine = StartCoroutine(RevealFirstDialogueImageRoutine(dialogueManager));
+    }
+
+    // Uses the existing blackout layer below dialogue UI so only the scene background fades.
+    private IEnumerator RevealFirstDialogueImageRoutine(DialogueManager dialogueManager)
+    {
+        yield return FadeBlackout(firstImageBackgroundDarkAlpha, firstImageDarkenDuration);
+
+        if (dialogueManager != null && firstDialogueImage != null)
+        {
+            dialogueManager.ShowDialogueImage(firstDialogueImage);
+            isFirstDialogueImageVisible = true;
+        }
+
+        firstDialogueImageRevealRoutine = null;
+    }
+
+    // Starts the first illustration close transition if it is not already running.
+    private void StartFirstDialogueImageClose(DialogueManager dialogueManager)
+    {
+        if (firstDialogueImageCloseRoutine != null)
+        {
+            return;
+        }
+
+        firstDialogueImageCloseRoutine = StartCoroutine(CloseFirstDialogueImageIfNeeded(dialogueManager));
+    }
+
+    // Waits for any active close transition, or runs one at first dialogue end.
+    private IEnumerator WaitForFirstDialogueImageClose(DialogueManager dialogueManager)
+    {
+        if (firstDialogueImageCloseRoutine != null)
+        {
+            yield return firstDialogueImageCloseRoutine;
+            yield break;
+        }
+
+        yield return CloseFirstDialogueImageIfNeeded(dialogueManager);
+    }
+
+    // Hides the first illustration, waits for its exit animation, then restores the background.
+    private IEnumerator CloseFirstDialogueImageIfNeeded(DialogueManager dialogueManager)
+    {
+        UnregisterFirstDialogueImageHideTrigger();
+        StopFirstDialogueImageRevealRoutine();
+
+        if (dialogueManager != null && isFirstDialogueImageVisible)
+        {
+            dialogueManager.HideDialogueImage();
+            isFirstDialogueImageVisible = false;
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, dialogueManager.DialogueImageAnimDuration));
+        }
+
+        if (blackoutCanvasGroup != null && blackoutCanvasGroup.alpha > 0f)
+        {
+            yield return FadeBlackout(0f, firstImageBrightenDuration);
+        }
+
+        firstDialogueImageCloseRoutine = null;
+    }
+
+    // Prevents the first-image reveal fade from fighting the ending blackout.
+    private void StopFirstDialogueImageRevealRoutine()
+    {
+        if (firstDialogueImageRevealRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(firstDialogueImageRevealRoutine);
+        firstDialogueImageRevealRoutine = null;
+    }
+
+    // Stops any active first-image close transition during teardown or a fresh reveal.
+    private void StopFirstDialogueImageCloseRoutine()
+    {
+        if (firstDialogueImageCloseRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(firstDialogueImageCloseRoutine);
+        firstDialogueImageCloseRoutine = null;
+    }
+
+    // Starts waiting for the configured first-phase line before beginning the player fade.
+    private void RegisterPlayerFadeTrigger()
+    {
+        if (pendingPlayerObject == null)
+        {
+            isPlayerFadeComplete = true;
+            return;
+        }
+
+        UnregisterPlayerFadeTrigger();
+        isWaitingToStartPlayerFade = true;
+        DialogueManager.DialogueLineShown += HandlePlayerFadeLineShown;
+    }
+
+    // Stops listening for the player-fade trigger once it has fired or is no longer needed.
+    private void UnregisterPlayerFadeTrigger()
+    {
+        if (!isWaitingToStartPlayerFade)
+        {
+            return;
+        }
+
+        DialogueManager.DialogueLineShown -= HandlePlayerFadeLineShown;
+        isWaitingToStartPlayerFade = false;
+    }
+
+    // Starts the player fade once the configured first dialogue line is shown.
+    private void HandlePlayerFadeLineShown(string lineText, int lineIndex, int totalLines)
+    {
+        if (!isWaitingToStartPlayerFade)
+        {
+            return;
+        }
+
+        int targetLineIndex = Mathf.Max(0, playerFadeStartLine - 1);
+        if (targetLineIndex >= totalLines)
+        {
+            return;
+        }
+
+        if (lineIndex < targetLineIndex)
+        {
+            return;
+        }
+
+        UnregisterPlayerFadeTrigger();
+        StartPlayerFadeIfNeeded();
+    }
+
+    // Ensures the player fade coroutine is launched only once.
+    private void StartPlayerFadeIfNeeded()
+    {
+        if (isPlayerFadeStarted)
+        {
+            return;
+        }
+
+        isPlayerFadeStarted = true;
+        StartCoroutine(FadeOutPlayer(pendingPlayerObject));
     }
 
     // Fades out the player presentation before the ending finishes.
@@ -258,9 +558,15 @@ public abstract class SharedEndingSequence : MonoBehaviour
     // Fades the scene blackout layer while keeping the dialogue UI visible above it.
     private IEnumerator FadeBlackout(float targetAlpha)
     {
+        yield return FadeBlackout(targetAlpha, blackoutFadeDuration);
+    }
+
+    // Fades the scene blackout layer over a caller-specified duration.
+    private IEnumerator FadeBlackout(float targetAlpha, float duration)
+    {
         if (blackoutCanvasGroup == null) yield break;
 
-        float duration = Mathf.Max(0.01f, blackoutFadeDuration);
+        duration = Mathf.Max(0.01f, duration);
         float elapsed = 0f;
         float startAlpha = blackoutCanvasGroup.alpha;
 
@@ -289,6 +595,12 @@ public abstract class SharedEndingSequence : MonoBehaviour
     // Cleans up runtime overlay objects if this sequence is destroyed early.
     protected virtual void OnDestroy()
     {
+        UnregisterFirstDialogueImageTrigger();
+        UnregisterFirstDialogueImageHideTrigger();
+        UnregisterPlayerFadeTrigger();
+        StopFirstDialogueImageRevealRoutine();
+        StopFirstDialogueImageCloseRoutine();
+
         if (blackoutOverlay != null)
         {
             Destroy(blackoutOverlay);
