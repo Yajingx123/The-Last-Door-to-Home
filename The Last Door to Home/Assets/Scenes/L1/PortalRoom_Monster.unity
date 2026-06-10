@@ -438,6 +438,11 @@ MonoBehaviour:
   firstDialogues:
   - ...
   firstDialogueImage: {fileID: 0}
+  firstDialogueImageStartLine: 1
+  firstDialogueImageHideLine: 2
+  firstImageDarkenDuration: 0.35
+  firstImageBrightenDuration: 0.45
+  firstImageBackgroundDarkAlpha: 1
   endingDialogues:
   - 222
   endingImage: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
@@ -457,6 +462,7 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   mainMenuSceneName: MainMenu
   clearInventoryOnFinish: 0
+  playerFadeStartLine: 1
   playerFadeDuration: 1.2
   postFadeDelay: 0.15
   blackoutFadeDuration: 0.8
@@ -8071,6 +8077,7 @@ GameObject:
   - component: {fileID: 1449405352}
   - component: {fileID: 1449405351}
   - component: {fileID: 1449405353}
+  - component: {fileID: 1449405354}
   m_Layer: 0
   m_Name: DoorToEnding
   m_TagString: Untagged
@@ -8158,7 +8165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eyeMonster: {fileID: 1136692596}
-  ending2SceneName: 
+  ending2SceneName: Ending2
   ending3SceneName: 
   setSpawnPositionOnLoad: 0
   ending2SpawnPosition: {x: 0, y: 0}
@@ -8166,6 +8173,51 @@ MonoBehaviour:
   reTriggerCooldown: 0.25
   sceneSwitchSfx: {fileID: 0}
   sceneSwitchSfxVolume: 1
+--- !u!61 &1449405354
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449405350}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.10183114, y: -0.5353397}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.5625, y: 3.84375}
+    newSize: {x: 2.5625, y: 3.84375}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1.0961336, y: 1.0506685}
+  m_EdgeRadius: 0
 --- !u!1 &1638261819 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7046168179983847338, guid: d3a7d007b89fb9045951d87b5628b7ce, type: 3}
