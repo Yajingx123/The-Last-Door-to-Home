@@ -36,6 +36,12 @@ public static class Inventory
     {
         if (!collectedIDs.Contains(uniqueID))
         {
+            Sprite resolvedIcon = runtimeIcon;
+            if (resolvedIcon == null && !string.IsNullOrWhiteSpace(iconResourcePath))
+            {
+                resolvedIcon = LoadIconFromResources(iconResourcePath);
+            }
+
             collectedIDs.Add(uniqueID);
             collectedItemOrder.Add(uniqueID);
             collectedItemNames.Add(name);
@@ -47,7 +53,7 @@ public static class Inventory
                 uniqueID = uniqueID,
                 itemDescription = description ?? string.Empty,
                 itemIconResourcePath = iconResourcePath ?? string.Empty,
-                runtimeIcon = runtimeIcon
+                runtimeIcon = resolvedIcon
             };
             ItemCollected?.Invoke(uniqueID);
         }
@@ -201,10 +207,32 @@ public static class Inventory
         StoryFlags.Clear();
     }
 
-    // Loads the requested data, scene, or runtime content.
+    // Loads a single Sprite path, or a sliced sprite using "SheetPath#SpriteName".
     private static Sprite LoadIconFromResources(string resourcePath)
     {
         if (string.IsNullOrWhiteSpace(resourcePath)) return null;
-        return Resources.Load<Sprite>(resourcePath);
+
+        string trimmedPath = resourcePath.Trim();
+        int spriteNameSeparator = trimmedPath.IndexOf('#');
+        if (spriteNameSeparator >= 0)
+        {
+            string sheetPath = trimmedPath.Substring(0, spriteNameSeparator);
+            string spriteName = trimmedPath.Substring(spriteNameSeparator + 1);
+            if (string.IsNullOrWhiteSpace(sheetPath) || string.IsNullOrWhiteSpace(spriteName)) return null;
+
+            Sprite[] sprites = Resources.LoadAll<Sprite>(sheetPath);
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                if (sprites[i] != null && string.Equals(sprites[i].name, spriteName, StringComparison.Ordinal))
+                {
+                    return sprites[i];
+                }
+            }
+
+            Debug.LogWarning($"Inventory: Could not find sprite '{spriteName}' in Resources path '{sheetPath}'.");
+            return null;
+        }
+
+        return Resources.Load<Sprite>(trimmedPath);
     }
 }

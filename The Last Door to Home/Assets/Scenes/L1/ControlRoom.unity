@@ -2673,7 +2673,7 @@ MonoBehaviour:
   itemDescription: This is the backup equipment for the control room staff. Compared
     to your helmet, it may have a special scanning function to the unknown creatures.
   itemIcon: {fileID: 1406025430, guid: 5c328cca3a25f01498602ba3270590cb, type: 3}
-  itemIconResourcePath: 
+  itemIconResourcePath: ItemIcons/Key_items#controlroom2_4
   prePickDialogues:
   - 'This is the backup equipment for the control room staff. Compared to your helmet,
     it may have a special scanning function to the unknown creatures.
@@ -4310,7 +4310,7 @@ MonoBehaviour:
   itemDescription: This is the backup equipment for the control room staff. Compared
     to your boots, it is lighter and offers better mobility.
   itemIcon: {fileID: -1900634224, guid: 5c328cca3a25f01498602ba3270590cb, type: 3}
-  itemIconResourcePath: 
+  itemIconResourcePath: ItemIcons/Key_items#controlroom2_6
   prePickDialogues:
   - 'This is the backup equipment for the control room staff. Compared to your boots,
     it is lighter and offers better mobility.
@@ -9297,7 +9297,7 @@ MonoBehaviour:
   itemDescription: "The backup energy source in the control room. \nTo activate the
     teleportation portal, three energy stones are required."
   itemIcon: {fileID: 1594065612, guid: 5c328cca3a25f01498602ba3270590cb, type: 3}
-  itemIconResourcePath: 
+  itemIconResourcePath: ItemIcons/Key_items#controlroom2_1
   prePickDialogues:
   - 'The backup energy source in the control room. To activate the teleportation
     portal, three energy stones are required.

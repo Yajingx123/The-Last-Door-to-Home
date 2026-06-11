@@ -25,7 +25,7 @@ public class PickableItem : MonoBehaviour, IInteractable
     [TextArea(2, 6)]
     public string itemDescription = "No description yet.";
     public Sprite itemIcon;
-    [Tooltip("可选：若图标放在 Resources 目录下，填入不带扩展名的路径，读档后也能恢复图标。")]
+    [Tooltip("Optional. For a single Sprite in Resources, use a path without extension, e.g. ItemIcons/Flower. For a sliced sprite sheet, use SheetPath#SpriteName, e.g. ItemIcons/Items#flower_01.")]
     public string itemIconResourcePath = "";
 
     [Header("拾取前对白（最后一句会出现拾取选项） / Dialogue Before Pickup (Pickup Option On Last Line)")]
