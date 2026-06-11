@@ -48,6 +48,7 @@ public class EndingSlide
     private int currentIndex;
     private bool isTransitioning;
     private bool isTypingCaption;
+    private bool hasRequestedSkip;
     private int sceneStartFrame = -1;
     private float configuredImageHeight = -1f;
     private Coroutine captionTypeRoutine;
@@ -83,7 +84,13 @@ public class EndingSlide
         if (isTransitioning) return;
         if (Time.frameCount == sceneStartFrame) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SkipCutscene();
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             if (isTypingCaption)
             {
@@ -93,6 +100,20 @@ public class EndingSlide
 
             StartCoroutine(AdvanceSlide());
         }
+    }
+
+    // 按Space时直接跳过整段结尾动画，回到主菜单。
+    // Skips the whole ending cutscene and returns to the main menu.
+    private void SkipCutscene()
+    {
+        if (hasRequestedSkip) return;
+        hasRequestedSkip = true;
+
+        StopAllCoroutines();
+        captionTypeRoutine = null;
+        isTypingCaption = false;
+        isTransitioning = true;
+        LoadMainMenu();
     }
 
     // Handles the advance slide step for this script.

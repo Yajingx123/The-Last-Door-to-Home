@@ -66,6 +66,7 @@ public class BgmLineCue
     private int currentIndex;
     private float configuredImageHeight = -1f;
     private bool isSequenceActive;
+    private bool hasRequestedSkip;
     private Coroutine imageSwapRoutine;
 
     // Prepares runtime state after the scene has finished its initial setup.
@@ -107,6 +108,38 @@ public class BgmLineCue
     {
         DialogueManager.DialogueLineShown -= HandleDialogueLineShown;
         DialogueManager.DialogueEnded -= HandleDialogueEnded;
+    }
+
+    // 每帧检测Space键，用来直接跳过整段中场动画。
+    // Checks for the Space key to skip the whole mid cutscene.
+    private void Update()
+    {
+        if (!isSequenceActive || hasRequestedSkip) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SkipCutscene();
+        }
+    }
+
+    // 按Space时直接跳过中场动画，并返回原场景或备用场景。
+    // Skips the whole mid cutscene and loads the return scene.
+    private void SkipCutscene()
+    {
+        if (hasRequestedSkip) return;
+        hasRequestedSkip = true;
+        isSequenceActive = false;
+
+        DialogueManager.DialogueLineShown -= HandleDialogueLineShown;
+        DialogueManager.DialogueEnded -= HandleDialogueEnded;
+
+        if (imageSwapRoutine != null)
+        {
+            StopCoroutine(imageSwapRoutine);
+            imageSwapRoutine = null;
+        }
+
+        LoadReturnScene();
     }
 
     // Builds the narration array consumed by the shared dialogue system.

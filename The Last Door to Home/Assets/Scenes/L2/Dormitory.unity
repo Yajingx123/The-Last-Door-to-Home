@@ -5220,7 +5220,10 @@ MonoBehaviour:
   pickOptionText: Pick it
   leaveOptionText: Leave
   afterPickOptionDialogues:
-  - You got Jeff's ID card.
+  - 'You got Jeff''s ID card.
+
+
+    Press [Tab] to see your inventory.'
   - How did he leave this thing here?
   afterLeaveOptionDialogues:
   - You left it there. You can come back and get it at any time.

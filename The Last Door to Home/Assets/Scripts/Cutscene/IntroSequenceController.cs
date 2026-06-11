@@ -41,6 +41,7 @@ public class IntroSlide
     private int currentIndex;
     private bool isTransitioning;
     private bool isTypingCaption;
+    private bool hasRequestedSkip;
     private int sceneStartFrame = -1;
     private float configuredImageHeight = -1f;
     private Coroutine captionTypeRoutine;
@@ -76,7 +77,13 @@ public class IntroSlide
         if (isTransitioning) return;
         if (Time.frameCount == sceneStartFrame) return;
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SkipCutscene();
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             if (isTypingCaption)
             {
@@ -86,6 +93,20 @@ public class IntroSlide
 
             StartCoroutine(AdvanceSlide());
         }
+    }
+
+    // 按Space时直接跳过整段开场动画，进入下一个场景。
+    // Skips the whole intro cutscene and loads the next scene.
+    private void SkipCutscene()
+    {
+        if (hasRequestedSkip) return;
+        hasRequestedSkip = true;
+
+        StopAllCoroutines();
+        captionTypeRoutine = null;
+        isTypingCaption = false;
+        isTransitioning = true;
+        LoadNextScene();
     }
 
     // Handles the advance slide step for this script.
