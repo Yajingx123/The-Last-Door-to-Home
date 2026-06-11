@@ -2,7 +2,11 @@
 
 ## Game Title
 
-**The Last Door to Home**
+**English Name:   The Last Door to Home**
+
+**Chinese Name: 咫尺归途**
+<img width="2082" height="1264" alt="image" src="https://github.com/user-attachments/assets/1fa471f5-34b1-4ab3-bd69-cd6e0faa334b" />
+
 
 ## Short Description
 
@@ -31,7 +35,7 @@ The game is not focused on fast-paced combat or traditional RPG progression. Ins
 
 ## Controls
 
-This game is mainly controlled by keyboard.
+This game is controlled by keyboard.
 
 | Action              | Key / Input               |
 | ------------------- | ------------------------- |
@@ -39,10 +43,9 @@ This game is mainly controlled by keyboard.
 | Interact / Confirm  | Enter                     |
 | Continue dialogue   | Enter                     |
 | Back / Return       | Esc                       |
-| Main Menu selection | Mouse / WASD / Arrow Keys |
+| Main Menu selection | WASD / Arrow Keys |
 
-The mouse is mainly used in the **Main Menu**.
-Most in-game interactions are completed with the keyboard.
+All in-game interactions are completed with the keyboard.
 
 ## How to Run
 
@@ -122,7 +125,7 @@ A simplified credit statement is included in the game’s **About Game** page.
 Detailed credits for assets, fonts, audio, references, and other external resources are recorded in the following file:
 
 ```text
-[Add the detailed credits file path here]
+The Last Door to Home\CREDITS.md
 ```
 
 ### Development Team
