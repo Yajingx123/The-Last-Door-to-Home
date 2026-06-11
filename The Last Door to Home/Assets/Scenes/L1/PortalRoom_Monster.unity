@@ -453,7 +453,7 @@ MonoBehaviour:
   - Luckily, this is just a game. You have thoundsands of chances to go home with
     Amelia.
   - Amelia is waiting for you in the next round.
-  endingImage: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
+  endingImage: {fileID: 21300000, guid: 91f06dc980ef8e14994ce5d9dfad04aa, type: 3}
   endingDialogueAudioSettings:
     bgmOnStart: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}
     bgmOnStartFadeOutDuration: 1

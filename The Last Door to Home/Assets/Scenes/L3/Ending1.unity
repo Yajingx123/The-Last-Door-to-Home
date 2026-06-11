@@ -158,6 +158,11 @@ MonoBehaviour:
   - Ameli----!
   - ...
   firstDialogueImage: {fileID: 0}
+  firstDialogueImageStartLine: 1
+  firstDialogueImageHideLine: 2
+  firstImageDarkenDuration: 0.35
+  firstImageBrightenDuration: 0.45
+  firstImageBackgroundDarkAlpha: 1
   endingDialogues:
   - ...
   - 'Ending 1: You Died
@@ -170,7 +175,7 @@ MonoBehaviour:
   - Luckily, this is just a game. You have thoundsands of chances to go home with
     Amelia.
   - Amelia is waiting for you in the next round.
-  endingImage: {fileID: 21300000, guid: 5657b0e86d4587746b9c3556db91b61d, type: 3}
+  endingImage: {fileID: 21300000, guid: 91f06dc980ef8e14994ce5d9dfad04aa, type: 3}
   endingDialogueAudioSettings:
     bgmOnStart: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}
     bgmOnStartFadeOutDuration: 1
@@ -187,6 +192,7 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   mainMenuSceneName: MainMenu
   clearInventoryOnFinish: 1
+  playerFadeStartLine: 1
   playerFadeDuration: 4
   postFadeDelay: 0.15
   blackoutFadeDuration: 0.8
@@ -1942,6 +1948,10 @@ PrefabInstance:
     - target: {fileID: 1227933243688758375, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3757411182501947603, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3974275403115473221, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_Camera
@@ -3762,7 +3772,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2b4a0a4f503d3234c9af26ba035442be, type: 2}
   - {fileID: 11400000, guid: 9e1f71b26cead444ca7a04d034edcd2e, type: 2}
   beatSets: []
-  persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 1
   autoPlayDelaySeconds: 1
 --- !u!4 &2024124469

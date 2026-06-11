@@ -278,36 +278,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slides:
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: b1fd6be1ba4c8c6429b727bbf117af83, type: 3}
     caption: '...
 
       ...
 
       .........Amelia?'
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: 885a5da00611bf64c997cd6b681c152c, type: 3}
     caption: You really want to give a tight hug to your beloved and feel each other's
       warmth, but your body is extremely sore. You can only slowly sit up.
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: 141c3a691ef516a428106e091e7668b6, type: 3}
     caption: You noticed that a colleague from the same department was waving at
       you. Her voice makes you feel familiar... Ah, it's Elena, the one who has been
       guiding you through the pager system.
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: 50f23e87380b2a2468f5acf317075541, type: 3}
     caption: As you gradually learned about what happened after losing consciousness,
       it turned out that after everyone was attacked by the giant eye flowers, Elena
       was the first to kill the monsters in the illusion and escape. Then she began
       to try to rescue the others.
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: fed0d42b76827df41b85d71d349658e3, type: 3}
     caption: Unfortunately, only a few people survived. Amelia was rescued before
       you, but she hasn't woken up yet. You are too deeply in a hallucination, so
       Elena keeps calling out to you in an attempt to help you.
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: 9f69d3aa06ef9d545ae1dbdabb6e8a3a, type: 3}
     caption: The backup energy source in the control room was just enough to allow
       the survivors to return home. This was a fortunate occurrence amid all the
       misfortunes. You all returned to your home relying on it.
-  - image: {fileID: 0}
-    caption: Amelia won't wait for you in the next round, because you two will spend
-      the rest of your lives together hand in hand.
-  - image: {fileID: 0}
+  - image: {fileID: 21300000, guid: 1440d4e5cc82d7442b582aaf2c6916c1, type: 3}
+    caption: '...
+
+      Now, Amelia won''t wait for you in the next round, because
+      you two will spend the rest of your lives together hand in hand.'
+  - image: {fileID: 21300000, guid: e65961e734b9e7a438ca9c2aed2c8417, type: 3}
     caption: ...That is the end of the story.
   slideImage: {fileID: 4070640201669926619}
   captionText: {fileID: 1510080989429682950}
@@ -317,7 +319,7 @@ MonoBehaviour:
   imageFadeDuration: 0.45
   useTypewriterEffect: 1
   charactersPerSecond: 28
-  bgmOnStart: {fileID: 0}
+  bgmOnStart: {fileID: 8300000, guid: 33a3a0dbe4ddbd7488e1cb9d46429609, type: 3}
   bgmFadeOutDuration: 0.5
   bgmFadeInDuration: 1
   bgmVolume: 1
