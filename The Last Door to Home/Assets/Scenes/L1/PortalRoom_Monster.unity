@@ -1741,7 +1741,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.625, y: 0.84375}
+    oldSize: {x: 0.375, y: 0.34375}
     newSize: {x: 0.625, y: 0.84375}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -1791,7 +1791,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
+  m_Sprite: {fileID: 1942152975, guid: 91436c6fbcb22b34faf8c84323169ced, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1873,7 +1873,7 @@ MonoBehaviour:
   heartsUiOffset: {x: 36, y: -36}
   heartIconSize: {x: 36, y: 36}
   heartSpacing: 8
-  fullHeartSprite: {fileID: -1899808678, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
+  fullHeartSprite: {fileID: -1387700692, guid: 91436c6fbcb22b34faf8c84323169ced, type: 3}
   fullHeartColor: {r: 0.86, g: 0.16, b: 0.28, a: 1}
   endingSequence: {fileID: 233120086}
   primaryVineMonster: {fileID: 1041922791}

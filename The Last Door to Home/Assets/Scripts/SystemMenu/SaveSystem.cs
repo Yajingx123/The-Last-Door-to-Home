@@ -18,6 +18,7 @@ public static class SaveSystem
     public const int SlotCount = 10;
     private const string SaveFolderName = "Saves";
 
+    // 把当前游戏状态保存到指定存档槽里。
     // Saves the current data or runtime state.
     public static bool SaveToSlot(int slotIndex, out string message)
     {
@@ -44,6 +45,7 @@ public static class SaveSystem
         return true;
     }
 
+    // 从指定存档槽读取数据，并恢复场景、玩家位置和游戏状态。
     // Loads the requested data, scene, or runtime content.
     public static bool LoadFromSlot(int slotIndex, out string message)
     {
@@ -74,6 +76,7 @@ public static class SaveSystem
         return true;
     }
 
+    // 获取所有存档槽的简要信息，用来显示读档/存档列表。
     // Returns the requested value or runtime object.
     public static List<SaveSlotSummary> GetSlotSummaries()
     {
@@ -106,6 +109,7 @@ public static class SaveSystem
         return summaries;
     }
 
+    // 检查当前是否至少有一个可用存档。
     // Returns whether the required has any save condition is met.
     public static bool HasAnySave()
     {
@@ -120,6 +124,7 @@ public static class SaveSystem
         return false;
     }
 
+    // 尝试读取最近保存的存档槽。
     // Attempts the requested operation and reports whether it succeeded.
     public static bool TryLoadMostRecentSlot(out string message)
     {
@@ -150,6 +155,7 @@ public static class SaveSystem
         return LoadFromSlot(latestSlotIndex, out message);
     }
 
+    // 把游玩秒数转换成小时:分钟:秒的显示格式。
     // Handles the format play time step for this script.
     public static string FormatPlayTime(float seconds)
     {
@@ -158,6 +164,7 @@ public static class SaveSystem
         return $"{totalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
     }
 
+    // 收集当前场景、玩家、背包和剧情状态，打包成存档数据。
     // Builds data or UI objects required by this system.
     private static SaveData BuildSaveData(int slotIndex, Scene activeScene)
     {
@@ -181,6 +188,7 @@ public static class SaveSystem
         };
     }
 
+    // 获取玩家当前位置，用来存档后恢复出生位置。
     // Resolves the best available value for the requested data.
     private static Vector2 ResolvePlayerPosition()
     {
@@ -198,6 +206,7 @@ public static class SaveSystem
         return Vector2.zero;
     }
 
+    // 判断当前是不是Boss相关场景，Boss场景读档时不直接恢复原坐标。
     // Returns whether is boss scene is true for the current state.
     private static bool IsBossScene()
     {
@@ -207,6 +216,7 @@ public static class SaveSystem
             || UnityEngine.Object.FindObjectOfType<StalkerMonster>() != null;
     }
 
+    // 尝试读取一个存档槽的JSON文件，并转换成SaveData。
     // Attempts the requested operation and reports whether it succeeded.
     private static bool TryReadSlot(int slotIndex, out SaveData data)
     {
@@ -230,12 +240,14 @@ public static class SaveSystem
         }
     }
 
+    // 检查存档槽编号是不是在允许范围内。
     // Returns whether is valid slot index is true for the current state.
     private static bool IsValidSlotIndex(int slotIndex)
     {
         return slotIndex >= 0 && slotIndex < SlotCount;
     }
 
+    // 把存档时间字符串转换成UTC时间，方便比较哪个存档最新。
     // Handles the parse saved at utc step for this script.
     private static DateTime ParseSavedAtUtc(string savedAtUtc)
     {
@@ -247,12 +259,14 @@ public static class SaveSystem
         return DateTime.MinValue;
     }
 
+    // 获取存档文件夹路径，也就是游戏实际写入存档的位置。
     // Returns the requested value or runtime object.
     private static string GetSaveFolderPath()
     {
         return Path.Combine(Application.persistentDataPath, SaveFolderName);
     }
 
+    // 获取某个存档槽对应的具体JSON文件路径。
     // Returns the requested value or runtime object.
     private static string GetSlotPath(int slotIndex)
     {

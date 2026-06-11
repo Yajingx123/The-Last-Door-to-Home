@@ -20,6 +20,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private Vector2 faceDir = Vector2.right;
 
+    // 每帧检查玩家输入，按下回车时尝试和面前的物体互动。
     // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
@@ -35,6 +36,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // 根据玩家当前按键更新面朝方向，之后用来判断玩家在看哪个物体。
     // Handles the update face direction step for this script.
     void UpdateFaceDirection()
     {
@@ -46,6 +48,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // 找到玩家面前最合适的可交互物体，并触发它的互动。
     // Attempts the requested operation and reports whether it succeeded.
     void TryInteract()
     {
@@ -98,7 +101,10 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    // 获取物体离玩家最近的交互点，让大碰撞体也能正确判断距离。因为有些物体的碰撞体可能很大，如果直接用物体中心点算距离，会不准确。
+    // GetInteractionPoint() 是帮 TryInteract() 算距离用的。
     // Returns the requested value or runtime object.
+    // GetInteractionPoint() is used to calculate the distance for TryInteract().
     Vector2 GetInteractionPoint(MonoBehaviour item)
     {
         Collider2D col = item.GetComponent<Collider2D>();

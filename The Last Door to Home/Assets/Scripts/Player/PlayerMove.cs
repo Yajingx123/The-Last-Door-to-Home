@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 /*
 Purpose: Handles player movement input, facing animation, speed modifiers, and footstep playback.
 Attached GameObject: Player GameObject with Rigidbody2D and Animator components.
@@ -136,6 +136,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // Handles the force stop immediate step for this script.
+    // called when a dialogue, plot, menu or certain events require the player to stop immediately.
     public void ForceStopImmediate()
     {
         inputMoveDir = Vector2.zero;
@@ -169,6 +170,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // Handles the freeze at current direction step for this script.
+    // retain the direction in which the player last looked.
     private void FreezeAtCurrentDirection()
     {
         rb.velocity = Vector2.zero;
@@ -197,6 +199,7 @@ public class PlayerMove : MonoBehaviour
     }
 
     // Handles the event or callback associated with this method.
+    // Check: Is the item just picked up that "acceleration item"
     private void HandleItemCollected(string uniqueID)
     {
         if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;

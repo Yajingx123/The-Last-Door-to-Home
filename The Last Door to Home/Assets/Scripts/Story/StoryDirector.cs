@@ -24,6 +24,7 @@ public class StoryDirector : MonoBehaviour
     public bool autoPlayFirstBeatOnStart = false;
     public float autoPlayDelaySeconds = 1f;
 
+    // 初始化剧情管理器单例，让其他物体可以找到它来触发剧情。
     // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
@@ -36,6 +37,7 @@ public class StoryDirector : MonoBehaviour
         Instance = this;
     }
 
+    // 对象销毁时清理单例引用，避免下个场景还指向旧对象。
     // Cleans up runtime references before the object is destroyed.
     void OnDestroy()
     {
@@ -45,6 +47,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // 场景开始时，如果设置了自动播放，就准备播放第一段剧情。
     // Prepares runtime state after the scene has finished its initial setup.
     void Start()
     {
@@ -54,6 +57,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // 根据事件ID寻找合适的剧情条目，并尝试播放它。
     // Attempts the requested operation and reports whether it succeeded.
     public bool TryHandleEvent(string eventId)
     {
@@ -61,6 +65,7 @@ public class StoryDirector : MonoBehaviour
         return TryHandleBeat(best);
     }
 
+    // 尝试执行一个剧情条目，包括检查条件、设置flag和播放对话。
     // Attempts the requested operation and reports whether it succeeded.
     public bool TryHandleBeat(StoryBeat beat)
     {
@@ -78,6 +83,7 @@ public class StoryDirector : MonoBehaviour
         return beat.blockDefaultAction;
     }
 
+    // 等对话系统准备好后，再自动播放第一段剧情。
     // Handles the auto play first beat when ready step for this script.
     private IEnumerator AutoPlayFirstBeatWhenReady()
     {
@@ -99,6 +105,7 @@ public class StoryDirector : MonoBehaviour
         TryAutoPlayFirstBeat();
     }
 
+    // 尝试播放列表里的第一段剧情，常用于场景开场对白。
     // Attempts the requested operation and reports whether it succeeded.
     private void TryAutoPlayFirstBeat()
     {
@@ -111,6 +118,7 @@ public class StoryDirector : MonoBehaviour
         TryHandleBeat(first);
     }
 
+    // 从所有剧情条目里找出匹配事件ID且优先级最高的一条。
     // Searches the scene hierarchy or data collection for the requested target.
     private StoryBeat FindBestBeat(string eventId)
     {
@@ -135,6 +143,7 @@ public class StoryDirector : MonoBehaviour
         return best;
     }
 
+    // 检查这段剧情现在能不能播放，比如flag、物品和是否已播放过。
     // Returns whether this script can can play.
     private bool CanPlay(StoryBeat beat)
     {
@@ -146,6 +155,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // 检查玩家是否拥有这段剧情要求的全部剧情flag。
     // Returns whether the required has all flags condition is met.
     private bool HasAllFlags(string[] flags)
     {
@@ -161,6 +171,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // 检查玩家是否拥有任意一个会阻止这段剧情的flag。
     // Returns whether the required has any flag condition is met.
     private bool HasAnyFlag(string[] flags)
     {
@@ -176,6 +187,7 @@ public class StoryDirector : MonoBehaviour
         return false;
     }
 
+    // 检查玩家是否拥有这段剧情要求的全部道具。
     // Returns whether the required has all items condition is met.
     private bool HasAllItems(string[] itemIDs)
     {
@@ -191,6 +203,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // 检查玩家是否拥有任意一个会阻止这段剧情的道具。
     // Returns whether the required has any item condition is met.
     private bool HasAnyItem(string[] itemIDs)
     {
@@ -206,6 +219,7 @@ public class StoryDirector : MonoBehaviour
         return false;
     }
 
+    // 播放剧情时设置新的剧情flag，记录剧情进度。
     // Applies the requested visual, audio, or gameplay state.
     private void ApplyFlags(string[] flags)
     {
@@ -219,6 +233,7 @@ public class StoryDirector : MonoBehaviour
         }
     }
 
+    // 决定这次剧情要显示哪几句对话，支持多次尝试显示不同文本。
     // Chooses the dialogue lines that should be used for this story beat.
     private string[] ResolveDialogues(StoryBeat beat)
     {
@@ -247,6 +262,7 @@ public class StoryDirector : MonoBehaviour
         return beat.dialogues;
     }
 
+    // 增加尝试次数计数，让下次互动可以显示不同提示。
     // Handles the increase attempt counter step for this script.
     private void IncreaseAttemptCounter(StoryBeat beat)
     {
@@ -257,6 +273,7 @@ public class StoryDirector : MonoBehaviour
         StoryFlags.IncrementCounter(beat.attemptCounterKey);
     }
 
+    // 把选好的对话交给DialogueManager播放，必要时也显示插图。
     // Plays the play dialogues sequence or audio feedback.
     private bool PlayDialogues(StoryBeat beat, string[] lines)
     {
@@ -274,6 +291,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // 检查这段一次性剧情之前是不是已经播放过。
     // Returns whether is beat already played is true for the current state.
     private bool IsBeatAlreadyPlayed(StoryBeat beat)
     {
@@ -283,6 +301,7 @@ public class StoryDirector : MonoBehaviour
         return false;
     }
 
+    // 把一次性剧情标记为已播放，防止之后重复触发。
     // Handles the mark beat played step for this script.
     private void MarkBeatPlayed(StoryBeat beat)
     {
@@ -294,6 +313,7 @@ public class StoryDirector : MonoBehaviour
         StoryFlags.Set(key);
     }
 
+    // 判断这段剧情是不是只允许播放一次。
     // Returns whether is one shot enabled is true for the current state.
     private bool IsOneShotEnabled(StoryBeat beat)
     {
@@ -302,6 +322,7 @@ public class StoryDirector : MonoBehaviour
         return true;
     }
 
+    // 生成这段剧情自己的唯一标记名，用来记录它是否播放过。
     // Returns the requested value or runtime object.
     private string GetBeatKey(StoryBeat beat)
     {

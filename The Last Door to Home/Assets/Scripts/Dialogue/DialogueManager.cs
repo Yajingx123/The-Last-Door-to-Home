@@ -82,6 +82,7 @@ public class DialogueManager : MonoBehaviour
     private DialogueAudioSettings activeDialogueAudioSettings;
     private bool isTypingLine;
 
+    // 初始化单例和UI引用，让对话系统一开始就准备好。
     // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
@@ -109,6 +110,7 @@ public class DialogueManager : MonoBehaviour
         CachePlayerMovementScripts();
     }
 
+    // 场景启动后预热对话UI，避免第一次显示时文字或布局闪一下。
     // Prepares runtime state after the scene has finished its initial setup.
     IEnumerator Start()
     {
@@ -116,6 +118,7 @@ public class DialogueManager : MonoBehaviour
         PrewarmDialogueUI();
     }
 
+    // 对象销毁时清理单例和打字音效，避免留下旧状态。
     // Cleans up runtime references before the object is destroyed.
     void OnDestroy()
     {
@@ -127,6 +130,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 找到玩家对象，方便对话时锁住玩家移动。
     // Resolves the best available value for the requested data.
     private void ResolvePlayerReference()
     {
@@ -148,6 +152,7 @@ public class DialogueManager : MonoBehaviour
         Debug.LogWarning("DialogueManager：未赋值Player物体，且未找到Tag=Player的对象。", this);
     }
 
+    // 缓存玩家身上的移动脚本，之后锁控制时不用反复查找。
     // Caches references or values needed by cache player movement scripts.
     private void CachePlayerMovementScripts()
     {
@@ -155,6 +160,7 @@ public class DialogueManager : MonoBehaviour
         cachedMovementScripts = player.GetComponents<MonoBehaviour>();
     }
 
+    // 提前刷新对话框UI，让第一次打开对话框更稳定。
     // Handles the prewarm dialogue ui step for this script.
     private void PrewarmDialogueUI()
     {
@@ -174,6 +180,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 每帧检测回车键，用来跳过打字或进入下一句对话。
     // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
@@ -192,6 +199,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 开始一段对话，显示第一句文字并锁住玩家控制。
     // Shows the show dialogue UI or dialogue flow.
     public void ShowDialogue(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
@@ -231,6 +239,7 @@ public class DialogueManager : MonoBehaviour
         DialogueStarted?.Invoke();
     }
 
+    // 推进到下一句对话，如果已经是最后一句就结束或打开选项。
     // Handles the advance dialogue step for this script.
     void AdvanceDialogue()
     {
@@ -251,6 +260,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 在最后一句对话后显示选项，比如拾取或做选择。
     // Shows the show option with last line UI or dialogue flow.
     void ShowOptionWithLastLine()
     {
@@ -267,6 +277,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 结束当前对话，关闭UI、恢复玩家控制，并执行结束回调。
     // Ends the end dialogue flow and restores the required state.
     void EndDialogue()
     {
@@ -300,6 +311,7 @@ public class DialogueManager : MonoBehaviour
         dialogueCompleteAction?.Invoke();
     }
 
+    // 选项处理完后关闭对话流程。
     // Closes the related UI or gameplay flow.
     public void CloseDialogueAfterOption()
     {
@@ -309,6 +321,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 选完选项后继续播放新的对话内容。
     // Continues the continue dialogue after option flow from its current state.
     public void ContinueDialogueAfterOption(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
@@ -355,6 +368,7 @@ public class DialogueManager : MonoBehaviour
         ShowCurrentDialogueLine();
     }
 
+    // 显示对话插图，让某句剧情可以配一张图片。
     // Shows the show dialogue image UI or dialogue flow.
     public void ShowDialogueImage(Sprite sprite)
     {
@@ -380,6 +394,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(true);
     }
 
+    // 隐藏对话插图，通常在对话结束时调用。
     // Hides the UI immediately and resets transient state.
     public void HideDialogueImage()
     {
@@ -388,6 +403,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(false);
     }
 
+    // 锁定或解锁玩家移动，防止对话时还能乱走。
     // Handles the lock player step for this script.
     public void LockPlayer(bool lockIt)
     {
@@ -416,6 +432,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 播放对话框打开动画。
     // Plays the play panel open anim sequence or audio feedback.
     void PlayPanelOpenAnim()
     {
@@ -431,6 +448,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(0f, 1f, false));
     }
 
+    // 播放对话框关闭动画，并停止正在进行的打字效果。
     // Plays the play panel close anim sequence or audio feedback.
     void PlayPanelCloseAnim()
     {
@@ -460,6 +478,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(1f, 0f, true));
     }
 
+    // 用缩放Y轴的方式控制对话框打开或收起。
     // Handles the animate panel scale y step for this script.
     IEnumerator AnimatePanelScaleY(float fromY, float toY, bool deactivateOnFinish)
     {
@@ -494,6 +513,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = null;
     }
 
+    // 设置对话框的Y轴缩放值，用来配合开关动画。
     // Updates the requested value or component state.
     void SetPanelScaleY(float scaleY01)
     {
@@ -506,6 +526,7 @@ public class DialogueManager : MonoBehaviour
         );
     }
 
+    // 确保对话框显示在插图前面，不被图片挡住。
     // Ensures the required ensure dialogue panel in front of image objects or state exist.
     void EnsureDialoguePanelInFrontOfImage()
     {
@@ -514,6 +535,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.transform.SetAsLastSibling();
     }
 
+    // 初始化对话插图UI，找到图片组件并准备淡入淡出效果。
     // Updates the requested value or component state.
     void SetupDialogueImageUI()
     {
@@ -551,6 +573,7 @@ public class DialogueManager : MonoBehaviour
         isDialogueImageActive = false;
     }
 
+    // 播放对话插图的显示或隐藏动画。
     // Plays the play dialogue image anim sequence or audio feedback.
     void PlayDialogueImageAnim(bool show)
     {
@@ -565,6 +588,7 @@ public class DialogueManager : MonoBehaviour
         imageAnimRoutine = StartCoroutine(AnimateDialogueImage(show));
     }
 
+    // 控制插图淡入淡出和上下移动，让图片出现得更自然。
     // Handles the animate dialogue image step for this script.
     IEnumerator AnimateDialogueImage(bool show)
     {
@@ -611,7 +635,9 @@ public class DialogueManager : MonoBehaviour
         imageAnimRoutine = null;
     }
 
+    // 通知其他系统当前显示了哪一句对话。如果要做某一句话时出现图片或其他效果，通过这个函数通知出去。
     // Handles the notify line shown step for this script.
+    // If an image or other effect appears when making a certain sentence, notify it through this function.
     private void NotifyLineShown()
     {
         if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
@@ -622,6 +648,7 @@ public class DialogueManager : MonoBehaviour
         DialogueLineShown?.Invoke(currentDialogues[dialogueIndex], dialogueIndex, currentDialogues.Length);
     }
 
+    // 显示当前这句对话，并决定是否使用打字机效果。
     // Shows the show current dialogue line UI or dialogue flow.
     private void ShowCurrentDialogueLine()
     {
@@ -659,6 +686,7 @@ public class DialogueManager : MonoBehaviour
         typewriterRoutine = StartCoroutine(TypeCurrentLineRoutine(line));
     }
 
+    // 逐字显示当前句子，制造打字机效果和停顿节奏。
     // Handles the type current line routine step for this script.
     private IEnumerator TypeCurrentLineRoutine(string line)
     {
@@ -709,6 +737,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 立刻显示完整当前句子，用来跳过打字过程。
     // Completes the complete current line instantly step immediately.
     private void CompleteCurrentLineInstantly()
     {
@@ -730,6 +759,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 开始播放打字音效，根据普通台词或引号台词选择声音。
     // Starts the start typing sfx sequence or runtime effect.
     private void StartTypingSfx()
     {
@@ -743,6 +773,7 @@ public class DialogueManager : MonoBehaviour
         AudioManager.EnsureInstance().PlayTypingLoop(clip, volume);
     }
 
+    // 立刻停止打字音效，避免对话结束后声音继续播放。
     // Stops the stop typing sfx immediate sequence or runtime effect.
     private void StopTypingSfxImmediate()
     {
@@ -750,7 +781,9 @@ public class DialogueManager : MonoBehaviour
         AudioManager.Instance.StopTypingLoop();
     }
 
+    // 获取当前正在显示的这一句对话文本,给 StartTypingSfx() 用。因为打字音效需要判断当前这句有没有引号
     // Returns the requested value or runtime object.
+    // For StartTypingSfx(). Because the typing sound effect needs to determine whether the current sentence has quotation marks
     private string GetCurrentDialogueLine()
     {
         if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
@@ -761,6 +794,7 @@ public class DialogueManager : MonoBehaviour
         return currentDialogues[dialogueIndex] ?? string.Empty;
     }
 
+    // 判断这一句是不是带引号的台词，用来切换特殊打字音效。
     // Returns whether is quoted line is true for the current state.
     private bool IsQuotedLine(string line)
     {
@@ -775,6 +809,7 @@ public class DialogueManager : MonoBehaviour
                line.Contains("』");
     }
 
+    // 根据当前台词类型选择要播放的打字音效。
     // Resolves the best available value for the requested data.
     private AudioClip ResolveTypingClip(bool isQuotedLine)
     {
@@ -799,6 +834,7 @@ public class DialogueManager : MonoBehaviour
         return defaultTypingSfx;
     }
 
+    // 根据当前台词类型选择打字音效音量。
     // Resolves the best available value for the requested data.
     private float ResolveTypingVolume(bool isQuotedLine)
     {
@@ -823,6 +859,7 @@ public class DialogueManager : MonoBehaviour
         return defaultTypingSfxVolume;
     }
 
+    // 根据标点符号决定打字时要不要短暂停顿。
     // Returns the requested value or runtime object.
     private float GetPauseAfterCharacter(string line, int charIndex)
     {
@@ -851,6 +888,7 @@ public class DialogueManager : MonoBehaviour
         return 0f;
     }
 
+    // 判断当前点号是不是普通句号，而不是省略号的一部分。
     // Returns whether is standalone period is true for the current state.
     private bool IsStandalonePeriod(string line, int charIndex)
     {
@@ -873,6 +911,7 @@ public class DialogueManager : MonoBehaviour
         return true;
     }
 
+    // 判断当前字符是不是省略号，并判断是不是省略号结尾。
     // Returns whether is ellipsis dot is true for the current state.
     private bool IsEllipsisDot(string line, int charIndex, out bool isEllipsisEnd)
     {

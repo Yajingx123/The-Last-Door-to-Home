@@ -106,6 +106,7 @@ public static class Inventory
     }
 
     // Exports runtime state into serializable data.
+    // Organize the items that players have already picked up into a list for archiving
     public static List<InventoryItemRecord> ExportCollectedItems()
     {
         var records = new List<InventoryItemRecord>();
@@ -130,6 +131,7 @@ public static class Inventory
     }
 
     // Exports runtime state into serializable data.
+    // 把已经打开过的保险箱 ID 导出成一个列表。存档时，游戏需要知道哪些保险箱已经开过了。
     public static List<string> ExportUnlockedSafeIds()
     {
         return new List<string>(unlockedSafeIDs);
@@ -142,6 +144,8 @@ public static class Inventory
     }
 
     // Restores runtime state from serialized data.
+    // When reading the file, restore the backpack status in the save file
+    // 读档时，把存档里的背包状态恢复回来。
     public static void ImportState(List<InventoryItemRecord> items, List<string> safeIds, List<string> doorIds)
     {
         collectedIDs.Clear();
