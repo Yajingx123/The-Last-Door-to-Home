@@ -453,7 +453,6 @@ MonoBehaviour:
   beats:
   - {fileID: 11400000, guid: 570a300bf5153054cae1a0ad2ba6cc32, type: 2}
   beatSets: []
-  persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 0
   autoPlayDelaySeconds: 1
 --- !u!4 &1080270970
