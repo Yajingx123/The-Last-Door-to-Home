@@ -124,37 +124,6 @@ public static class SaveSystem
         return false;
     }
 
-    // 尝试读取最近保存的存档槽。
-    // Attempts the requested operation and reports whether it succeeded.
-    public static bool TryLoadMostRecentSlot(out string message)
-    {
-        int latestSlotIndex = -1;
-        DateTime latestSaveTime = DateTime.MinValue;
-
-        for (int i = 0; i < SlotCount; i++)
-        {
-            if (!TryReadSlot(i, out SaveData data))
-            {
-                continue;
-            }
-
-            DateTime parsedTime = ParseSavedAtUtc(data.savedAtUtc);
-            if (latestSlotIndex < 0 || parsedTime > latestSaveTime)
-            {
-                latestSlotIndex = i;
-                latestSaveTime = parsedTime;
-            }
-        }
-
-        if (latestSlotIndex < 0)
-        {
-            message = "No save data found.";
-            return false;
-        }
-
-        return LoadFromSlot(latestSlotIndex, out message);
-    }
-
     // 把游玩秒数转换成小时:分钟:秒的显示格式。
     // Handles the format play time step for this script.
     public static string FormatPlayTime(float seconds)
@@ -245,18 +214,6 @@ public static class SaveSystem
     private static bool IsValidSlotIndex(int slotIndex)
     {
         return slotIndex >= 0 && slotIndex < SlotCount;
-    }
-
-    // 把存档时间字符串转换成UTC时间，方便比较哪个存档最新。
-    // Handles the parse saved at utc step for this script.
-    private static DateTime ParseSavedAtUtc(string savedAtUtc)
-    {
-        if (DateTime.TryParse(savedAtUtc, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime parsed))
-        {
-            return parsed.ToUniversalTime();
-        }
-
-        return DateTime.MinValue;
     }
 
     // 获取存档文件夹路径，也就是游戏实际写入存档的位置。
