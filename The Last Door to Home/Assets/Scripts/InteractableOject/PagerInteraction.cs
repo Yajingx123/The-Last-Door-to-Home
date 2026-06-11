@@ -17,6 +17,11 @@ public class PagerInteraction : MonoBehaviour, IInteractable
     public string pagerUniqueID = "pager_01";
     public string pagerItemName = "Pager";
     public ItemType pagerItemType = ItemType.Tool;
+    [TextArea(2, 6)]
+    public string pagerItemDescription = "No description yet.";
+    public Sprite pagerItemIcon;
+    [Tooltip("Optional. For a single Sprite in Resources, use a path without extension, e.g. ItemIcons/Pager. For a sliced sprite sheet, use SheetPath#SpriteName, e.g. ItemIcons/Items#pager_01.")]
+    public string pagerItemIconResourcePath = "";
 
     [Header("场景中被拾取后要隐藏的物体（可选） / Scene Object To Hide After Pickup (Optional)")]
     public GameObject pickupHideTarget;
@@ -121,7 +126,14 @@ public class PagerInteraction : MonoBehaviour, IInteractable
     {
         if (!Inventory.HasCollected(pagerUniqueID))
         {
-            Inventory.AddItem(pagerItemName, pagerItemType, pagerUniqueID);
+            Inventory.AddItem(
+                pagerItemName,
+                pagerItemType,
+                pagerUniqueID,
+                pagerItemDescription,
+                pagerItemIconResourcePath,
+                pagerItemIcon
+            );
         }
 
         HidePagerInScene();

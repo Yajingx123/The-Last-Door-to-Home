@@ -5071,6 +5071,10 @@ MonoBehaviour:
   pagerUniqueID: pager
   pagerItemName: pager
   pagerItemType: 1
+  pagerItemDescription: Your pager, but the signal is bad and you cannot call out
+    but just receive messages.
+  pagerItemIcon: {fileID: -628206517, guid: 5c91ce6a40028d44b9ccc436e4c60af5, type: 3}
+  pagerItemIconResourcePath: ItemIcons/pager#dormroom2_1
   pickupHideTarget: {fileID: 1625645182}
   foundDialogues:
   - Your pager. You always bring it with you.
