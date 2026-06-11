@@ -1695,6 +1695,8 @@ MonoBehaviour:
   spawnDistanceInCells: 2
   maxSpawnDistanceInCells: 5
   fadeInDuration: 1
+  visibleDurationBeforeAutoRelocate: 8
+  fadeOutDuration: 1
   blinkDurationOnTouch: 1
   blinkCountOnTouch: 5
   targetsToRemove:
@@ -1704,7 +1706,7 @@ MonoBehaviour:
   - {fileID: 107635160}
   - {fileID: 9919938}
   - {fileID: 1131166840}
-  touchesPerRemoval: 2
+  touchesPerRemoval: 3
 --- !u!61 &1136692597
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8091,7 +8093,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1448221460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8108,7 +8110,7 @@ MonoBehaviour:
   clearInventoryBeforeApplying: 1
   requireMonsterControllerInScene: 1
   itemA:
-    giveItem: 0
+    giveItem: 1
     itemUniqueID: boots
     itemName: Faster Boots
     itemType: 1
@@ -8116,7 +8118,7 @@ MonoBehaviour:
       to your boots, it is lighter and offers better mobility.
     iconResourcePath: ItemIcons/Key_items#controlroom2_6
   itemB:
-    giveItem: 0
+    giveItem: 1
     itemUniqueID: stone02
     itemName: Second Energy Stone
     itemType: 4
@@ -8124,7 +8126,7 @@ MonoBehaviour:
       the teleportation portal, three energy stones are required."
     iconResourcePath: ItemIcons/Key_items#controlroom2_1
   itemC:
-    giveItem: 0
+    giveItem: 1
     itemUniqueID: helmet
     itemName: Helmet
     itemType: 1

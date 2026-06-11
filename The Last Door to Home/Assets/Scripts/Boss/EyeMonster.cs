@@ -26,6 +26,11 @@ public class EyeMonster : MonoBehaviour
     [SerializeField] private int maxSpawnDistanceInCells = 8;
     [SerializeField] private float fadeInDuration = 1f;
 
+    [Header("自动换位 / Auto Relocation")]
+    [Tooltip("Eye Monster 出现后，如果玩家在这段时间内没有碰到它，它会自动淡出并换到下一个位置。")]
+    [SerializeField] private float visibleDurationBeforeAutoRelocate = 8f;
+    [SerializeField] private float fadeOutDuration = 1f;
+
     [Header("碰撞反馈 / Collision Feedback")]
     [SerializeField] private float blinkDurationOnTouch = 1f;
     [SerializeField] private int blinkCountOnTouch = 5;
@@ -41,6 +46,7 @@ public class EyeMonster : MonoBehaviour
     private bool hasClearedAllTargets;
     private int touchCount;
     private int nextTargetIndex;
+    private Coroutine autoRelocateRoutine;
 
     public bool HasClearedAllTargets => hasClearedAllTargets;
 
@@ -65,7 +71,7 @@ public class EyeMonster : MonoBehaviour
         ResolveController();
         ResolveComponents();
         MoveToNextSpawnPosition();
-        StartCoroutine(FadeInRoutine());
+        StartCoroutine(ShowAtCurrentPositionRoutine());
     }
 
     // Returns whether this script can can appear with inventory.
@@ -99,8 +105,17 @@ public class EyeMonster : MonoBehaviour
             return;
         }
 
+        StopAutoRelocateRoutine();
         isRelocating = true;
         StartCoroutine(BlinkAndRelocateRoutine());
+    }
+
+    // 在当前位置淡入显示，显示完成后开始计时等待玩家碰撞。
+    // Shows the monster at its current position, then starts the auto-relocation timer.
+    private IEnumerator ShowAtCurrentPositionRoutine()
+    {
+        yield return StartCoroutine(FadeInRoutine());
+        StartAutoRelocateTimer();
     }
 
     // Handles the blink and relocate routine step for this script.
@@ -129,7 +144,7 @@ public class EyeMonster : MonoBehaviour
         }
 
         MoveToNextSpawnPosition();
-        yield return StartCoroutine(FadeInRoutine());
+        yield return StartCoroutine(ShowAtCurrentPositionRoutine());
     }
 
     // Fades the related visual element for the fade in routine step.
@@ -152,6 +167,72 @@ public class EyeMonster : MonoBehaviour
         SetRendererAlpha(1f);
         SetHitboxEnabled(true);
         isRelocating = false;
+    }
+
+    // 开始8秒自动换位计时，如果玩家没有碰到Eye Monster就会触发淡出换位。
+    // Starts the timer that relocates the monster when the player does not touch it.
+    private void StartAutoRelocateTimer()
+    {
+        StopAutoRelocateRoutine();
+
+        if (!isActiveAndEnabled || hasClearedAllTargets)
+        {
+            return;
+        }
+
+        autoRelocateRoutine = StartCoroutine(AutoRelocateAfterDelayRoutine());
+    }
+
+    // 停止自动换位计时，通常在玩家碰到Eye Monster时调用。
+    // Stops the current auto-relocation timer.
+    private void StopAutoRelocateRoutine()
+    {
+        if (autoRelocateRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(autoRelocateRoutine);
+        autoRelocateRoutine = null;
+    }
+
+    // 等待指定时间后自动淡出，然后换到下一个位置重新出现。
+    // Waits, fades out, relocates, and shows the monster again.
+    private IEnumerator AutoRelocateAfterDelayRoutine()
+    {
+        float delay = Mathf.Max(0f, visibleDurationBeforeAutoRelocate);
+        if (delay > 0f)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+
+        autoRelocateRoutine = null;
+        isRelocating = true;
+        SetHitboxEnabled(false);
+
+        yield return StartCoroutine(FadeOutRoutine());
+
+        SetVisibleImmediate(false);
+        MoveToNextSpawnPosition();
+        yield return StartCoroutine(ShowAtCurrentPositionRoutine());
+    }
+
+    // 慢慢降低透明度，让Eye Monster自然消失。
+    // Fades the monster out before it relocates.
+    private IEnumerator FadeOutRoutine()
+    {
+        float duration = Mathf.Max(0.01f, fadeOutDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            SetRendererAlpha(1f - t);
+            yield return null;
+        }
+
+        SetRendererAlpha(0f);
     }
 
     // Moves the current selection or object in the requested direction.
@@ -397,5 +478,12 @@ public class EyeMonster : MonoBehaviour
         }
 
         return false;
+    }
+
+    // 对象关闭或销毁时停止自动换位计时，避免协程继续跑。
+    // Stops timer coroutines when this object is disabled.
+    private void OnDisable()
+    {
+        StopAutoRelocateRoutine();
     }
 }
