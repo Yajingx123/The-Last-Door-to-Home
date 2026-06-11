@@ -8175,7 +8175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eyeMonster: {fileID: 1136692596}
   ending2SceneName: Ending2
-  ending3SceneName: 
+  ending3SceneName: Ending3
   setSpawnPositionOnLoad: 0
   ending2SpawnPosition: {x: 0, y: 0}
   ending3SpawnPosition: {x: 0, y: 0}
