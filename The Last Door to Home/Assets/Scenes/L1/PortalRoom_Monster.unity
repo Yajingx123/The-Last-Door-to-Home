@@ -8075,6 +8075,77 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7046168179983847338, guid: d3a7d007b89fb9045951d87b5628b7ce, type: 3}
   m_PrefabInstance: {fileID: 1668291551}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1448221459
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1448221461}
+  - component: {fileID: 1448221460}
+  m_Layer: 0
+  m_Name: MonsterTestInventory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1448221460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448221459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b5019134927814fbdd786544a2a569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableInEditor: 1
+  clearInventoryBeforeApplying: 1
+  requireMonsterControllerInScene: 1
+  itemA:
+    giveItem: 0
+    itemUniqueID: boots
+    itemName: Faster Boots
+    itemType: 1
+    itemDescription: This is the backup equipment for the control room staff. Compared
+      to your boots, it is lighter and offers better mobility.
+    iconResourcePath: ItemIcons/Key_items#controlroom2_6
+  itemB:
+    giveItem: 0
+    itemUniqueID: stone02
+    itemName: Second Energy Stone
+    itemType: 4
+    itemDescription: "The backup energy source in the control room. \nTo activate
+      the teleportation portal, three energy stones are required."
+    iconResourcePath: ItemIcons/Key_items#controlroom2_1
+  itemC:
+    giveItem: 0
+    itemUniqueID: helmet
+    itemName: Helmet
+    itemType: 1
+    itemDescription: This is the backup equipment for the control room staff. Compared
+      to your helmet, it may have a special scanning function to the unknown creatures.
+    iconResourcePath: ItemIcons/Key_items#controlroom2_4
+--- !u!4 &1448221461
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448221459}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.7487788, y: 9.2969475, z: -0.0049256785}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1449405350
 GameObject:
   m_ObjectHideFlags: 0
@@ -8890,3 +8961,4 @@ SceneRoots:
   - {fileID: 233120087}
   - {fileID: 748013860}
   - {fileID: 1449405352}
+  - {fileID: 1448221461}
