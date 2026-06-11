@@ -3,43 +3,42 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections;
-
 /*
-Purpose: Plays an ending cutscene sequence and returns to the main menu when it finishes.
-Attached GameObject: Ending cutscene controller GameObject.
-Main responsibilities: Sequence ending slides, captions, fade timing, and final scene transition.
-Inputs: Inspector-configured slides, UI references, and player advance input.
-Outputs or effects: Updates ending visuals/text and loads the main menu after the final slide.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify slide images, caption typing, final MainMenu transition, and optional BGM in Play Mode.
+Purpose: Controls a cutscene sequence or stores cutscene return context.
+Attached GameObject: Cutscene scene controller GameObject, or static context helper when applicable.
+Main responsibilities: Displays slides/text, handles timing and input, plays audio, and transitions to the next scene.
+Inputs: Serialized cutscene assets, player input, timing settings, audio clips, and return-scene context.
+Outputs or effects: Updates cutscene UI, plays audio, records return data, and loads follow-up scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify slide order, skip/advance input, audio timing, and final scene transition.
 */
 
 public class EndingCutsceneSequenceController : MonoBehaviour
 {
     [Serializable]
-    public class EndingSlide
+public class EndingSlide
     {
         public Sprite image;
         [TextArea(2, 6)]
         public string caption;
     }
 
-    [Header("Slides")]
+    [Header("Slides / 幻灯片")]
     public EndingSlide[] slides;
 
-    [Header("UI")]
+    [Header("UI / 界面")]
     public Image slideImage;
     public TextMeshProUGUI captionText;
     public CanvasGroup contentCanvasGroup;
 
-    [Header("Flow")]
+    [Header("Flow / 流程")]
     public string mainMenuSceneName = "MainMenu";
     [SerializeField] private float fadeDuration = 0.35f;
     [SerializeField] private float imageFadeDuration = 0.45f;
     [SerializeField] private bool useTypewriterEffect = true;
     [SerializeField] private float charactersPerSecond = 28f;
 
-    [Header("BGM")]
+    [Header("BGM / 背景音乐")]
     public AudioClip bgmOnStart;
     public float bgmFadeOutDuration = 0.5f;
     public float bgmFadeInDuration = 1f;
@@ -53,7 +52,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
     private float configuredImageHeight = -1f;
     private Coroutine captionTypeRoutine;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         sceneStartFrame = Time.frameCount;
@@ -78,7 +77,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         StartCoroutine(FadeInOpeningSlide());
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during the ending.
+    // Reads per-frame input and updates frame-dependent runtime state.
     private void Update()
     {
         if (isTransitioning) return;
@@ -96,7 +95,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Advances the ending sequence to the next configured slide.
+    // Handles the advance slide step for this script.
     private IEnumerator AdvanceSlide()
     {
         isTransitioning = true;
@@ -116,7 +115,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         isTransitioning = false;
     }
 
-    // Applies the current ending slide visuals and caption.
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplySlide(int index)
     {
         EndingSlide slide = slides[index];
@@ -134,7 +133,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Plays the optional ending BGM when the cutscene begins.
+    // Plays the play opening bgm sequence or audio feedback.
     private void PlayOpeningBgm()
     {
         if (bgmOnStart == null) return;
@@ -148,7 +147,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         );
     }
 
-    // Fades the cutscene content group over the requested duration.
+    // Fades the related visual element for the fade content step.
     private IEnumerator FadeContent(float from, float to)
     {
         if (contentCanvasGroup == null)
@@ -171,25 +170,25 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         contentCanvasGroup.alpha = to;
     }
 
-    // Fades in the opening slide content and image together.
+    // Fades the related visual element for the fade in opening slide step.
     private IEnumerator FadeInOpeningSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
     }
 
-    // Fades out the currently displayed slide before switching to the next one.
+    // Fades the related visual element for the fade out current slide step.
     private IEnumerator FadeOutCurrentSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(1f, 0f));
     }
 
-    // Fades in the newly applied slide after the sprite and caption have updated.
+    // Fades the related visual element for the fade in current slide step.
     private IEnumerator FadeInCurrentSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
     }
 
-    // Fades the slide image and content alpha together.
+    // Fades the related visual element for the fade current slide step.
     private IEnumerator FadeCurrentSlide(float from, float to)
     {
         IEnumerator contentFade = FadeContent(from, to);
@@ -201,7 +200,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Fades only the slide image alpha to create a visible dimming effect during image changes.
+    // Fades the related visual element for the fade slide image step.
     private IEnumerator FadeSlideImage(float from, float to)
     {
         if (slideImage == null)
@@ -224,7 +223,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         SetSlideImageAlpha(to);
     }
 
-    // Applies the requested alpha directly to the current slide image color.
+    // Updates the requested value or component state.
     private void SetSlideImageAlpha(float alpha)
     {
         if (slideImage == null)
@@ -237,7 +236,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         slideImage.color = color;
     }
 
-    // Loads the main menu after the ending sequence finishes.
+    // Loads the requested data, scene, or runtime content.
     private void LoadMainMenu()
     {
         if (string.IsNullOrWhiteSpace(mainMenuSceneName))
@@ -249,7 +248,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         SceneTransition.LoadScene(mainMenuSceneName);
     }
 
-    // Refreshes layout-sensitive visuals after the rect transform changes size.
+    // Responds when the RectTransform size changes.
     private void OnRectTransformDimensionsChange()
     {
         if (slideImage != null && slideImage.sprite != null)
@@ -263,7 +262,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Fits the ending image to the currently available layout height.
+    // Handles the fit image to available height step for this script.
     private void FitImageToAvailableHeight()
     {
         if (slideImage == null || slideImage.sprite == null)
@@ -293,7 +292,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
     }
 
-    // Caches the configured image height used by the ending layout.
+    // Caches references or values needed by cache configured image height.
     private void CacheConfiguredImageHeight()
     {
         if (slideImage == null)
@@ -308,7 +307,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Shows the current ending caption and starts its reveal flow.
+    // Shows the show caption UI or dialogue flow.
     private void ShowCaption(string caption)
     {
         if (captionText == null)
@@ -336,7 +335,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         captionTypeRoutine = StartCoroutine(TypeCaptionRoutine(caption));
     }
 
-    // Reveals the ending caption text over time with the configured typing effect.
+    // Handles the type caption routine step for this script.
     private IEnumerator TypeCaptionRoutine(string caption)
     {
         isTypingCaption = true;
@@ -364,7 +363,7 @@ public class EndingCutsceneSequenceController : MonoBehaviour
         captionTypeRoutine = null;
     }
 
-    // Completes the current caption immediately without waiting for typing.
+    // Completes the complete caption instantly step immediately.
     private void CompleteCaptionInstantly()
     {
         if (!isTypingCaption || captionText == null)

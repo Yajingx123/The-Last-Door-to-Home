@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 /*
-Purpose: Saves and loads the lightweight game state used by the pause-menu slot system.
-Attached GameObject: Not attached; accessed through static helpers.
-Main responsibilities: Serialize save slots, restore runtime state, and coordinate scene reload behavior.
-Inputs: Inventory/story state, active scene info, player position, and selected save slot.
-Outputs or effects: Writes JSON save files, restores runtime state, and triggers scene transitions on load.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify slot overwrite, empty-slot handling, boss-scene spawn fallback, and restored story progression after load.
+Purpose: Saves, loads, and summarizes the game state for the slot-based save system.
+Attached GameObject: Static helper; no GameObject attachment required.
+Main responsibilities: Serializes save data, restores inventory/story/session state, resolves player position, and loads saved scenes.
+Inputs: Slot index, active scene, player transform, inventory state, story flags, and persistent save files.
+Outputs or effects: Writes JSON files, restores runtime state, returns status messages, and starts scene transitions.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify save overwrite, empty-slot handling, corrupted-file handling, load restore, and boss-scene spawn fallback.
 */
 
 public static class SaveSystem
@@ -19,6 +18,7 @@ public static class SaveSystem
     public const int SlotCount = 10;
     private const string SaveFolderName = "Saves";
 
+    // Saves the current data or runtime state.
     public static bool SaveToSlot(int slotIndex, out string message)
     {
         if (!IsValidSlotIndex(slotIndex))
@@ -44,6 +44,7 @@ public static class SaveSystem
         return true;
     }
 
+    // Loads the requested data, scene, or runtime content.
     public static bool LoadFromSlot(int slotIndex, out string message)
     {
         if (!TryReadSlot(slotIndex, out SaveData data))
@@ -73,6 +74,7 @@ public static class SaveSystem
         return true;
     }
 
+    // Returns the requested value or runtime object.
     public static List<SaveSlotSummary> GetSlotSummaries()
     {
         var summaries = new List<SaveSlotSummary>(SlotCount);
@@ -104,6 +106,7 @@ public static class SaveSystem
         return summaries;
     }
 
+    // Returns whether the required has any save condition is met.
     public static bool HasAnySave()
     {
         for (int i = 0; i < SlotCount; i++)
@@ -117,6 +120,7 @@ public static class SaveSystem
         return false;
     }
 
+    // Attempts the requested operation and reports whether it succeeded.
     public static bool TryLoadMostRecentSlot(out string message)
     {
         int latestSlotIndex = -1;
@@ -146,6 +150,7 @@ public static class SaveSystem
         return LoadFromSlot(latestSlotIndex, out message);
     }
 
+    // Handles the format play time step for this script.
     public static string FormatPlayTime(float seconds)
     {
         TimeSpan span = TimeSpan.FromSeconds(Mathf.Max(0f, seconds));
@@ -153,6 +158,7 @@ public static class SaveSystem
         return $"{totalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
     }
 
+    // Builds data or UI objects required by this system.
     private static SaveData BuildSaveData(int slotIndex, Scene activeScene)
     {
         Vector2 playerPosition = ResolvePlayerPosition();
@@ -175,6 +181,7 @@ public static class SaveSystem
         };
     }
 
+    // Resolves the best available value for the requested data.
     private static Vector2 ResolvePlayerPosition()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -191,6 +198,7 @@ public static class SaveSystem
         return Vector2.zero;
     }
 
+    // Returns whether is boss scene is true for the current state.
     private static bool IsBossScene()
     {
         return UnityEngine.Object.FindObjectOfType<MonsterController>() != null
@@ -199,6 +207,7 @@ public static class SaveSystem
             || UnityEngine.Object.FindObjectOfType<StalkerMonster>() != null;
     }
 
+    // Attempts the requested operation and reports whether it succeeded.
     private static bool TryReadSlot(int slotIndex, out SaveData data)
     {
         data = null;
@@ -221,11 +230,13 @@ public static class SaveSystem
         }
     }
 
+    // Returns whether is valid slot index is true for the current state.
     private static bool IsValidSlotIndex(int slotIndex)
     {
         return slotIndex >= 0 && slotIndex < SlotCount;
     }
 
+    // Handles the parse saved at utc step for this script.
     private static DateTime ParseSavedAtUtc(string savedAtUtc)
     {
         if (DateTime.TryParse(savedAtUtc, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime parsed))
@@ -236,11 +247,13 @@ public static class SaveSystem
         return DateTime.MinValue;
     }
 
+    // Returns the requested value or runtime object.
     private static string GetSaveFolderPath()
     {
         return Path.Combine(Application.persistentDataPath, SaveFolderName);
     }
 
+    // Returns the requested value or runtime object.
     private static string GetSlotPath(int slotIndex)
     {
         return Path.Combine(GetSaveFolderPath(), $"slot_{slotIndex + 1:00}.json");

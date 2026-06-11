@@ -1,13 +1,12 @@
 using UnityEngine;
-
 /*
-Purpose: Manages p la ye rs pa wn behavior for this part of the game.
-Attached GameObject: Player GameObject or a player-specific child object.
-Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
-Inputs: Inspector references, Unity input, and state from linked gameplay managers.
-Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Restores the player position after scene transitions.
+Attached GameObject: Player GameObject.
+Main responsibilities: Applies a pending spawn position once, then clears the spawn request flag.
+Inputs: Static spawn position and spawn request values set before scene loading.
+Outputs or effects: Updates the Player transform position and clears NEED_SPAWN.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify scene exits, save loading, and new-game starts place the player at the expected position.
 */
 
 public class PlayerSpawn : MonoBehaviour
@@ -15,7 +14,7 @@ public class PlayerSpawn : MonoBehaviour
     public static Vector2 SPAWN_POSITION;
     public static bool NEED_SPAWN = false;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (NEED_SPAWN)

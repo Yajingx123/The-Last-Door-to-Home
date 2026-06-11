@@ -1,35 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
-
 /*
-Purpose: Shows a simple open/cancel door menu and loads the Ending 3 cutscene scene with a white fade.
-Attached GameObject: Interactable door object with collider and player interaction detection.
-Main responsibilities: Present door options and start a white scene transition into the ending cutscene.
-Inputs: Player interaction calls and inspector-configured target ending cutscene scene.
-Outputs or effects: Locks option input briefly, plays optional SFX, fades white, and loads the ending cutscene scene.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify target scene name, cutscene return behavior, option labels, and fade color in Play Mode.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class DoorToEnding3 : MonoBehaviour, IInteractable
 {
-    [Header("目标结局动画场景")]
+    [Header("目标结局动画场景 / Target Ending Cutscene Scene")]
     public string targetEndingSceneName = "Ending3";
 
-    [Header("选项文案")]
+    [Header("选项文案 / Option Text")]
     public string openOptionText = "Open It";
     public string cancelOptionText = "Cancel";
 
-    [Header("白色渐变")]
+    [Header("白色渐变 / White Fade")]
     public Color fadeColor = Color.white;
     [Tooltip("从开始渐白到新场景渐显完成的总时长。会平均分给淡出和淡入。")]
     public float totalFadeDuration = 6f;
 
-    [Header("音效")]
+    [Header("音效 / Audio")]
     public AudioClip openSfx;
     [Range(0f, 1f)] public float openSfxVolume = 1f;
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (OptionMenu.Instance == null) return;
@@ -54,7 +53,7 @@ public class DoorToEnding3 : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    // Opens the door and starts the configured ending cutscene scene.
+    // Opens the related UI or gameplay flow.
     private void OpenDoor()
     {
         if (string.IsNullOrWhiteSpace(targetEndingSceneName)) return;
@@ -68,7 +67,7 @@ public class DoorToEnding3 : MonoBehaviour, IInteractable
         SceneTransition.LoadSceneWithFadeColor(targetEndingSceneName, fadeColor, halfFadeDuration, halfFadeDuration);
     }
 
-    // Closes the option flow without triggering dialogue.
+    // Returns whether this script can cancel.
     private void Cancel()
     {
         if (DialogueManager.Instance != null)

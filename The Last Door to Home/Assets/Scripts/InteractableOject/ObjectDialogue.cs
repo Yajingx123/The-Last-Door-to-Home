@@ -1,26 +1,25 @@
 using UnityEngine;
-
 /*
-Purpose: Manages o bj ec td ia lo gu e behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class ObjectDialogue : MonoBehaviour, IInteractable
 {
-    [Header("多段对话（每一行按一次回车）")]
+    [Header("多段对话（每一行按一次回车） / Multi-Line Dialogue (Press Return Per Line)")]
     [TextArea(3, 10)]
     public string[] dialogues;
 
-    [Header("阅读插图（可选）")]
+    [Header("阅读插图（可选） / Reading Illustration (Optional)")]
     public bool showDialogueImage;
     public Sprite dialogueImageSprite;
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null) return;
@@ -30,7 +29,7 @@ public class ObjectDialogue : MonoBehaviour, IInteractable
             DialogueManager.Instance.ShowDialogueImage(dialogueImageSprite);
         }
 
-        // 纯对白专用
+        // Dialogue-only interaction path.
         DialogueManager.Instance.ShowDialogue(dialogues);
     }
 }

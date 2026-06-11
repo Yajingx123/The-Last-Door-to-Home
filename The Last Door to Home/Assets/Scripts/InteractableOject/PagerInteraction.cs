@@ -1,42 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 /*
-Purpose: Manages p ag er in te ra ct io n behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class PagerInteraction : MonoBehaviour, IInteractable
 {
-    [Header("Pager 物品信息")]
+    [Header("Pager 物品信息 / Pager Item Info")]
     public string pagerUniqueID = "pager_01";
     public string pagerItemName = "Pager";
     public ItemType pagerItemType = ItemType.Tool;
 
-    [Header("场景中被拾取后要隐藏的物体（可选）")]
+    [Header("场景中被拾取后要隐藏的物体（可选） / Scene Object To Hide After Pickup (Optional)")]
     public GameObject pickupHideTarget;
 
-    [Header("首次发现：前置对白")]
+    [Header("首次发现：前置对白 / First Discovery: Intro Dialogue")]
     [TextArea(3, 10)]
     public string[] foundDialogues;
 
-    [Header("首次发现：是否播放录音选项")]
+    [Header("首次发现：是否播放录音选项 / First Discovery: Play Recording Option")]
     public string playRecordingOptionText = "播放录音";
     [TextArea(2, 8)]
     public string[] afterPlayRecordingDialogues;
 
-    [Header("Pager 对话音频")]
+    [Header("Pager 对话音频 / Pager Dialogue Audio")]
     public DialogueAudioSettings dialogueAudioSettings;
 
     private bool pickupInProgress;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     void Start()
     {
         if (Inventory.HasCollected(pagerUniqueID))
@@ -45,7 +44,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null || OptionMenu.Instance == null) return;
@@ -65,7 +64,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         ShowFirstChoiceMenu();
     }
 
-    // Shows the first pager choice menu for this interaction.
+    // Shows the show first choice menu UI or dialogue flow.
     private void ShowFirstChoiceMenu()
     {
         if (OptionMenu.Instance == null || DialogueManager.Instance == null) return;
@@ -86,7 +85,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    // Continues the pager interaction flow and then grants the pickup.
+    // Continues the continue and pickup flow from its current state.
     private void ContinueAndPickup(string[] lines)
     {
         if (DialogueManager.Instance == null)
@@ -106,7 +105,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         DialogueManager.Instance.CloseDialogueAfterOption();
     }
 
-    // Finalizes the pickup after the related dialogue has fully closed.
+    // Handles the finalize pickup after dialogue closed step for this script.
     private IEnumerator FinalizePickupAfterDialogueClosed()
     {
         while (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
@@ -117,7 +116,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         FinalizePickup();
     }
 
-    // Finalizes the pickup flow and applies the collected-item state.
+    // Handles the finalize pickup step for this script.
     private void FinalizePickup()
     {
         if (!Inventory.HasCollected(pagerUniqueID))
@@ -129,7 +128,7 @@ public class PagerInteraction : MonoBehaviour, IInteractable
         pickupInProgress = false;
     }
 
-    // Hides the pager object in the scene after it is collected.
+    // Hides the UI immediately and resets transient state.
     private void HidePagerInScene()
     {
         GameObject hideTarget = pickupHideTarget != null ? pickupHideTarget : gameObject;

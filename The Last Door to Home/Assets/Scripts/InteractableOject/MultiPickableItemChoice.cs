@@ -1,21 +1,20 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-
 /*
-Purpose: Lets one interactable object route the player to one of several PickableItem flows.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Show an optional intro dialogue, then a menu of pickable items plus cancel.
-Inputs: Player interaction calls, inspector-configured PickableItem GameObjects, and dialogue UI state.
-Outputs or effects: Starts the selected PickableItem interaction or closes/cancels the menu.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector item references, option text, cancel behavior, and collected-item filtering.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class MultiPickableItemChoice : MonoBehaviour, IInteractable
 {
     [Serializable]
-    public class PickableChoice
+public class PickableChoice
     {
         [Tooltip("拖入带有 PickableItem 脚本的 GameObject。")]
         public GameObject itemObject;
@@ -31,6 +30,7 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
             }
         }
 
+        // Returns the requested value or runtime object.
         public string GetOptionText()
         {
             PickableItem item = Item;
@@ -40,21 +40,21 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
         }
     }
 
-    [Header("前置对白（最后一句后弹出选择菜单，可空）")]
+    [Header("前置对白（最后一句后弹出选择菜单，可空） / Intro Dialogue (Choice Menu After Last Line, Optional)")]
     [TextArea(3, 10)]
     public string[] preDialogues;
 
-    [Header("所有可拿物品都已拿完后的对白（可空）")]
+    [Header("所有可拿物品都已拿完后的对白（可空） / Dialogue After All Items Are Collected (Optional)")]
     [TextArea(2, 6)]
     public string[] allCollectedDialogues;
 
-    [Header("可选择拾取的物品")]
+    [Header("可选择拾取的物品 / Selectable Pickup Items")]
     public PickableChoice[] choices;
 
-    [Header("取消选项")]
+    [Header("取消选项 / Cancel Option")]
     public string cancelOptionText = "Cancel";
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (OptionMenu.Instance == null) return;
@@ -81,7 +81,7 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    // Builds one menu entry for each available item, followed by cancel.
+    // Builds data or UI objects required by this system.
     private List<OptionMenu.OptionEntry> BuildEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -117,7 +117,7 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
         return entries;
     }
 
-    // Checks whether at least one configured PickableItem can still be picked.
+    // Returns whether the required has available pickable item condition is met.
     private bool HasAvailablePickableItem()
     {
         if (choices == null) return false;
@@ -135,7 +135,7 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
         return false;
     }
 
-    // Shows the fallback dialogue after every configured item has been collected.
+    // Shows the show all collected dialogue UI or dialogue flow.
     private void ShowAllCollectedDialogue()
     {
         if (DialogueManager.Instance == null) return;
@@ -146,14 +146,14 @@ public class MultiPickableItemChoice : MonoBehaviour, IInteractable
         }
     }
 
-    // Hands control to the selected PickableItem so it can show its own pick/leave choice.
+    // Starts the start pickable item flow sequence or runtime effect.
     private void StartPickableItemFlow(PickableItem item)
     {
         if (item == null) return;
         item.OnInteract();
     }
 
-    // Cancels the chooser and restores player control when there is no dialogue to close.
+    // Closes the related UI or gameplay flow.
     private void CloseOrUnlockAfterCancel()
     {
         if (DialogueManager.Instance == null) return;

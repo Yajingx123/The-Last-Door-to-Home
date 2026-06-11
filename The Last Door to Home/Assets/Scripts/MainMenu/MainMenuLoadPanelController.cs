@@ -4,15 +4,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 /*
-Purpose: Shows a keyboard-driven load-slot overlay from the main menu Continue button.
-Attached GameObject: Auto-created runtime singleton in the MainMenu scene.
-Main responsibilities: Display ten save slots, handle selection input, and load the chosen slot.
-Inputs: Main menu input, save slot summaries, and load requests.
-Outputs or effects: Opens and closes a UI overlay and triggers save-slot loading.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify Continue opens the slot list, empty slots fail gracefully, and Esc returns to the main menu buttons.
+Purpose: Shows the keyboard-driven save-slot load panel from the main menu Continue option.
+Attached GameObject: Runtime-created singleton in the MainMenu scene, or an optional scene controller object.
+Main responsibilities: Builds the load-slot overlay, reads save summaries, moves slot selection, and loads the selected slot.
+Inputs: Continue button action, save-slot summaries, keyboard input, and SaveSystem load results.
+Outputs or effects: Shows/hides the overlay, updates slot text and footer messages, and triggers save-slot loading.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify Continue opens the panel, empty slots show feedback, valid slots load, and Esc returns to the menu.
 */
 
 public class MainMenuLoadPanelController : MonoBehaviour
@@ -36,7 +35,9 @@ public class MainMenuLoadPanelController : MonoBehaviour
 
     public static bool IsOpen => instance != null && instance.overlayObject != null && instance.overlayObject.activeSelf;
 
+    // Ensures the load panel controller exists after the MainMenu scene loads.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // Ensures the runtime singleton exists after a scene load.
     private static void Bootstrap()
     {
         Scene activeScene = SceneManager.GetActiveScene();
@@ -48,6 +49,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         EnsureInstance();
     }
 
+    // Opens the related UI or gameplay flow.
     public static void OpenPanel()
     {
         EnsureInstance();
@@ -55,6 +57,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         instance.OpenInternal();
     }
 
+    // Finds or creates the shared runtime instance used by this system.
     private static void EnsureInstance()
     {
         if (instance != null) return;
@@ -71,6 +74,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         instance.Initialize();
     }
 
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -83,6 +87,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         Initialize();
     }
 
+    // Reads per-frame input and updates frame-dependent runtime state.
     private void Update()
     {
         if (!IsOpen) return;
@@ -112,6 +117,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Creates required runtime objects and prepares this system for use.
     private void Initialize()
     {
         if (panelCanvas != null)
@@ -123,6 +129,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         ClosePanel();
     }
 
+    // Opens the related UI or gameplay flow.
     private void OpenInternal()
     {
         if (overlayObject == null) return;
@@ -138,6 +145,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         RefreshSlotList();
     }
 
+    // Closes the related UI or gameplay flow.
     private void ClosePanel()
     {
         if (overlayObject != null)
@@ -146,6 +154,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryLoadSelectedSlot()
     {
         if (selectedIndex < 0 || selectedIndex >= slotSummaries.Count || !slotSummaries[selectedIndex].hasData)
@@ -165,6 +174,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         ClosePanel();
     }
 
+    // Moves the current selection or object in the requested direction.
     private void MoveSelection(int direction)
     {
         if (slotLabels.Count == 0) return;
@@ -182,6 +192,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         RefreshSelection();
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshSlotList()
     {
         slotSummaries = SaveSystem.GetSlotSummaries();
@@ -207,6 +218,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         RefreshFooter();
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshSelection()
     {
         for (int i = 0; i < slotTexts.Count; i++)
@@ -219,6 +231,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshFooter()
     {
         if (footerText != null)
@@ -227,6 +240,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Builds data or UI objects required by this system.
     private static string BuildSlotLabel(SaveSlotSummary summary)
     {
         if (summary == null)
@@ -244,6 +258,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return $"Slot {summary.slotIndex + 1:00}   {sceneName}   {playTime}";
     }
 
+    // Builds data or UI objects required by this system.
     private void BuildUiFromPrefabOrFallback()
     {
         if (BuildUiFromPrefab())
@@ -254,6 +269,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         BuildUi();
     }
 
+    // Builds data or UI objects required by this system.
     private bool BuildUiFromPrefab()
     {
         GameObject prefab = Resources.Load<GameObject>(PauseMenuPrefabResourcePath);
@@ -354,6 +370,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return true;
     }
 
+    // Builds data or UI objects required by this system.
     private void BuildUi()
     {
         panelCanvas = gameObject.GetComponent<Canvas>();
@@ -432,6 +449,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         DisableMouseInteraction();
     }
 
+    // Ensures the required ensure slot text count objects or state exist.
     private void EnsureSlotTextCount(int requiredCount, Transform parentOverride = null)
     {
         Transform parent = parentOverride != null ? parentOverride : (slotTexts.Count > 0 ? slotTexts[0].transform.parent : null);
@@ -446,6 +464,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Handles the disable mouse interaction step for this script.
     private void DisableMouseInteraction()
     {
         if (overlayObject == null) return;
@@ -457,6 +476,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Creates and configures a new runtime object or data value.
     private Component CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
     {
         GameObject textObject = CreateUiObject(objectName, parent);
@@ -472,6 +492,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return text;
     }
 
+    // Loads the requested data, scene, or runtime content.
     private void LoadTextPoolFromContainer(List<Component> targetPool, Transform parent)
     {
         targetPool.Clear();
@@ -487,6 +508,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Creates and configures a new runtime object or data value.
     private static GameObject CreateUiObject(string objectName, Transform parent)
     {
         GameObject go = new GameObject(objectName, typeof(RectTransform));
@@ -494,6 +516,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return go;
     }
 
+    // Handles the stretch to full screen step for this script.
     private static void StretchToFullScreen(RectTransform rect)
     {
         rect.anchorMin = Vector2.zero;
@@ -502,12 +525,14 @@ public class MainMenuLoadPanelController : MonoBehaviour
         rect.offsetMax = Vector2.zero;
     }
 
+    // Searches the scene hierarchy or data collection for the requested target.
     private static Component FindRequiredTextComponent(Transform root, string objectName)
     {
         Transform target = FindChildRecursive(root, objectName);
         return target != null ? GetSupportedTextComponent(target) : null;
     }
 
+    // Searches the scene hierarchy or data collection for the requested target.
     private static Transform FindChildRecursive(Transform parent, string childName)
     {
         if (parent == null) return null;
@@ -525,6 +550,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return null;
     }
 
+    // Returns the requested value or runtime object.
     private static Component GetSupportedTextComponent(Transform target)
     {
         if (target == null) return null;
@@ -544,6 +570,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         return null;
     }
 
+    // Updates the requested value or component state.
     private static void SetTextValue(Component textComponent, string value)
     {
         if (textComponent is Text legacyText)
@@ -558,6 +585,7 @@ public class MainMenuLoadPanelController : MonoBehaviour
         }
     }
 
+    // Updates the requested value or component state.
     private static void SetTextColor(Component textComponent, Color color)
     {
         if (textComponent is Text legacyText)

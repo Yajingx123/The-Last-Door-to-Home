@@ -1,6 +1,15 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+/*
+Purpose: Stores collected items and unlocked object state for the current game run.
+Attached GameObject: Static helper; no GameObject attachment required.
+Main responsibilities: Adds collected items, checks item/type ownership, tracks unlocked safes/doors, and imports/exports save data.
+Inputs: Pickup calls, unique item IDs, item metadata, save data, and unlock requests.
+Outputs or effects: Updates shared inventory state, raises ItemCollected, and returns serialized records for saving.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify duplicate collection prevention, item lookup, unlock tracking, and import/export round trips.
+*/
 
 public enum ItemType
 {
@@ -10,17 +19,6 @@ public enum ItemType
     Flower,
     stone
 }
-
-/*
-Purpose: Provides shared i nv en to ry utilities for other gameplay systems.
-Attached GameObject: Not attached; accessed as a static utility from other systems.
-Main responsibilities: Maintain shared state or helper operations and provide a central access point.
-Inputs: Method parameters, saved runtime state, and calls from other scripts.
-Outputs or effects: Updated shared state and return values consumed by other systems.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
-*/
-
 public static class Inventory
 {
     public static event Action<string> ItemCollected;
@@ -33,7 +31,7 @@ public static class Inventory
     private static HashSet<string> unlockedSafeIDs = new HashSet<string>();
     private static HashSet<string> unlockedDoorIDs = new HashSet<string>();
 
-    // Adds the supplied item to the shared inventory state.
+    // Handles the add item step for this script.
     public static void AddItem(string name, ItemType type, string uniqueID, string description = "", string iconResourcePath = "", Sprite runtimeIcon = null)
     {
         if (!collectedIDs.Contains(uniqueID))
@@ -55,53 +53,53 @@ public static class Inventory
         }
     }
 
-    // Checks whether the requested unique item has already been collected.
+    // Returns whether the required has collected condition is met.
     public static bool HasCollected(string uniqueID)
     {
         return collectedIDs.Contains(uniqueID);
     }
 
-    // Checks whether the named inventory item is present.
+    // Returns whether the required has item condition is met.
     public static bool HasItem(string itemName)
     {
         return collectedItemNames.Contains(itemName);
     }
 
-    // Checks whether any collected item matches the requested type.
+    // Returns whether the required has item type condition is met.
     public static bool HasItemType(ItemType itemType)
     {
         return collectedTypes.Contains(itemType);
     }
 
-    // Marks the requested safe as unlocked in shared state.
+    // Handles the mark safe unlocked step for this script.
     public static void MarkSafeUnlocked(string safeUniqueID)
     {
         if (string.IsNullOrEmpty(safeUniqueID)) return;
         unlockedSafeIDs.Add(safeUniqueID);
     }
 
-    // Checks whether the requested safe has already been unlocked.
+    // Returns whether is safe unlocked is true for the current state.
     public static bool IsSafeUnlocked(string safeUniqueID)
     {
         if (string.IsNullOrEmpty(safeUniqueID)) return false;
         return unlockedSafeIDs.Contains(safeUniqueID);
     }
 
-    // Marks the requested door as unlocked in shared state.
+    // Handles the mark door unlocked step for this script.
     public static void MarkDoorUnlocked(string doorUniqueID)
     {
         if (string.IsNullOrEmpty(doorUniqueID)) return;
         unlockedDoorIDs.Add(doorUniqueID);
     }
 
-    // Checks whether the requested door has already been unlocked.
+    // Returns whether is door unlocked is true for the current state.
     public static bool IsDoorUnlocked(string doorUniqueID)
     {
         if (string.IsNullOrEmpty(doorUniqueID)) return false;
         return unlockedDoorIDs.Contains(doorUniqueID);
     }
 
-    // Exports the collected inventory items for save serialization.
+    // Exports runtime state into serializable data.
     public static List<InventoryItemRecord> ExportCollectedItems()
     {
         var records = new List<InventoryItemRecord>();
@@ -125,19 +123,19 @@ public static class Inventory
         return records;
     }
 
-    // Exports unlocked safe identifiers for save serialization.
+    // Exports runtime state into serializable data.
     public static List<string> ExportUnlockedSafeIds()
     {
         return new List<string>(unlockedSafeIDs);
     }
 
-    // Exports unlocked door identifiers for save serialization.
+    // Exports runtime state into serializable data.
     public static List<string> ExportUnlockedDoorIds()
     {
         return new List<string>(unlockedDoorIDs);
     }
 
-    // Restores the shared inventory state from save data.
+    // Restores runtime state from serialized data.
     public static void ImportState(List<InventoryItemRecord> items, List<string> safeIds, List<string> doorIds)
     {
         collectedIDs.Clear();
@@ -190,7 +188,7 @@ public static class Inventory
         }
     }
 
-    // Clears the stored runtime state managed by this utility.
+    // Clears the stored runtime state managed by this system.
     public static void Clear()
     {
         collectedIDs.Clear();
@@ -203,6 +201,7 @@ public static class Inventory
         StoryFlags.Clear();
     }
 
+    // Loads the requested data, scene, or runtime content.
     private static Sprite LoadIconFromResources(string resourcePath)
     {
         if (string.IsNullOrWhiteSpace(resourcePath)) return null;

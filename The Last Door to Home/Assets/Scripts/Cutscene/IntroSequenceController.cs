@@ -3,36 +3,35 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections;
-
 /*
-Purpose: Manages i nt ro se qu en ce co nt ro ll er behavior for this part of the game.
-Attached GameObject: Cutscene controller GameObject.
-Main responsibilities: Sequence cutscene presentation, timing, and related audiovisual cues.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Controls a cutscene sequence or stores cutscene return context.
+Attached GameObject: Cutscene scene controller GameObject, or static context helper when applicable.
+Main responsibilities: Displays slides/text, handles timing and input, plays audio, and transitions to the next scene.
+Inputs: Serialized cutscene assets, player input, timing settings, audio clips, and return-scene context.
+Outputs or effects: Updates cutscene UI, plays audio, records return data, and loads follow-up scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify slide order, skip/advance input, audio timing, and final scene transition.
 */
 
 public class IntroSequenceController : MonoBehaviour
 {
     [Serializable]
-    public class IntroSlide
+public class IntroSlide
     {
         public Sprite image;
         [TextArea(2, 6)]
         public string caption;
     }
 
-    [Header("Slides")]
+    [Header("Slides / 幻灯片")]
     public IntroSlide[] slides;
 
-    [Header("UI")]
+    [Header("UI / 界面")]
     public Image slideImage;
     public TextMeshProUGUI captionText;
     public CanvasGroup contentCanvasGroup;
 
-    [Header("Flow")]
+    [Header("Flow / 流程")]
     public string nextSceneName;
     [SerializeField] private float fadeDuration = 0.35f;
     [SerializeField] private float imageFadeDuration = 0.45f;
@@ -46,7 +45,7 @@ public class IntroSequenceController : MonoBehaviour
     private float configuredImageHeight = -1f;
     private Coroutine captionTypeRoutine;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     void Start()
     {
         sceneStartFrame = Time.frameCount;
@@ -71,7 +70,7 @@ public class IntroSequenceController : MonoBehaviour
         StartCoroutine(FadeInOpeningSlide());
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (isTransitioning) return;
@@ -89,7 +88,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
-    // Advances the intro sequence to the next configured slide.
+    // Handles the advance slide step for this script.
     private IEnumerator AdvanceSlide()
     {
         isTransitioning = true;
@@ -109,7 +108,7 @@ public class IntroSequenceController : MonoBehaviour
         isTransitioning = false;
     }
 
-    // Applies the current slide visuals, text, and related presentation state.
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplySlide(int index)
     {
         IntroSlide slide = slides[index];
@@ -127,7 +126,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
-    // Fades the cutscene content group over the requested duration.
+    // Fades the related visual element for the fade content step.
     private IEnumerator FadeContent(float from, float to)
     {
         if (contentCanvasGroup == null)
@@ -150,25 +149,25 @@ public class IntroSequenceController : MonoBehaviour
         contentCanvasGroup.alpha = to;
     }
 
-    // Fades in the opening slide content and image together.
+    // Fades the related visual element for the fade in opening slide step.
     private IEnumerator FadeInOpeningSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
     }
 
-    // Fades out the currently displayed slide before switching to the next one.
+    // Fades the related visual element for the fade out current slide step.
     private IEnumerator FadeOutCurrentSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(1f, 0f));
     }
 
-    // Fades in the newly applied slide after the sprite and caption have updated.
+    // Fades the related visual element for the fade in current slide step.
     private IEnumerator FadeInCurrentSlide()
     {
         yield return StartCoroutine(FadeCurrentSlide(0f, 1f));
     }
 
-    // Fades the slide image and content alpha together for a smoother scene transition.
+    // Fades the related visual element for the fade current slide step.
     private IEnumerator FadeCurrentSlide(float from, float to)
     {
         IEnumerator contentFade = FadeContent(from, to);
@@ -180,7 +179,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
-    // Fades only the slide image alpha to create a visible dimming effect during image changes.
+    // Fades the related visual element for the fade slide image step.
     private IEnumerator FadeSlideImage(float from, float to)
     {
         if (slideImage == null)
@@ -203,7 +202,7 @@ public class IntroSequenceController : MonoBehaviour
         SetSlideImageAlpha(to);
     }
 
-    // Applies the requested alpha directly to the current slide image color.
+    // Updates the requested value or component state.
     private void SetSlideImageAlpha(float alpha)
     {
         if (slideImage == null)
@@ -216,7 +215,7 @@ public class IntroSequenceController : MonoBehaviour
         slideImage.color = color;
     }
 
-    // Loads the next configured scene after the intro sequence finishes.
+    // Loads the requested data, scene, or runtime content.
     private void LoadNextScene()
     {
         if (string.IsNullOrWhiteSpace(nextSceneName))
@@ -228,7 +227,7 @@ public class IntroSequenceController : MonoBehaviour
         SceneTransition.LoadScene(nextSceneName);
     }
 
-    // Refreshes layout-sensitive visuals after the rect transform changes size.
+    // Responds when the RectTransform size changes.
     private void OnRectTransformDimensionsChange()
     {
         if (slideImage != null && slideImage.sprite != null)
@@ -241,7 +240,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
-    // Fits the intro image to the currently available layout height.
+    // Handles the fit image to available height step for this script.
     private void FitImageToAvailableHeight()
     {
         if (slideImage == null || slideImage.sprite == null)
@@ -271,7 +270,7 @@ public class IntroSequenceController : MonoBehaviour
         imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
     }
 
-    // Caches the configured image height used by the cutscene layout.
+    // Caches references or values needed by cache configured image height.
     private void CacheConfiguredImageHeight()
     {
         if (slideImage == null)
@@ -286,7 +285,7 @@ public class IntroSequenceController : MonoBehaviour
         }
     }
 
-    // Shows the current intro caption and starts its reveal flow.
+    // Shows the show caption UI or dialogue flow.
     private void ShowCaption(string caption)
     {
         if (captionText == null)
@@ -314,7 +313,7 @@ public class IntroSequenceController : MonoBehaviour
         captionTypeRoutine = StartCoroutine(TypeCaptionRoutine(caption));
     }
 
-    // Reveals the intro caption text over time with the configured typing effect.
+    // Handles the type caption routine step for this script.
     private IEnumerator TypeCaptionRoutine(string caption)
     {
         isTypingCaption = true;
@@ -342,7 +341,7 @@ public class IntroSequenceController : MonoBehaviour
         captionTypeRoutine = null;
     }
 
-    // Completes the current caption immediately without waiting for typing.
+    // Completes the complete caption instantly step immediately.
     private void CompleteCaptionInstantly()
     {
         if (!isTypingCaption || captionText == null)

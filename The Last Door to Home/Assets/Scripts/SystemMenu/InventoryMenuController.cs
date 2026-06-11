@@ -3,15 +3,14 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 /*
-Purpose: Provides a global Tab inventory menu for showing collected items in gameplay scenes.
-Attached GameObject: Auto-created runtime singleton.
-Main responsibilities: Listen for Tab, display a grid-style inventory, and block gameplay input while open.
-Inputs: Active scene info, player input, and current inventory state.
-Outputs or effects: Pauses gameplay, shows an overlay, and restores normal input when closed.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify Tab toggles in gameplay scenes, grid selection works, and the detail panel matches the selected item.
+Purpose: Shows the global Tab inventory menu in gameplay scenes.
+Attached GameObject: Runtime-created singleton that persists across gameplay scenes.
+Main responsibilities: Builds the inventory UI, blocks gameplay input while open, displays collected items, and refreshes item details.
+Inputs: Tab/Escape/navigation keys, active scene, collected inventory records, icons, and DialogueManager lock state.
+Outputs or effects: Shows/hides inventory overlay, pauses time, updates item grid, icons, detail text, and selection highlight.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify Tab toggling, empty inventory, grid navigation, item icons, and details for each item type.
 */
 
 public class InventoryMenuController : MonoBehaviour
@@ -41,11 +40,13 @@ public class InventoryMenuController : MonoBehaviour
     public static bool IsOpen => instance != null && instance.isMenuOpen;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // Ensures the runtime singleton exists after a scene load.
     private static void Bootstrap()
     {
         EnsureInstance();
     }
 
+    // Finds or creates the shared runtime instance used by this system.
     private static void EnsureInstance()
     {
         if (instance != null) return;
@@ -62,6 +63,7 @@ public class InventoryMenuController : MonoBehaviour
         instance.Initialize();
     }
 
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -74,16 +76,19 @@ public class InventoryMenuController : MonoBehaviour
         Initialize();
     }
 
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    // Unregisters callbacks when the component becomes inactive.
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // Reads per-frame input and updates frame-dependent runtime state.
     private void Update()
     {
         if (!isMenuOpen)
@@ -127,6 +132,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Creates required runtime objects and prepares this system for use.
     private void Initialize()
     {
         if (menuCanvas != null)
@@ -140,11 +146,13 @@ public class InventoryMenuController : MonoBehaviour
         HideMenuImmediate();
     }
 
+    // Handles the on scene loaded step for this script.
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         HideMenuImmediate();
     }
 
+    // Handles the should allow inventory menu step for this script.
     private bool ShouldAllowInventoryMenu()
     {
         if (SceneTransition.IsTransitioning) return false;
@@ -154,6 +162,7 @@ public class InventoryMenuController : MonoBehaviour
         return true;
     }
 
+    // Returns whether is scene excluded is true for the current state.
     private static bool IsSceneExcluded(Scene scene)
     {
         if (!scene.IsValid()) return true;
@@ -167,6 +176,7 @@ public class InventoryMenuController : MonoBehaviour
             || sceneName.IndexOf("Cutscene", System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
+    // Opens the related UI or gameplay flow.
     private void OpenMenu()
     {
         isMenuOpen = true;
@@ -177,6 +187,7 @@ public class InventoryMenuController : MonoBehaviour
         RefreshInventoryView();
     }
 
+    // Closes the related UI or gameplay flow.
     private void CloseMenu()
     {
         isMenuOpen = false;
@@ -185,6 +196,7 @@ public class InventoryMenuController : MonoBehaviour
         LockGameplayInput(false);
     }
 
+    // Hides the UI immediately and resets transient state.
     private void HideMenuImmediate()
     {
         isMenuOpen = false;
@@ -195,6 +207,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Handles the lock gameplay input step for this script.
     private void LockGameplayInput(bool lockIt)
     {
         if (DialogueManager.Instance != null)
@@ -203,6 +216,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshInventoryView()
     {
         cachedItems = Inventory.ExportCollectedItems();
@@ -250,6 +264,7 @@ public class InventoryMenuController : MonoBehaviour
         RefreshDetailPanel();
     }
 
+    // Moves the current selection or object in the requested direction.
     private void MoveSelectionHorizontal(int direction)
     {
         int candidate = selectedIndex + direction;
@@ -264,6 +279,7 @@ public class InventoryMenuController : MonoBehaviour
         RefreshDetailPanel();
     }
 
+    // Moves the current selection or object in the requested direction.
     private void MoveSelectionVertical(int rowDelta)
     {
         int candidate = selectedIndex + rowDelta * ColumnCount;
@@ -274,6 +290,7 @@ public class InventoryMenuController : MonoBehaviour
         RefreshDetailPanel();
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshSelectionVisuals()
     {
         for (int i = 0; i < slotTexts.Count; i++)
@@ -296,6 +313,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshDetailPanel()
     {
         if (cachedItems.Count == 0 || selectedIndex < 0 || selectedIndex >= cachedItems.Count)
@@ -319,12 +337,14 @@ public class InventoryMenuController : MonoBehaviour
         detailBodyText.text = builder.ToString();
     }
 
+    // Resolves the best available value for the requested data.
     private static string ResolveItemName(InventoryItemRecord item)
     {
         if (item == null) return "Unknown Item";
         return string.IsNullOrWhiteSpace(item.itemName) ? item.uniqueID : item.itemName;
     }
 
+    // Resolves the best available value for the requested data.
     private static string ResolveDescription(InventoryItemRecord item)
     {
         if (item == null) return "No information available.";
@@ -347,6 +367,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Builds data or UI objects required by this system.
     private void BuildUi()
     {
         menuCanvas = gameObject.GetComponent<Canvas>();
@@ -466,6 +487,7 @@ public class InventoryMenuController : MonoBehaviour
         footerRect.sizeDelta = new Vector2(-60f, 56f);
     }
 
+    // Ensures the required ensure slot count objects or state exist.
     private void EnsureSlotCount(int requiredCount, Transform parentOverride = null)
     {
         Transform parent = parentOverride != null ? parentOverride : (slotTexts.Count > 0 ? slotTexts[0].transform.parent.parent : null);
@@ -497,6 +519,7 @@ public class InventoryMenuController : MonoBehaviour
         }
     }
 
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplyIcon(Image image, Sprite sprite)
     {
         if (image == null) return;
@@ -509,6 +532,7 @@ public class InventoryMenuController : MonoBehaviour
             : new Color(0.35f, 0.35f, 0.35f, 1f);
     }
 
+    // Creates and configures a new runtime object or data value.
     private Text CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment, FontStyle fontStyle)
     {
         GameObject textObject = CreateUiObject(objectName, parent);
@@ -524,6 +548,7 @@ public class InventoryMenuController : MonoBehaviour
         return text;
     }
 
+    // Creates and configures a new runtime object or data value.
     private static GameObject CreateUiObject(string objectName, Transform parent)
     {
         GameObject go = new GameObject(objectName, typeof(RectTransform));
@@ -531,6 +556,7 @@ public class InventoryMenuController : MonoBehaviour
         return go;
     }
 
+    // Handles the stretch to full screen step for this script.
     private static void StretchToFullScreen(RectTransform rect)
     {
         rect.anchorMin = Vector2.zero;

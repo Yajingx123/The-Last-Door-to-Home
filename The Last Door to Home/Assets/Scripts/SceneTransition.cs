@@ -3,15 +3,14 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 /*
-Purpose: Manages s ce ne tr an si ti on behavior for this part of the game.
-Attached GameObject: Relevant scene controller GameObject.
-Main responsibilities: Coordinate inspector data, runtime checks, and the main behaviour handled by this script.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Provides a shared fade transition for scene loading.
+Attached GameObject: SceneTransition GameObject or runtime-created singleton.
+Main responsibilities: Creates the fade overlay, blocks input during transitions, loads scenes, and fades in after loading.
+Inputs: Scene names, optional before-load callbacks, fade colors, durations, and scene-loaded events.
+Outputs or effects: Updates transition UI alpha, invokes callbacks, and loads Unity scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify repeated load requests are blocked and fade timing behaves correctly across scenes.
 */
 
 public class SceneTransition : MonoBehaviour
@@ -32,7 +31,7 @@ public class SceneTransition : MonoBehaviour
 
     public static bool IsTransitioning => instance != null && instance.isTransitioning;
 
-    // Starts loading the requested scene through the transition flow.
+    // Loads the requested data, scene, or runtime content.
     public static void LoadScene(string sceneName, Action beforeSceneLoad = null)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -46,7 +45,7 @@ public class SceneTransition : MonoBehaviour
         instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, instance.fadeColor, instance.fadeOutDuration, instance.fadeInDuration));
     }
 
-    // Starts loading the requested scene through a transition using a temporary fade color.
+    // Loads the requested data, scene, or runtime content.
     public static void LoadSceneWithFadeColor(string sceneName, Color transitionFadeColor, Action beforeSceneLoad = null)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -60,7 +59,7 @@ public class SceneTransition : MonoBehaviour
         instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, transitionFadeColor, instance.fadeOutDuration, instance.fadeInDuration));
     }
 
-    // Starts loading the requested scene through a transition using a temporary fade color and custom fade durations.
+    // Loads the requested data, scene, or runtime content.
     public static void LoadSceneWithFadeColor(string sceneName, Color transitionFadeColor, float customFadeOutDuration, float customFadeInDuration, Action beforeSceneLoad = null)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -74,7 +73,7 @@ public class SceneTransition : MonoBehaviour
         instance.StartCoroutine(instance.LoadSceneRoutine(sceneName, beforeSceneLoad, transitionFadeColor, customFadeOutDuration, customFadeInDuration));
     }
 
-    // Returns the shared singleton instance, creating it if needed.
+    // Finds or creates the shared runtime instance used by this system.
     private static void EnsureInstance()
     {
         if (instance != null) return;
@@ -91,7 +90,7 @@ public class SceneTransition : MonoBehaviour
         instance.Initialize();
     }
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -104,19 +103,19 @@ public class SceneTransition : MonoBehaviour
         Initialize();
     }
 
-    // Resets transient state whenever this component becomes active again.
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    // Stops transient behaviour when this component becomes disabled.
+    // Unregisters callbacks when the component becomes inactive.
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    // Initializes the runtime resources needed by this manager.
+    // Creates required runtime objects and prepares this system for use.
     private void Initialize()
     {
         if (transitionCanvas != null)
@@ -176,7 +175,7 @@ public class SceneTransition : MonoBehaviour
         activeFadeInDuration = fadeInDuration;
     }
 
-    // Runs the asynchronous scene load and transition timing sequence.
+    // Loads the requested data, scene, or runtime content.
     private IEnumerator LoadSceneRoutine(string sceneName, Action beforeSceneLoad, Color transitionFadeColor, float customFadeOutDuration, float customFadeInDuration)
     {
         isTransitioning = true;
@@ -194,14 +193,14 @@ public class SceneTransition : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    // Handles scene-loaded callbacks needed after a transition completes.
+    // Handles the on scene loaded step for this script.
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!shouldFadeInAfterLoad) return;
         StartCoroutine(FadeInAfterLoad());
     }
 
-    // Fades the transition back in after the next scene finishes loading.
+    // Fades the related visual element for the fade in after load step.
     private IEnumerator FadeInAfterLoad()
     {
         shouldFadeInAfterLoad = false;
@@ -219,7 +218,7 @@ public class SceneTransition : MonoBehaviour
         isTransitioning = false;
     }
 
-    // Animates the transition canvas toward the requested fade value.
+    // Fades the related visual element for the fade step.
     private IEnumerator Fade(float from, float to, float duration, bool easeOut)
     {
         if (canvasGroup == null) yield break;

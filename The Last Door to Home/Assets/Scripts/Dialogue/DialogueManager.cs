@@ -3,15 +3,14 @@ using TMPro;
 using System;
 using System.Collections;
 using UnityEngine.UI;
-
 /*
-Purpose: Coordinates dialogue flow, typing effects, player locking, and dialogue-related UI.
-Attached GameObject: Dialogue UI manager or option menu GameObject in the scene canvas.
-Main responsibilities: Control dialogue UI state, react to input, and notify dependent gameplay systems.
-Inputs: UI references, dialogue content arrays, callbacks, and player input.
-Outputs or effects: Shows or hides UI, locks controls, and triggers dialogue-related side effects.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Displays dialogue text and controls dialogue-driven input locking.
+Attached GameObject: Dialogue UI controller GameObject or runtime singleton.
+Main responsibilities: Shows dialogue lines, advances text, plays dialogue audio, and reports whether player control is locked.
+Inputs: Dialogue line arrays, optional callbacks, player input, and audio settings.
+Outputs or effects: Updates dialogue UI, locks/unlocks gameplay input, invokes callbacks, and plays text/audio feedback.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify line advance, callbacks, audio, skipped text, and interaction blocking.
 */
 
 public class DialogueManager : MonoBehaviour
@@ -21,15 +20,15 @@ public class DialogueManager : MonoBehaviour
     public static event Action<string, int, int> DialogueLineShown;
     public static event Action DialogueEnded;
 
-    [Header("UI")]
+    [Header("UI / 界面")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
 
-    [Header("对话框开关动画")]
+    [Header("对话框开关动画 / Dialogue Panel Open-Close Animation")]
     [SerializeField] private float panelAnimDuration = 0.18f;
     [SerializeField] private AnimationCurve panelAnimCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
-    [Header("打字机效果")]
+    [Header("打字机效果 / Typewriter Effect")]
     [SerializeField] private bool useTypewriterEffect = true;
     [SerializeField] private float charactersPerSecond = 20f;
     [SerializeField] private float commaPauseSeconds = 0.12f;
@@ -41,10 +40,10 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private AudioClip defaultQuotedTypingSfx;
     [SerializeField] [Range(0f, 1f)] private float defaultQuotedTypingSfxVolume = 0.2f;
 
-    [Header("玩家控制（拖Player物体）")]
+    [Header("玩家控制（拖Player物体） / Player Control (Drag Player Object)")]
     public GameObject player;
 
-    [Header("对话插图（可选）")]
+    [Header("对话插图（可选） / Dialogue Illustration (Optional)")]
     public GameObject dialogueImagePanel;
     public Image dialogueImage;
     [SerializeField] private float imageAnimDuration = 0.2f;
@@ -83,7 +82,7 @@ public class DialogueManager : MonoBehaviour
     private DialogueAudioSettings activeDialogueAudioSettings;
     private bool isTypingLine;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -110,14 +109,14 @@ public class DialogueManager : MonoBehaviour
         CachePlayerMovementScripts();
     }
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     IEnumerator Start()
     {
         yield return null;
         PrewarmDialogueUI();
     }
 
-    // Cleans up cached state and running effects during teardown.
+    // Cleans up runtime references before the object is destroyed.
     void OnDestroy()
     {
         StopTypingSfxImmediate();
@@ -128,7 +127,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Finds and caches the player reference used by the dialogue system.
+    // Resolves the best available value for the requested data.
     private void ResolvePlayerReference()
     {
         if (player == null)
@@ -149,14 +148,14 @@ public class DialogueManager : MonoBehaviour
         Debug.LogWarning("DialogueManager：未赋值Player物体，且未找到Tag=Player的对象。", this);
     }
 
-    // Caches movement-related scripts so player control can be toggled efficiently.
+    // Caches references or values needed by cache player movement scripts.
     private void CachePlayerMovementScripts()
     {
         if (player == null) return;
         cachedMovementScripts = player.GetComponents<MonoBehaviour>();
     }
 
-    // Prepares dialogue UI elements to avoid first-use layout hiccups.
+    // Handles the prewarm dialogue ui step for this script.
     private void PrewarmDialogueUI()
     {
         if (dialogueText != null)
@@ -175,7 +174,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (EscapeMenuController.IsMenuOpen) return;
@@ -193,7 +192,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Starts a new dialogue sequence with the provided content and callbacks.
+    // Shows the show dialogue UI or dialogue flow.
     public void ShowDialogue(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
         if (isDialogueActive) return;
@@ -232,7 +231,7 @@ public class DialogueManager : MonoBehaviour
         DialogueStarted?.Invoke();
     }
 
-    // Moves the dialogue flow to the next line or finishing action.
+    // Handles the advance dialogue step for this script.
     void AdvanceDialogue()
     {
         if (dialogueIndex >= currentDialogues.Length - 1)
@@ -252,7 +251,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Opens the option menu once the final dialogue line has been reached.
+    // Shows the show option with last line UI or dialogue flow.
     void ShowOptionWithLastLine()
     {
         if (isWaitingForOptionChoice) return;
@@ -268,7 +267,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Closes the dialogue flow and restores normal gameplay state.
+    // Ends the end dialogue flow and restores the required state.
     void EndDialogue()
     {
         isDialogueActive = false;
@@ -301,7 +300,7 @@ public class DialogueManager : MonoBehaviour
         dialogueCompleteAction?.Invoke();
     }
 
-    // Finishes the current dialogue after the option menu resolves.
+    // Closes the related UI or gameplay flow.
     public void CloseDialogueAfterOption()
     {
         if (isWaitingForOptionChoice)
@@ -310,7 +309,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Continues the dialogue with a follow-up sequence after an option is chosen.
+    // Continues the continue dialogue after option flow from its current state.
     public void ContinueDialogueAfterOption(string[] texts, PickableItem item = null, Action onLastLineOption = null, Action onDialogueComplete = null, DialogueAudioSettings audioSettings = null)
     {
         if (texts == null || texts.Length == 0)
@@ -356,7 +355,7 @@ public class DialogueManager : MonoBehaviour
         ShowCurrentDialogueLine();
     }
 
-    // Displays the requested dialogue illustration panel and sprite.
+    // Shows the show dialogue image UI or dialogue flow.
     public void ShowDialogueImage(Sprite sprite)
     {
         if (sprite == null)
@@ -381,7 +380,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(true);
     }
 
-    // Hides the active dialogue illustration if one is being shown.
+    // Hides the UI immediately and resets transient state.
     public void HideDialogueImage()
     {
         if (dialogueImagePanel == null || dialogueImage == null) return;
@@ -389,7 +388,7 @@ public class DialogueManager : MonoBehaviour
         PlayDialogueImageAnim(false);
     }
 
-    // Locks or unlocks player movement while dialogue is active.
+    // Handles the lock player step for this script.
     public void LockPlayer(bool lockIt)
     {
         if (playerRb == null || player == null) return;
@@ -417,7 +416,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Starts the panel opening animation for the dialogue window.
+    // Plays the play panel open anim sequence or audio feedback.
     void PlayPanelOpenAnim()
     {
         if (dialoguePanel == null) return;
@@ -432,7 +431,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(0f, 1f, false));
     }
 
-    // Starts the panel closing animation and stops typing playback.
+    // Plays the play panel close anim sequence or audio feedback.
     void PlayPanelCloseAnim()
     {
         if (dialoguePanel == null) return;
@@ -461,7 +460,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = StartCoroutine(AnimatePanelScaleY(1f, 0f, true));
     }
 
-    // Animates the dialogue panel scale on the vertical axis over time.
+    // Handles the animate panel scale y step for this script.
     IEnumerator AnimatePanelScaleY(float fromY, float toY, bool deactivateOnFinish)
     {
         if (dialoguePanelRect == null)
@@ -495,7 +494,7 @@ public class DialogueManager : MonoBehaviour
         panelAnimRoutine = null;
     }
 
-    // Applies the current vertical scale value to the dialogue panel.
+    // Updates the requested value or component state.
     void SetPanelScaleY(float scaleY01)
     {
         if (dialoguePanelRect == null) return;
@@ -507,7 +506,7 @@ public class DialogueManager : MonoBehaviour
         );
     }
 
-    // Keeps the dialogue panel layered above the optional dialogue image.
+    // Ensures the required ensure dialogue panel in front of image objects or state exist.
     void EnsureDialoguePanelInFrontOfImage()
     {
         if (dialoguePanel == null || dialogueImagePanel == null) return;
@@ -515,7 +514,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.transform.SetAsLastSibling();
     }
 
-    // Caches and prepares the optional dialogue image UI elements.
+    // Updates the requested value or component state.
     void SetupDialogueImageUI()
     {
         if (dialogueImagePanel == null)
@@ -552,7 +551,7 @@ public class DialogueManager : MonoBehaviour
         isDialogueImageActive = false;
     }
 
-    // Launches the show or hide animation for the dialogue image.
+    // Plays the play dialogue image anim sequence or audio feedback.
     void PlayDialogueImageAnim(bool show)
     {
         if (dialogueImagePanel == null || dialogueImageRect == null || dialogueImageCanvasGroup == null) return;
@@ -566,7 +565,7 @@ public class DialogueManager : MonoBehaviour
         imageAnimRoutine = StartCoroutine(AnimateDialogueImage(show));
     }
 
-    // Animates the dialogue image position and fade state over time.
+    // Handles the animate dialogue image step for this script.
     IEnumerator AnimateDialogueImage(bool show)
     {
         if (show) dialogueImagePanel.SetActive(true);
@@ -612,7 +611,7 @@ public class DialogueManager : MonoBehaviour
         imageAnimRoutine = null;
     }
 
-    // Broadcasts an event for the currently visible dialogue line.
+    // Handles the notify line shown step for this script.
     private void NotifyLineShown()
     {
         if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
@@ -623,7 +622,7 @@ public class DialogueManager : MonoBehaviour
         DialogueLineShown?.Invoke(currentDialogues[dialogueIndex], dialogueIndex, currentDialogues.Length);
     }
 
-    // Displays the current dialogue line and starts the typewriter effect if enabled.
+    // Shows the show current dialogue line UI or dialogue flow.
     private void ShowCurrentDialogueLine()
     {
         if (dialogueText == null || currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
@@ -660,7 +659,7 @@ public class DialogueManager : MonoBehaviour
         typewriterRoutine = StartCoroutine(TypeCurrentLineRoutine(line));
     }
 
-    // Reveals the active dialogue line over time with punctuation-aware pauses.
+    // Handles the type current line routine step for this script.
     private IEnumerator TypeCurrentLineRoutine(string line)
     {
         isTypingLine = true;
@@ -710,7 +709,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Finishes the current typewriter line immediately.
+    // Completes the complete current line instantly step immediately.
     private void CompleteCurrentLineInstantly()
     {
         if (!isTypingLine) return;
@@ -731,7 +730,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    // Starts the correct looping typing sound for the active dialogue line.
+    // Starts the start typing sfx sequence or runtime effect.
     private void StartTypingSfx()
     {
         bool isQuotedLine = IsQuotedLine(GetCurrentDialogueLine());
@@ -744,14 +743,14 @@ public class DialogueManager : MonoBehaviour
         AudioManager.EnsureInstance().PlayTypingLoop(clip, volume);
     }
 
-    // Stops any active looping typing sound right away.
+    // Stops the stop typing sfx immediate sequence or runtime effect.
     private void StopTypingSfxImmediate()
     {
         if (AudioManager.Instance == null) return;
         AudioManager.Instance.StopTypingLoop();
     }
 
-    // Returns the currently selected dialogue line text safely.
+    // Returns the requested value or runtime object.
     private string GetCurrentDialogueLine()
     {
         if (currentDialogues == null || dialogueIndex < 0 || dialogueIndex >= currentDialogues.Length)
@@ -762,7 +761,7 @@ public class DialogueManager : MonoBehaviour
         return currentDialogues[dialogueIndex] ?? string.Empty;
     }
 
-    // Checks whether the supplied dialogue line should use quoted-line audio settings.
+    // Returns whether is quoted line is true for the current state.
     private bool IsQuotedLine(string line)
     {
         if (string.IsNullOrEmpty(line)) return false;
@@ -776,7 +775,7 @@ public class DialogueManager : MonoBehaviour
                line.Contains("』");
     }
 
-    // Chooses the correct typing sound clip for the current dialogue context.
+    // Resolves the best available value for the requested data.
     private AudioClip ResolveTypingClip(bool isQuotedLine)
     {
         if (isQuotedLine)
@@ -800,7 +799,7 @@ public class DialogueManager : MonoBehaviour
         return defaultTypingSfx;
     }
 
-    // Chooses the correct typing sound volume for the current dialogue context.
+    // Resolves the best available value for the requested data.
     private float ResolveTypingVolume(bool isQuotedLine)
     {
         if (isQuotedLine)
@@ -824,7 +823,7 @@ public class DialogueManager : MonoBehaviour
         return defaultTypingSfxVolume;
     }
 
-    // Returns any extra typewriter pause that should follow the given character.
+    // Returns the requested value or runtime object.
     private float GetPauseAfterCharacter(string line, int charIndex)
     {
         if (string.IsNullOrEmpty(line) || charIndex < 0 || charIndex >= line.Length)
@@ -852,7 +851,7 @@ public class DialogueManager : MonoBehaviour
         return 0f;
     }
 
-    // Determines whether the current period should count as sentence punctuation.
+    // Returns whether is standalone period is true for the current state.
     private bool IsStandalonePeriod(string line, int charIndex)
     {
         char current = line[charIndex];
@@ -874,7 +873,7 @@ public class DialogueManager : MonoBehaviour
         return true;
     }
 
-    // Checks whether the current character belongs to an ellipsis sequence.
+    // Returns whether is ellipsis dot is true for the current state.
     private bool IsEllipsisDot(string line, int charIndex, out bool isEllipsisEnd)
     {
         isEllipsisEnd = false;

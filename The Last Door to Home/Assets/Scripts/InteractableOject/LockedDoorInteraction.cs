@@ -1,69 +1,68 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 /*
-Purpose: Manages l oc ke dd oo ri nt er ac ti on behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class LockedDoorInteraction : MonoBehaviour, IInteractable
 {
     [Serializable]
-    public class DoorKeyOption
+public class DoorKeyOption
     {
-        [Header("这个Key的唯一ID（匹配 PickableItem.itemUniqueID）")]
+        [Header("这个Key的唯一ID（匹配 PickableItem.itemUniqueID） / Key Unique ID (Matches PickableItem.itemUniqueID)")]
         public string keyUniqueID = "";
 
-        [Header("显示在选项里的文本")]
+        [Header("显示在选项里的文本 / Text Shown In Option")]
         public string optionText = "Use Key";
 
-        [Header("使用错误Key时提示")]
+        [Header("使用错误Key时提示 / Message When Using Wrong Key")]
         [TextArea(2, 5)]
         public string wrongKeyMessage = "This key does not fit.";
 
-        [Header("该Key是否正确")]
+        [Header("该Key是否正确 / Whether This Key Is Correct")]
         public bool isCorrectKey;
     }
 
-    [Header("门唯一ID（用于跨场景记忆已解锁）")]
+    [Header("门唯一ID（用于跨场景记忆已解锁） / Door Unique ID (Remembers Unlock Across Scenes)")]
     public string doorUniqueID = "door_01";
 
-    [Header("目标场景")]
+    [Header("目标场景 / Target Scene")]
     public string targetSceneName = "";
 
-    [Header("出生点")]
+    [Header("出生点 / Spawn Position")]
     public Vector2 spawnPosition;
 
-    [Header("前置对白（可空）")]
+    [Header("前置对白（可空） / Intro Dialogue (Optional)")]
     [TextArea(3, 10)]
     public string[] preDialogues;
 
-    [Header("无任何Key时提示（可空，不填则只显示前置对白）")]
+    [Header("无任何Key时提示（可空，不填则只显示前置对白） / No-Key Message (Optional)")]
     [TextArea(2, 5)]
     public string noKeyMessage = "";
 
-    [Header("可尝试的Key选项")]
+    [Header("可尝试的Key选项 / Available Key Options")]
     public DoorKeyOption[] keyOptions;
 
-    [Header("音效")]
+    [Header("音效 / Audio")]
     public AudioClip sceneSwitchSfx;
     [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     private bool isUnlocked;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
         isUnlocked = Inventory.IsDoorUnlocked(doorUniqueID);
     }
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (isUnlocked)
@@ -105,7 +104,7 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         showOptions.Invoke();
     }
 
-    // Builds option entries for the keys the player currently owns.
+    // Builds data or UI objects required by this system.
     private List<OptionMenu.OptionEntry> BuildOwnedKeyEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -128,7 +127,7 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         return entries;
     }
 
-    // Attempts to use the selected key on this locked door.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryUseKey(DoorKeyOption keyOption)
     {
         if (keyOption.isCorrectKey)
@@ -148,14 +147,14 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Unlocks the door and applies its post-unlock state changes.
+    // Unlocks the related object and records the unlock door state.
     private void UnlockDoor()
     {
         isUnlocked = true;
         Inventory.MarkDoorUnlocked(doorUniqueID);
     }
 
-    // Performs the requested scene change immediately.
+    // Switches to the target scene or state for switch scene now.
     private void SwitchSceneNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
@@ -171,7 +170,7 @@ public class LockedDoorInteraction : MonoBehaviour, IInteractable
         });
     }
 
-    // Handles trigger entry events for this gameplay object.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isUnlocked) return;

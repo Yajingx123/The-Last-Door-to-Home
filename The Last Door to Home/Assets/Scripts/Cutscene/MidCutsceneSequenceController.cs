@@ -3,27 +3,26 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 /*
-Purpose: Manages mid-game cutscene playback through the shared dialogue system and returns to the previous gameplay scene.
-Attached GameObject: Mid-cutscene controller GameObject.
-Main responsibilities: Coordinate narration lines, beat images, line-based BGM changes, and the return-to-scene flow.
-Inputs: Inspector configuration, dialogue callbacks, scene-return context, and runtime UI references.
-Outputs or effects: Shows cutscene images, routes narration through DialogueManager, switches BGM, and restores gameplay scene state.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify dialogue progression, line-based BGM changes, and scene return with restored player position after playback completes.
+Purpose: Controls a cutscene sequence or stores cutscene return context.
+Attached GameObject: Cutscene scene controller GameObject, or static context helper when applicable.
+Main responsibilities: Displays slides/text, handles timing and input, plays audio, and transitions to the next scene.
+Inputs: Serialized cutscene assets, player input, timing settings, audio clips, and return-scene context.
+Outputs or effects: Updates cutscene UI, plays audio, records return data, and loads follow-up scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify slide order, skip/advance input, audio timing, and final scene transition.
 */
 
 public class MidCutsceneSequenceController : MonoBehaviour
 {
-    public enum ReturnSceneMode
+public enum ReturnSceneMode
     {
         SavedSceneIfAvailable,
         ExplicitScene
     }
 
     [Serializable]
-    public class CutsceneBeat
+public class CutsceneBeat
     {
         public Sprite image;
         [TextArea(2, 6)]
@@ -31,7 +30,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
     }
 
     [Serializable]
-    public class BgmLineCue
+public class BgmLineCue
     {
         [Min(0)] public int lineNumber = 0;
         public AudioClip bgmClip;
@@ -41,20 +40,20 @@ public class MidCutsceneSequenceController : MonoBehaviour
         public bool restartIfSameClip = false;
     }
 
-    [Header("Beats")]
+    [Header("Beats / 剧情段落")]
     public CutsceneBeat[] beats;
 
-    [Header("UI")]
+    [Header("UI / 界面")]
     public Image slideImage;
     public CanvasGroup contentCanvasGroup;
 
-    [Header("Dialogue")]
+    [Header("Dialogue / 对话")]
     public DialogueAudioSettings dialogueAudioSettings;
 
-    [Header("BGM Line Cues")]
+    [Header("BGM Line Cues / 背景音乐台词触发点")]
     public BgmLineCue[] bgmLineCues;
 
-    [Header("Scene Return")]
+    [Header("Scene Return / 场景返回")]
     [SerializeField] private ReturnSceneMode returnSceneMode = ReturnSceneMode.SavedSceneIfAvailable;
     public string fallbackSceneName;
     public Vector2 fallbackSpawnPosition;
@@ -69,7 +68,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
     private bool isSequenceActive;
     private Coroutine imageSwapRoutine;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         CacheConfiguredImageHeight();
@@ -103,7 +102,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         StartCoroutine(BeginNarrationNextFrame());
     }
 
-    // Cleans up event subscriptions if this cutscene controller is destroyed mid-playback.
+    // Cleans up runtime references before the object is destroyed.
     private void OnDestroy()
     {
         DialogueManager.DialogueLineShown -= HandleDialogueLineShown;
@@ -123,7 +122,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         return lines;
     }
 
-    // Starts narration one frame later so the dialogue UI is fully ready on fresh scene load.
+    // Begins the begin narration next frame sequence.
     private IEnumerator BeginNarrationNextFrame()
     {
         yield return null;
@@ -142,7 +141,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         );
     }
 
-    // Caches line-to-BGM mappings for fast lookup while the dialogue advances.
+    // Caches references or values needed by cache bgm line cues.
     private void CacheBgmLineCues()
     {
         bgmCueByLineNumber.Clear();
@@ -158,7 +157,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Responds when the dialogue system shows a new line for this cutscene.
+    // Handles the event or callback associated with this method.
     private void HandleDialogueLineShown(string lineText, int lineIndex, int totalLines)
     {
         if (!isSequenceActive) return;
@@ -185,7 +184,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         TryApplyBgmCue(lineIndex);
     }
 
-    // Returns to gameplay once this cutscene-owned dialogue finishes.
+    // Handles the event or callback associated with this method.
     private void HandleDialogueEnded()
     {
         if (!isSequenceActive) return;
@@ -196,13 +195,13 @@ public class MidCutsceneSequenceController : MonoBehaviour
         LoadReturnScene();
     }
 
-    // Fades in the first beat after scene load.
+    // Fades the related visual element for the fade in opening beat step.
     private IEnumerator FadeInOpeningBeat()
     {
         yield return StartCoroutine(FadeCurrentBeat(0f, 1f));
     }
 
-    // Swaps the current beat image with the usual fade timing.
+    // Handles the swap beat image routine step for this script.
     private IEnumerator SwapBeatImageRoutine(int beatIndex)
     {
         yield return StartCoroutine(FadeCurrentBeat(1f, 0f));
@@ -211,7 +210,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         imageSwapRoutine = null;
     }
 
-    // Fades the image panel and image alpha together.
+    // Fades the related visual element for the fade current beat step.
     private IEnumerator FadeCurrentBeat(float from, float to)
     {
         IEnumerator contentFade = FadeContent(from, to);
@@ -223,7 +222,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Fades the cutscene content group over the requested duration.
+    // Fades the related visual element for the fade content step.
     private IEnumerator FadeContent(float from, float to)
     {
         if (contentCanvasGroup == null)
@@ -246,7 +245,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         contentCanvasGroup.alpha = to;
     }
 
-    // Fades the beat image alpha for smoother visual transitions.
+    // Fades the related visual element for the fade slide image step.
     private IEnumerator FadeSlideImage(float from, float to)
     {
         if (slideImage == null)
@@ -269,7 +268,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         SetSlideImageAlpha(to);
     }
 
-    // Applies the requested alpha directly to the current beat image.
+    // Updates the requested value or component state.
     private void SetSlideImageAlpha(float alpha)
     {
         if (slideImage == null)
@@ -282,7 +281,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         slideImage.color = color;
     }
 
-    // Applies the beat image immediately without any transition.
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplyBeatImageInstantly(int beatIndex)
     {
         if (slideImage == null) return;
@@ -298,7 +297,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Starts the configured BGM change when the current narration line has a cue.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryApplyBgmCue(int lineNumber)
     {
         if (!bgmCueByLineNumber.TryGetValue(lineNumber, out BgmLineCue cue))
@@ -321,7 +320,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         );
     }
 
-    // Returns either to the saved gameplay scene or to an explicitly configured scene, depending on the selected mode.
+    // Loads the requested data, scene, or runtime content.
     private void LoadReturnScene()
     {
         if (returnSceneMode == ReturnSceneMode.SavedSceneIfAvailable && CutsceneReturnContext.HasSavedContext)
@@ -349,7 +348,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         });
     }
 
-    // Refreshes layout-sensitive visuals after the rect transform changes size.
+    // Responds when the RectTransform size changes.
     private void OnRectTransformDimensionsChange()
     {
         if (slideImage != null && slideImage.sprite != null)
@@ -363,7 +362,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         }
     }
 
-    // Fits the cutscene image to the currently available layout height.
+    // Handles the fit image to available height step for this script.
     private void FitImageToAvailableHeight()
     {
         if (slideImage == null || slideImage.sprite == null)
@@ -393,7 +392,7 @@ public class MidCutsceneSequenceController : MonoBehaviour
         imageRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
     }
 
-    // Caches the configured image height used by the cutscene layout.
+    // Caches references or values needed by cache configured image height.
     private void CacheConfiguredImageHeight()
     {
         if (slideImage == null)

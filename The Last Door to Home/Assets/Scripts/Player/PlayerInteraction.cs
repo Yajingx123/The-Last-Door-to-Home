@@ -1,19 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
-
 /*
-Purpose: Manages p la ye ri nt er ac ti on behavior for this part of the game.
-Attached GameObject: Player GameObject or a player-specific child object.
-Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
-Inputs: Inspector references, Unity input, and state from linked gameplay managers.
-Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Finds and triggers the best interactable target in front of the player.
+Attached GameObject: Player GameObject.
+Main responsibilities: Tracks facing direction, filters interactables by range and angle, and invokes the selected target interaction.
+Inputs: Movement input, Return key input, configured range/angle limits, DialogueManager lock state, and IInteractable objects.
+Outputs or effects: Calls OnInteract on the best matching interactable target.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify close targets, large colliders, facing-angle filtering, and blocked interaction during dialogue.
 */
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("交互设置")]
+    [Header("交互设置 / Interaction Settings")]
     public float interactRange = 1.5f;
     public float angleTolerance = 60f;
     [Tooltip("即使碰撞体最近点很近，也要求与物体锚点(Transform)距离不能超过该值，避免大碰撞体导致远距离误触发。")]
@@ -21,7 +20,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private Vector2 faceDir = Vector2.right;
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (EscapeMenuController.IsMenuOpen) return;
@@ -36,7 +35,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Refreshes the facing direction used for interaction checks.
+    // Handles the update face direction step for this script.
     void UpdateFaceDirection()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -47,7 +46,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Attempts to interact with the best matching target in range.
+    // Attempts the requested operation and reports whether it succeeded.
     void TryInteract()
     {
         if (DialogueManager.Instance == null)
@@ -99,7 +98,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Returns the best interaction point for the supplied target component.
+    // Returns the requested value or runtime object.
     Vector2 GetInteractionPoint(MonoBehaviour item)
     {
         Collider2D col = item.GetComponent<Collider2D>();

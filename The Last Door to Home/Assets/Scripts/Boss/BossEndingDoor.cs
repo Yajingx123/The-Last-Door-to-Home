@@ -1,40 +1,39 @@
 using UnityEngine;
-
 /*
-Purpose: Sends the player to one of two ending scenes depending on whether the linked eye monster cleared every target.
-Attached GameObject: A door or exit object with a trigger collider.
-Main responsibilities: Detect player entry, evaluate the eye-monster clear state, and switch to the matching ending scene.
-Inputs: The linked EyeMonster, target ending scene names, optional spawn positions, and optional switch sound.
-Outputs or effects: Loads ending2 or ending3 through the shared scene-transition flow.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify trigger size, player tag, both ending scene names, and the eye-monster clear condition in Play Mode.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class BossEndingDoor : MonoBehaviour
 {
-    [Header("Boss Condition")]
+    [Header("Boss Condition / Boss 条件")]
     [SerializeField] private EyeMonster eyeMonster;
 
-    [Header("Ending Scenes")]
+    [Header("Ending Scenes / 结局场景")]
     [SerializeField] private string ending2SceneName;
     [SerializeField] private string ending3SceneName;
 
-    [Header("Spawn Positions")]
+    [Header("Spawn Positions / 出生点")]
     [SerializeField] private bool setSpawnPositionOnLoad;
     [SerializeField] private Vector2 ending2SpawnPosition;
     [SerializeField] private Vector2 ending3SpawnPosition;
 
-    [Header("Trigger Control")]
+    [Header("Trigger Control / 触发控制")]
     [SerializeField] private float reTriggerCooldown = 0.25f;
 
-    [Header("Audio")]
+    [Header("Audio / 音频")]
     [SerializeField] private AudioClip sceneSwitchSfx;
     [SerializeField, Range(0f, 1f)] private float sceneSwitchSfxVolume = 1f;
 
     private bool handledThisStay;
     private float nextAllowedTriggerTime;
 
-    // Loads the appropriate ending scene when the player enters this boss-exit door.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player"))
@@ -51,7 +50,7 @@ public class BossEndingDoor : MonoBehaviour
         LoadConfiguredEnding();
     }
 
-    // Rearms the trigger after the player leaves the door area.
+    // Handles 2D trigger exit events for this object.
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player"))
@@ -63,7 +62,7 @@ public class BossEndingDoor : MonoBehaviour
         nextAllowedTriggerTime = Time.time + Mathf.Max(0f, reTriggerCooldown);
     }
 
-    // Chooses ending3 only when the eye monster finished clearing every target and then deactivated itself.
+    // Loads the requested data, scene, or runtime content.
     private void LoadConfiguredEnding()
     {
         bool shouldLoadEnding3 = eyeMonster != null

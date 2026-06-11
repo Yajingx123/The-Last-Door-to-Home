@@ -1,27 +1,25 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-
 /*
-Purpose: Manages c ho ic ei nt er ac ti on behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class ChoiceInteraction : MonoBehaviour, IInteractable
 {
-    public enum RequireMode
+public enum RequireMode
     {
         None,
         ByItemType,
         ByUniqueID
     }
-
-    public enum ChoiceActionType
+public enum ChoiceActionType
     {
         None,
         LoadScene,
@@ -29,7 +27,7 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
     }
 
     [Serializable]
-    public class ChoiceOption
+public class ChoiceOption
     {
         public string optionText = "Option";
         public RequireMode requireMode = RequireMode.None;
@@ -42,18 +40,18 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
         public Vector2 spawnPosition;
     }
 
-    [Header("前置对白（可空）")]
+    [Header("前置对白（可空） / Intro Dialogue (Optional)")]
     [TextArea(3, 10)]
     public string[] preDialogues;
 
-    [Header("选项配置")]
+    [Header("选项配置 / Option Settings")]
     public ChoiceOption[] choices;
 
-    [Header("音效")]
+    [Header("音效 / Audio")]
     public AudioClip sceneSwitchSfx;
     [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (OptionMenu.Instance == null) return;
@@ -73,7 +71,7 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    // Builds the option entries that should be shown to the player.
+    // Builds data or UI objects required by this system.
     private List<OptionMenu.OptionEntry> BuildEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -94,7 +92,7 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
         return entries;
     }
 
-    // Checks whether the selected choice can currently be executed.
+    // Returns whether this script can can execute.
     private bool CanExecute(ChoiceOption choice)
     {
         if (choice.requireMode == RequireMode.None) return true;
@@ -108,7 +106,7 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
         return Inventory.HasCollected(choice.requiredItemUniqueID);
     }
 
-    // Handles the blocked interaction path and shows the appropriate feedback.
+    // Handles the event or callback associated with this method.
     private void HandleBlocked(ChoiceOption choice)
     {
         if (DialogueManager.Instance != null && !string.IsNullOrWhiteSpace(choice.noItemMessage))
@@ -117,7 +115,7 @@ public class ChoiceInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Executes the chosen interaction result and applies its side effects.
+    // Handles the execute choice step for this script.
     private void ExecuteChoice(ChoiceOption choice)
     {
         if (choice.actionType == ChoiceActionType.LoadScene && !string.IsNullOrWhiteSpace(choice.targetSceneName))

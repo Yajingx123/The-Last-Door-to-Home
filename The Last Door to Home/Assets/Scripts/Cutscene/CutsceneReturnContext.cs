@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 /*
-Purpose: Stores the scene and player position needed to return from a temporary cutscene.
-Attached GameObject: None; this is a static helper.
-Main responsibilities: Capture the current gameplay scene context before entering a cutscene and restore it afterward.
-Inputs: Active scene information and the current player transform.
-Outputs or effects: Provides saved return-scene data and configures PlayerSpawn for the restored scene load.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify that entering and exiting a cutscene restores the player to the expected position in the previous scene.
+Purpose: Controls a cutscene sequence or stores cutscene return context.
+Attached GameObject: Cutscene scene controller GameObject, or static context helper when applicable.
+Main responsibilities: Displays slides/text, handles timing and input, plays audio, and transitions to the next scene.
+Inputs: Serialized cutscene assets, player input, timing settings, audio clips, and return-scene context.
+Outputs or effects: Updates cutscene UI, plays audio, records return data, and loads follow-up scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify slide order, skip/advance input, audio timing, and final scene transition.
 */
 
 public static class CutsceneReturnContext
@@ -19,7 +18,7 @@ public static class CutsceneReturnContext
 
     public static bool HasSavedContext => hasReturnScene && !string.IsNullOrWhiteSpace(returnSceneName);
 
-    // Saves the active scene name and the current player position before entering a temporary cutscene.
+    // Saves the current data or runtime state.
     public static void SaveCurrentSceneAndPlayerPosition()
     {
         Scene activeScene = SceneManager.GetActiveScene();
@@ -36,7 +35,7 @@ public static class CutsceneReturnContext
         hasReturnScene = true;
     }
 
-    // Restores the saved player spawn data just before the previous scene is loaded again.
+    // Applies the requested visual, audio, or gameplay state.
     public static void ApplyReturnSpawn()
     {
         if (!HasSavedContext) return;
@@ -45,13 +44,13 @@ public static class CutsceneReturnContext
         PlayerSpawn.NEED_SPAWN = true;
     }
 
-    // Returns the saved scene name for the cutscene exit flow.
+    // Returns the requested value or runtime object.
     public static string GetReturnSceneName()
     {
         return returnSceneName;
     }
 
-    // Clears any saved cutscene return data after it has been consumed or invalidated.
+    // Clears the stored runtime state managed by this system.
     public static void Clear()
     {
         returnSceneName = string.Empty;
@@ -59,7 +58,7 @@ public static class CutsceneReturnContext
         hasReturnScene = false;
     }
 
-    // Finds the current player position, falling back to the pending spawn value when needed.
+    // Resolves the best available value for the requested data.
     private static Vector2 ResolvePlayerPosition()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");

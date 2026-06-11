@@ -1,33 +1,32 @@
 using UnityEngine;
-
 /*
-Purpose: Handles player movement input, facing animation, and footstep playback.
-Attached GameObject: Player GameObject or a player-specific child object.
-Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
-Inputs: Inspector references, Unity input, and state from linked gameplay managers.
-Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Handles player movement input, facing animation, speed modifiers, and footstep playback.
+Attached GameObject: Player GameObject with Rigidbody2D and Animator components.
+Main responsibilities: Reads movement input, prevents diagonal movement, updates animation parameters, applies movement physics, and stops movement when gameplay is locked.
+Inputs: Horizontal/Vertical input axes, inventory speed item state, dialogue/menu lock state, and footstep audio settings.
+Outputs or effects: Rigidbody2D velocity, Animator state, footstep audio playback, and the public current-movement state.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify movement in all directions, lock behavior during menus/dialogue, speed item pickup, and footstep timing.
 */
 
 public class PlayerMove : MonoBehaviour
 {
-    [Header("移动速度")]
+    [Header("移动速度 / Movement Speed")]
     public float moveSpeed = 2.5f;
-    [Header("道具速度加成")]
+    [Header("道具速度加成 / Item Speed Boost")]
     [Tooltip("拿到这个 PickableItem.itemUniqueID 后，把玩家速度改成下面的数值。留空则不启用。")]
     public string speedBoostItemUniqueID = "";
     public float speedBoostMoveSpeed = 3f;
-    [Header("松键后动画缓冲时间（秒）")]
+    [Header("松键后动画缓冲时间（秒） / Animation Buffer After Release (Seconds)")]
     public float stopFreezeDelay = 0.08f;
-    [Header("脚步音效")]
+    [Header("脚步音效 / Footstep Audio")]
     public AudioClip footstepClip;
     public float footstepInterval = 0.38f;
     [Range(0f, 1f)] public float footstepVolume = 0.55f;
 
     private Rigidbody2D rb;
     private Animator anim;
-    private Vector2 lastMoveDir = Vector2.down; // 默认朝下（正面）
+    private Vector2 lastMoveDir = Vector2.down; // Default facing direction is down/front.
     private Vector2 inputMoveDir = Vector2.zero;
     private bool isMoving;
     private float stopTimer;
@@ -36,7 +35,7 @@ public class PlayerMove : MonoBehaviour
 
     public bool IsCurrentlyMoving => inputMoveDir.sqrMagnitude > 0.01f;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -47,21 +46,23 @@ public class PlayerMove : MonoBehaviour
         ApplyInventorySpeedEffect();
     }
 
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         Inventory.ItemCollected += HandleItemCollected;
         ApplyInventorySpeedEffect();
     }
 
+    // Unregisters callbacks when the component becomes inactive.
     private void OnDisable()
     {
         Inventory.ItemCollected -= HandleItemCollected;
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
-        // 对话或系统菜单打开时，立即停止玩家移动并冻结朝向。
+        // Stop movement immediately while dialogue or a system menu owns player input.
         if (EscapeMenuController.IsMenuOpen
             || InventoryMenuController.IsOpen
             || (DialogueManager.Instance != null && DialogueManager.Instance.IsPlayerControlLocked))
@@ -75,11 +76,11 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
-        // 输入
+        // Read raw movement input.
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
-        // 🔴 禁止斜走：优先上下，再左右
+        // Disallow diagonal movement; vertical input has priority over horizontal input.
         inputMoveDir = Vector2.zero;
 
         if (Mathf.Abs(v) > 0.1f)
@@ -95,21 +96,21 @@ public class PlayerMove : MonoBehaviour
 
         if (inputMoveDir.sqrMagnitude > 0.01f)
         {
-            // 有输入：更新朝向并正常播放动画
+            // Update facing direction and play the movement animation while input is active.
             lastMoveDir = inputMoveDir;
             anim.SetFloat("MoveX", inputMoveDir.x);
             anim.SetFloat("MoveY", inputMoveDir.y);
             anim.speed = 1f;
             stopTimer = stopFreezeDelay;
 
-            // 让短按也能在本帧立刻评估方向切换，避免“点一下来不及转向”
+            // Evaluate direction changes immediately so quick taps still turn the player.
             anim.Update(0f);
             isMoving = true;
             UpdateFootstepAudio();
         }
         else
         {
-            // 无输入：先给一个很短的播放缓冲，避免短按只看到平移
+            // Keep a short animation buffer after input stops so quick taps remain visible.
             if (stopTimer > 0f)
             {
                 stopTimer -= Time.deltaTime;
@@ -120,7 +121,7 @@ public class PlayerMove : MonoBehaviour
             }
             else
             {
-                // 缓冲结束后，停在最后朝向的第1帧
+                // After the buffer ends, freeze on the first frame of the last facing direction.
                 footstepTimer = 0f;
                 StopFootstepAudio();
                 FreezeAtCurrentDirection();
@@ -128,13 +129,13 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    // Applies physics-driven updates on the fixed timestep.
+    // Applies physics-related updates on Unity's fixed timestep.
     void FixedUpdate()
     {
         rb.velocity = inputMoveDir * moveSpeed;
     }
 
-    // Immediately cancels movement and freezes the player in the current facing direction.
+    // Handles the force stop immediate step for this script.
     public void ForceStopImmediate()
     {
         inputMoveDir = Vector2.zero;
@@ -145,7 +146,7 @@ public class PlayerMove : MonoBehaviour
         FreezeAtCurrentDirection();
     }
 
-    // Updates timed footstep playback while the player is moving.
+    // Handles the update footstep audio step for this script.
     private void UpdateFootstepAudio()
     {
         if (footstepClip == null || !wasMovingThisFrame)
@@ -160,27 +161,27 @@ public class PlayerMove : MonoBehaviour
         footstepTimer = Mathf.Max(0.05f, footstepInterval);
     }
 
-    // Stops the active footstep loop or one-shot playback when movement ends.
+    // Stops the stop footstep audio sequence or runtime effect.
     private void StopFootstepAudio()
     {
         if (AudioManager.Instance == null) return;
         AudioManager.Instance.StopFootstep();
     }
 
-    // Freezes movement while preserving the current facing animation frame.
+    // Handles the freeze at current direction step for this script.
     private void FreezeAtCurrentDirection()
     {
         rb.velocity = Vector2.zero;
         anim.SetFloat("MoveX", lastMoveDir.x);
         anim.SetFloat("MoveY", lastMoveDir.y);
 
-        // 仅在“移动 -> 静止”切换时重置到首帧，避免每帧强制重置
+        // Reset to the first frame only when transitioning from moving to idle.
         if (isMoving)
         {
             int stateHash;
             if (anim.IsInTransition(0))
             {
-                // 如果正在切状态，优先锁定到目标状态的第1帧
+                // If the animator is transitioning, lock to the first frame of the next state.
                 stateHash = anim.GetNextAnimatorStateInfo(0).fullPathHash;
             }
             else
@@ -195,6 +196,7 @@ public class PlayerMove : MonoBehaviour
         isMoving = false;
     }
 
+    // Handles the event or callback associated with this method.
     private void HandleItemCollected(string uniqueID)
     {
         if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
@@ -203,6 +205,7 @@ public class PlayerMove : MonoBehaviour
         moveSpeed = speedBoostMoveSpeed;
     }
 
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplyInventorySpeedEffect()
     {
         if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;

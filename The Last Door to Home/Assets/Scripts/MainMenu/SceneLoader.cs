@@ -1,28 +1,26 @@
 using UnityEngine;
-
 /*
-Purpose: Manages s ce ne lo ad er behavior for this part of the game.
-Attached GameObject: Main menu canvas or UI controller GameObject.
-Main responsibilities: Process menu navigation input and drive scene or UI transitions.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Provides main-menu button actions for starting, continuing, loading, and quitting the game.
+Attached GameObject: Main menu controller GameObject referenced by UI button OnClick events.
+Main responsibilities: Routes menu button requests into scene transitions, new-game setup, save-slot UI, or application quit.
+Inputs: Button OnClick events, configured new-game scene name, and shared game/session state.
+Outputs or effects: Clears or updates runtime state, opens the Continue panel, starts scene transitions, or quits Play Mode/application.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify each main-menu button calls the expected method and handles empty scene names safely.
 */
 
 public class SceneLoader : MonoBehaviour
 {
-    [Header("New Game 跳转场景")]
+    [Header("New Game 跳转场景 / New Game Target Scene")]
     public string newGameSceneName = "IntroCutscene";
 
-    // 跳转到指定场景（通过场景名）
-    // Starts loading the requested scene through the transition flow.
+    // Loads the requested data, scene, or runtime content.
     public void LoadScene(string sceneName)
     {
         SceneTransition.LoadScene(sceneName);
     }
 
-    // Starts a new game flow from the main menu.
+    // Starts the start new game sequence or runtime effect.
     public void StartNewGame()
     {
         if (string.IsNullOrWhiteSpace(newGameSceneName))
@@ -38,23 +36,22 @@ public class SceneLoader : MonoBehaviour
         SceneTransition.LoadScene(newGameSceneName);
     }
 
-    // Opens the manual Continue slot list from the main menu.
+    // Continues the continue game flow from its current state.
     public void ContinueGame()
     {
         MainMenuLoadPanelController.OpenPanel();
     }
 
-    // 退出游戏（仅打包后生效，编辑器中无效果）
-    // Quits the application from the main menu flow.
+    // Quits the application or exits Play Mode in the Unity Editor.
     public void QuitGame()
     {
         Application.Quit();
         #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false; // 编辑器中停止运行
+        UnityEditor.EditorApplication.isPlaying = false; // Stop Play Mode in the Unity Editor.
         #endif
     }
 
-    // Alias for UI buttons labeled Exit.
+    // Handles the exit game step for this script.
     public void ExitGame()
     {
         QuitGame();

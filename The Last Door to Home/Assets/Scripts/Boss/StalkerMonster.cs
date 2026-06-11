@@ -1,27 +1,26 @@
 using System.Collections;
 using UnityEngine;
-
 /*
-Purpose: Controls a boss minion that periodically locks the player's position and slides straight toward it.
-Attached GameObject: The enemy prefab or a scene enemy object with a Collider2D and optional Animator.
-Main responsibilities: Wait, snapshot the player's position, move in a straight line, pause, and repeat.
-Inputs: Arena settings, player reference or auto-discovery, and timing or movement values from the Inspector.
-Outputs or effects: Repositions and moves the enemy within the arena, and logs when it collides with the player.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify collider setup, Rigidbody2D trigger events, and arena coordinates in Play Mode.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class StalkerMonster : MonoBehaviour
 {
-    [Header("道具速度变化")]
+    [Header("道具速度变化 / Item Speed Change")]
     [Tooltip("拿到这个 PickableItem.itemUniqueID 后，把 Stalker 速度改成下面的数值。留空则不启用。")]
     [SerializeField] private string speedBoostItemUniqueID = "";
     [SerializeField] private float speedBoostMoveSpeed = 7f;
 
-    [Header("区域设置")]
+    [Header("区域设置 / Area Settings")]
     [SerializeField] private MonsterController controller;
 
-    [Header("行为")]
+    [Header("行为 / Behavior")]
     [SerializeField] private float lockDelay = 3f;
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float stayDuration = 2f;
@@ -34,7 +33,7 @@ public class StalkerMonster : MonoBehaviour
     private Vector3 initialPosition;
     private bool isAttackEnabled;
 
-    // Starts the movement loop automatically when requested.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         initialPosition = transform.position;
@@ -43,7 +42,7 @@ public class StalkerMonster : MonoBehaviour
         ApplyInventorySpeedEffect();
     }
 
-    // Starts the movement loop automatically when requested.
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         Inventory.ItemCollected += HandleItemCollected;
@@ -59,7 +58,7 @@ public class StalkerMonster : MonoBehaviour
         }
     }
 
-    // Stops active routines when the object is disabled.
+    // Unregisters callbacks when the component becomes inactive.
     private void OnDisable()
     {
         Inventory.ItemCollected -= HandleItemCollected;
@@ -71,7 +70,7 @@ public class StalkerMonster : MonoBehaviour
         }
     }
 
-    // Begins the full spawn-and-chase loop.
+    // Executes the action associated with the current selection.
     public void ActivateMonster()
     {
         if (!isActiveAndEnabled)
@@ -91,7 +90,7 @@ public class StalkerMonster : MonoBehaviour
         behaviorRoutine = StartCoroutine(BehaviorRoutine());
     }
 
-    // Stops attacking and returns this monster to its placed idle state.
+    // Handles the deactivate monster step for this script.
     public void DeactivateMonster()
     {
         isAttackEnabled = false;
@@ -112,7 +111,7 @@ public class StalkerMonster : MonoBehaviour
         SetIdleVisualState(visibleWhenIdle);
     }
 
-    // Keeps the monster stationary at its placed idle point while leaving contact damage active.
+    // Handles the enable idle damage step for this script.
     public void EnableIdleDamage()
     {
         isAttackEnabled = false;
@@ -133,7 +132,7 @@ public class StalkerMonster : MonoBehaviour
         SetIdleVisualState(visibleWhenIdle);
     }
 
-    // Runs the repeated delay, lock, slide, and wait sequence.
+    // Handles the behavior routine step for this script.
     private IEnumerator BehaviorRoutine()
     {
         if (hitbox != null)
@@ -159,7 +158,7 @@ public class StalkerMonster : MonoBehaviour
         }
     }
 
-    // Moves in a straight line toward the locked target point.
+    // Moves the current selection or object in the requested direction.
     private IEnumerator MoveToTarget(Vector2 targetPosition)
     {
         float safeSpeed = Mathf.Max(0.01f, moveSpeed);
@@ -173,7 +172,7 @@ public class StalkerMonster : MonoBehaviour
         transform.position = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
     }
 
-    // Locks the player's current grid position before the monster starts moving.
+    // Returns the requested value or runtime object.
     private Vector2 GetLockedPlayerPosition()
     {
         ResolveController();
@@ -186,7 +185,7 @@ public class StalkerMonster : MonoBehaviour
         return controller.GetCellCenter(targetCell.x, targetCell.y);
     }
 
-    // Finds the shared arena config when not explicitly assigned.
+    // Resolves the best available value for the requested data.
     private void ResolveController()
     {
         if (controller == null)
@@ -195,7 +194,7 @@ public class StalkerMonster : MonoBehaviour
         }
     }
 
-    // Applies damage when this monster collides with the player.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         ResolveController();
@@ -208,6 +207,7 @@ public class StalkerMonster : MonoBehaviour
         controller.TryDamagePlayer("StalkerMonster", this);
     }
 
+    // Handles the event or callback associated with this method.
     private void HandleItemCollected(string uniqueID)
     {
         if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
@@ -216,6 +216,7 @@ public class StalkerMonster : MonoBehaviour
         moveSpeed = speedBoostMoveSpeed;
     }
 
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplyInventorySpeedEffect()
     {
         if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
@@ -224,7 +225,7 @@ public class StalkerMonster : MonoBehaviour
         moveSpeed = speedBoostMoveSpeed;
     }
 
-    // Shows or hides the stalker visuals without changing object activation.
+    // Updates the requested value or component state.
     private void SetIdleVisualState(bool isVisible)
     {
         if (renderersToToggle == null)
@@ -241,7 +242,7 @@ public class StalkerMonster : MonoBehaviour
         }
     }
 
-    // Draws the arena bounds in the editor for easier placement.
+    // Draws editor-only debug helpers while this object is selected.
     private void OnDrawGizmosSelected()
     {
         ResolveController();

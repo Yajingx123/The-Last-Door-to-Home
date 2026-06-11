@@ -1,45 +1,45 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 /*
-Purpose: Manages a ut os or ti ng pl ay er behavior for this part of the game.
-Attached GameObject: Player GameObject or a player-specific child object.
-Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
-Inputs: Inspector references, Unity input, and state from linked gameplay managers.
-Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Automatically adjusts the player sprite sorting order around decoration objects.
+Attached GameObject: Player GameObject with a SpriteRenderer.
+Main responsibilities: Scans nearby decoration colliders, finds the closest valid SpriteRenderer, and offsets the player sorting order.
+Inputs: Player position, configured detection box, decoration tags, layer mask, and nearby Collider2D/SpriteRenderer data.
+Outputs or effects: Updates the player SpriteRenderer sortingOrder and optional debug log output.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify the player renders in front of and behind decorations from multiple approach directions.
 */
 
-[RequireComponent(typeof(SpriteRenderer))]
 public class AutoSortingPlayer : MonoBehaviour
 {
-    [Header("默认层级（附近没有参照物时）")]
+    [Header("默认层级（附近没有参照物时） / Default Sorting Order (No Nearby Reference)")]
     public int defaultOrder = 100;
 
-    [Header("相对参照物偏移")]
-    public int behindOffset = -2; // 玩家在物体后面
-    public int frontOffset = 2;   // 玩家在物体前面
+    [Header("相对参照物偏移 / Reference Sorting Offset")]
+    public int behindOffset = -2; // Sorting offset when the player is behind the object.
+    public int frontOffset = 2;   // Sorting offset when the player is in front of the object.
 
-    [Header("检测范围")]
+    [Header("检测范围 / Detection Range")]
     public Vector2 checkBoxSize = new Vector2(2.2f, 2.2f);
     public LayerMask detectLayers = ~0;
     public bool includeTriggerColliders = true;
     public string[] decorationTags = { "decorations", "decoration" };
 
-    [Header("调试")]
+    [Header("调试 / Debug")]
     public bool debugLogTarget;
 
     private SpriteRenderer playerSR;
     private string lastTargetName;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
         playerSR = GetComponent<SpriteRenderer>();
     }
 
-    // Applies follow-up updates after other frame logic has already run.
+    // Applies follow-up updates after other frame logic has completed.
     void LateUpdate()
     {
         if (playerSR == null) return;
@@ -63,7 +63,7 @@ public class AutoSortingPlayer : MonoBehaviour
             if (sr == null) sr = col.GetComponentInParent<SpriteRenderer>();
             if (sr == null) sr = col.GetComponentInChildren<SpriteRenderer>();
             if (sr == null) continue;
-            if (sr.sortingLayerID != playerSR.sortingLayerID) continue; // 只比较同一Sorting Layer
+            if (sr.sortingLayerID != playerSR.sortingLayerID) continue; // Compare only within the same sorting layer.
 
             float sqrDist = (col.bounds.ClosestPoint(transform.position) - transform.position).sqrMagnitude;
             if (sqrDist < bestSqrDist)
@@ -92,7 +92,7 @@ public class AutoSortingPlayer : MonoBehaviour
         }
     }
 
-    // Checks whether the collider belongs to a decoration tag that should affect player occlusion.
+    // Returns whether the required has decoration tag condition is met.
     private bool HasDecorationTag(Collider2D col)
     {
         if (col == null) return false;
@@ -118,7 +118,7 @@ public class AutoSortingPlayer : MonoBehaviour
         return false;
     }
 
-    // Checks whether the supplied transform or any of its parents uses one of the configured decoration tags.
+    // Returns whether the required has any configured tag condition is met.
     private bool HasAnyConfiguredTag(Transform targetTransform)
     {
         Transform current = targetTransform;

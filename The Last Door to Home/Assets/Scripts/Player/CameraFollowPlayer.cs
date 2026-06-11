@@ -1,50 +1,50 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 /*
-Purpose: Smoothly follows the player while clamping the camera inside the map bounds.
-Attached GameObject: Main Camera GameObject that follows the player.
-Main responsibilities: Read player-facing state, coordinate related components, and apply movement or presentation updates.
-Inputs: Inspector references, Unity input, and state from linked gameplay managers.
-Outputs or effects: Moves the player or camera, updates animations, and changes immediate gameplay feel.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Smoothly follows the player while clamping the camera inside map bounds.
+Attached GameObject: Main Camera GameObject.
+Main responsibilities: Caches the Camera component, follows a target transform, smooths motion, and clamps the final camera position.
+Inputs: Target transform, map bounds Collider2D, smoothing value, and camera aspect/orthographic size.
+Outputs or effects: Updates the camera transform position every frame after player movement.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify camera behavior near every map edge and after enabling/disabling the camera object.
 */
 
-[RequireComponent(typeof(Camera))]
 public class CameraFollowPlayer : MonoBehaviour
 {
-    [Header("跟随目标")]
+    [Header("跟随目标 / Follow Target")]
     [SerializeField] private Transform target;
 
-    [Header("地图边界（挂了 Collider2D 的物体）")]
+    [Header("地图边界（挂了 Collider2D 的物体） / Map Bounds (Object With Collider2D)")]
     [SerializeField] private Collider2D mapBounds;
 
-    [Header("平滑跟随（0 表示直接跟随）")]
+    [Header("平滑跟随（0 表示直接跟随） / Smooth Follow (0 Means Instant)")]
     [SerializeField, Min(0f)] private float smoothTime = 0.12f;
 
     private Camera cam;
     private Vector3 velocity = Vector3.zero;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         cam = GetComponent<Camera>();
     }
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         SnapToTargetIfReady();
     }
 
-    // Resets transient state whenever this component becomes active again.
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         velocity = Vector3.zero;
         SnapToTargetIfReady();
     }
 
-    // Applies follow-up updates after other frame logic has already run.
+    // Applies follow-up updates after other frame logic has completed.
     private void LateUpdate()
     {
         if (target == null || mapBounds == null)
@@ -67,7 +67,7 @@ public class CameraFollowPlayer : MonoBehaviour
         transform.position = ClampToBounds(followPos);
     }
 
-    // Snaps the camera directly to the target once the required references are available.
+    // Handles the snap to target if ready step for this script.
     private void SnapToTargetIfReady()
     {
         if (target == null || mapBounds == null || cam == null)
@@ -79,7 +79,7 @@ public class CameraFollowPlayer : MonoBehaviour
         transform.position = ClampToBounds(desired);
     }
 
-    // Constrains the supplied position so the camera stays inside the map limits.
+    // Handles the clamp to bounds step for this script.
     private Vector3 ClampToBounds(Vector3 position)
     {
         Bounds b = mapBounds.bounds;

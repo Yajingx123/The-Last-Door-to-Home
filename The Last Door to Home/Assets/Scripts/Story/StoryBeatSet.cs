@@ -1,18 +1,18 @@
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "StoryBeatSet", menuName = "Story/Story Beat Set")]
 /*
-Purpose: Stores configurable s to ry be at se t data for inspector-driven workflows.
-Attached GameObject: Not attached; create and configure this ScriptableObject as a project asset.
-Main responsibilities: Hold serialized configuration that other runtime systems can read safely.
-Inputs: Inspector-authored data referenced by runtime systems.
-Outputs or effects: Serialized data assets that influence runtime behaviour when referenced.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Defines or executes story progression logic.
+Attached GameObject: Story controller, trigger object, or ScriptableObject asset depending on the script type.
+Main responsibilities: Tracks story flags/counters, evaluates story beats, and triggers dialogue or ending flows.
+Inputs: Story event IDs, flags, counters, configured beats, interaction triggers, and scene state.
+Outputs or effects: Updates story state, starts dialogue/events, blocks progression when needed, or triggers ending sequences.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify each story event fires once or repeats as designed and survives save/load when required.
 */
 
-[CreateAssetMenu(fileName = "StoryBeatSet", menuName = "Story/Story Beat Set")]
 public class StoryBeatSet : ScriptableObject
 {
-    [Header("按顺序触发的剧情条目")]
+    [Header("按顺序触发的剧情条目 / Sequential Story Beats")]
     public StoryBeat[] beats;
 }
