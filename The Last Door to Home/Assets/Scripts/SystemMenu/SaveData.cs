@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
+/*
+Purpose: Defines serializable data containers used by the save system.
+Attached GameObject: Data classes; no GameObject attachment required.
+Main responsibilities: Stores save-slot data, inventory item records, story counters, and save summary metadata.
+Inputs: Values assigned by SaveSystem, Inventory, StoryFlags, and menu display code.
+Outputs or effects: Serializable fields consumed by JSON save files and menu summary displays.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify newly added fields remain serializable and are restored correctly from existing save files.
+*/
+
 public class SaveData
 {
     public int slotIndex;

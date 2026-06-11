@@ -4,20 +4,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 /*
-Purpose: Provides a global Escape pause menu outside of main menu and cutscene scenes.
-Attached GameObject: Auto-created runtime singleton.
-Main responsibilities: Listen for Escape, show a keyboard-driven pause UI, and route menu actions.
-Inputs: Active scene info, player input, save metadata, and audio manager state.
-Outputs or effects: Pauses gameplay, shows UI, adjusts audio settings, and triggers scene transitions.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify gameplay pauses, save/load slots work, menu input stays inside the pause UI, and submenu actions behave as expected.
+Purpose: Provides the global Escape pause menu outside main-menu and cutscene scenes.
+Attached GameObject: Runtime-created singleton that persists across gameplay scenes.
+Main responsibilities: Builds the pause UI, handles keyboard navigation, routes save/load/music/info actions, and locks gameplay while open.
+Inputs: Escape/menu keys, active scene, save-slot data, AudioManager state, and DialogueManager lock state.
+Outputs or effects: Shows/hides pause UI, pauses time, saves/loads slots, changes volume, and starts main-menu transitions.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify each page, slot operation, volume adjustment, input lock, and excluded scene behavior.
 */
 
 public class EscapeMenuController : MonoBehaviour
 {
-    private enum MenuPage
+private enum MenuPage
     {
         Main,
         SaveSlots,
@@ -59,11 +58,13 @@ public class EscapeMenuController : MonoBehaviour
     public static bool IsMenuOpen => instance != null && instance.isMenuOpen;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    // Ensures the runtime singleton exists after a scene load.
     private static void Bootstrap()
     {
         EnsureInstance();
     }
 
+    // Finds or creates the shared runtime instance used by this system.
     private static void EnsureInstance()
     {
         if (instance != null) return;
@@ -80,6 +81,7 @@ public class EscapeMenuController : MonoBehaviour
         instance.Initialize();
     }
 
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -92,16 +94,19 @@ public class EscapeMenuController : MonoBehaviour
         Initialize();
     }
 
+    // Registers callbacks or resets transient state when the component becomes active.
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    // Unregisters callbacks when the component becomes inactive.
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // Reads per-frame input and updates frame-dependent runtime state.
     private void Update()
     {
         if (!isMenuOpen)
@@ -116,6 +121,7 @@ public class EscapeMenuController : MonoBehaviour
         HandleOpenMenuInput();
     }
 
+    // Creates required runtime objects and prepares this system for use.
     private void Initialize()
     {
         if (menuCanvas != null)
@@ -132,11 +138,13 @@ public class EscapeMenuController : MonoBehaviour
         HideMenuImmediate();
     }
 
+    // Handles the on scene loaded step for this script.
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         HideMenuImmediate();
     }
 
+    // Handles the should allow escape menu step for this script.
     private bool ShouldAllowEscapeMenu()
     {
         if (SceneTransition.IsTransitioning) return false;
@@ -145,6 +153,7 @@ public class EscapeMenuController : MonoBehaviour
         return true;
     }
 
+    // Returns whether is scene excluded is true for the current state.
     private bool IsSceneExcluded(Scene scene)
     {
         if (!scene.IsValid()) return true;
@@ -158,6 +167,7 @@ public class EscapeMenuController : MonoBehaviour
             || sceneName.IndexOf("Cutscene", System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
+    // Opens the related UI or gameplay flow.
     private void OpenMenu()
     {
         if (overlayObject == null) return;
@@ -173,6 +183,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Closes the related UI or gameplay flow.
     private void CloseMenu()
     {
         isMenuOpen = false;
@@ -181,6 +192,7 @@ public class EscapeMenuController : MonoBehaviour
         LockGameplayInput(false);
     }
 
+    // Hides the UI immediately and resets transient state.
     private void HideMenuImmediate()
     {
         isMenuOpen = false;
@@ -194,6 +206,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Handles the lock gameplay input step for this script.
     private void LockGameplayInput(bool lockIt)
     {
         if (DialogueManager.Instance != null)
@@ -202,6 +215,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Handles the event or callback associated with this method.
     private void HandleOpenMenuInput()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -256,6 +270,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Moves the current selection or object in the requested direction.
     private void MoveSelection(int direction)
     {
         int optionCount = currentDisplayTargets.Count;
@@ -274,6 +289,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshVisualSelection();
     }
 
+    // Executes the action associated with the current selection.
     private void ActivateSelectedOption()
     {
         switch (currentPage)
@@ -295,6 +311,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Executes the action associated with the current selection.
     private void ActivateMainMenuOption()
     {
         switch (selectedIndex)
@@ -317,6 +334,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Saves the current data or runtime state.
     private void SaveToSelectedSlot()
     {
         if (!SaveSystem.SaveToSlot(selectedIndex, out string message))
@@ -330,6 +348,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Loads the requested data, scene, or runtime content.
     private void LoadFromSelectedSlot()
     {
         if (!SaveSystem.LoadFromSlot(selectedIndex, out string message))
@@ -342,6 +361,7 @@ public class EscapeMenuController : MonoBehaviour
         CloseMenu();
     }
 
+    // Handles the adjust selected volume step for this script.
     private void AdjustSelectedVolume(float delta)
     {
         AudioManager audioManager = AudioManager.EnsureInstance();
@@ -365,6 +385,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Resets the reset selected volume to default state to its default value.
     private void ResetSelectedVolumeToDefault()
     {
         AudioManager audioManager = AudioManager.EnsureInstance();
@@ -388,6 +409,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Shows the show main page UI or dialogue flow.
     private void ShowMainPage()
     {
         currentPage = MenuPage.Main;
@@ -396,6 +418,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Shows the show save slots page UI or dialogue flow.
     private void ShowSaveSlotsPage()
     {
         currentPage = MenuPage.SaveSlots;
@@ -404,6 +427,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Shows the show load slots page UI or dialogue flow.
     private void ShowLoadSlotsPage()
     {
         currentPage = MenuPage.LoadSlots;
@@ -412,6 +436,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Shows the show music page UI or dialogue flow.
     private void ShowMusicPage()
     {
         currentPage = MenuPage.Music;
@@ -420,6 +445,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Shows the show information page UI or dialogue flow.
     private void ShowInformationPage()
     {
         currentPage = MenuPage.Information;
@@ -428,6 +454,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshCurrentPage();
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshCurrentPage()
     {
         if (overlayObject == null) return;
@@ -502,6 +529,7 @@ public class EscapeMenuController : MonoBehaviour
         RefreshFooter();
     }
 
+    // Handles the append slot labels step for this script.
     private void AppendSlotLabels()
     {
         slotSummaries = SaveSystem.GetSlotSummaries();
@@ -511,6 +539,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshVisualSelection()
     {
         for (int i = 0; i < currentDisplayTargets.Count; i++)
@@ -522,6 +551,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshFooter()
     {
         if (footerText != null)
@@ -530,12 +560,14 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Handles the back to menu step for this script.
     private void BackToMenu()
     {
         CloseMenu();
         SceneTransition.LoadScene(mainMenuSceneName);
     }
 
+    // Builds data or UI objects required by this system.
     private static string BuildSlotLabel(SaveSlotSummary summary)
     {
         if (summary == null)
@@ -553,6 +585,7 @@ public class EscapeMenuController : MonoBehaviour
         return $"Slot {summary.slotIndex + 1:00}   {sceneName}   {playTime}";
     }
 
+    // Builds data or UI objects required by this system.
     private static string BuildVolumeLabel(string label, float volume)
     {
         int percent = Mathf.RoundToInt(Mathf.Clamp01(volume) * 100f);
@@ -573,6 +606,7 @@ public class EscapeMenuController : MonoBehaviour
         return builder.ToString();
     }
 
+    // Builds data or UI objects required by this system.
     private bool BuildUiFromPrefab()
     {
         GameObject prefab = Resources.Load<GameObject>(PauseMenuPrefabResourcePath);
@@ -656,11 +690,13 @@ public class EscapeMenuController : MonoBehaviour
         return true;
     }
 
+    // Returns the requested value or runtime object.
     private List<Component> GetSlotOptionTextPool()
     {
         return slotOptionTexts.Count > 0 ? slotOptionTexts : optionTexts;
     }
 
+    // Loads the requested data, scene, or runtime content.
     private void LoadTextPoolFromContainer(List<Component> targetPool, Transform parent)
     {
         targetPool.Clear();
@@ -676,6 +712,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Handles the add sequential targets step for this script.
     private void AddSequentialTargets(List<Component> sourcePool, int count)
     {
         int targetCount = Mathf.Min(sourcePool.Count, count);
@@ -685,6 +722,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Updates the requested value or component state.
     private static void SetTextPoolVisible(List<Component> targetPool, bool visible)
     {
         for (int i = 0; i < targetPool.Count; i++)
@@ -697,6 +735,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Applies the requested visual, audio, or gameplay state.
     private void ApplyEntryLayout(Component textComponent)
     {
         if (textComponent == null) return;
@@ -712,12 +751,14 @@ public class EscapeMenuController : MonoBehaviour
         layoutElement.preferredHeight = isMultiline ? 72f : 28f;
     }
 
+    // Updates the requested value or component state.
     private static void SetOptionalText(Component textComponent, string value)
     {
         SetTextValue(textComponent, value);
         SetComponentActive(textComponent, !string.IsNullOrEmpty(value));
     }
 
+    // Updates the requested value or component state.
     private static void SetComponentActive(Component component, bool active)
     {
         if (component != null)
@@ -726,6 +767,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Updates the requested value or component state.
     private static void SetGameObjectActive(GameObject gameObject, bool active)
     {
         if (gameObject != null)
@@ -734,12 +776,14 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Searches the scene hierarchy or data collection for the requested target.
     private static Component FindRequiredTextComponent(Transform root, string objectName)
     {
         Transform target = FindChildRecursive(root, objectName);
         return target != null ? GetSupportedTextComponent(target) : null;
     }
 
+    // Returns the requested value or runtime object.
     private static Component GetSupportedTextComponent(Transform target)
     {
         if (target == null) return null;
@@ -759,6 +803,7 @@ public class EscapeMenuController : MonoBehaviour
         return null;
     }
 
+    // Updates the requested value or component state.
     private static void SetTextValue(Component textComponent, string value)
     {
         if (textComponent is Text legacyText)
@@ -773,6 +818,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Returns the requested value or runtime object.
     private static string GetTextValue(Component textComponent)
     {
         if (textComponent is Text legacyText)
@@ -788,6 +834,7 @@ public class EscapeMenuController : MonoBehaviour
         return string.Empty;
     }
 
+    // Updates the requested value or component state.
     private static void SetTextColor(Component textComponent, Color color)
     {
         if (textComponent is Text legacyText)
@@ -802,6 +849,7 @@ public class EscapeMenuController : MonoBehaviour
         }
     }
 
+    // Searches the scene hierarchy or data collection for the requested target.
     private static Transform FindChildRecursive(Transform parent, string childName)
     {
         if (parent == null) return null;

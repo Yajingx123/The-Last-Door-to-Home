@@ -1,35 +1,32 @@
 using System;
 using System.Collections;
 using UnityEngine;
-
 /*
-Purpose: Moves one vine monster through rows in a looping attack pattern.
-Attached GameObject: The vine monster object that owns the animation and hitbox.
-Main responsibilities: Reposition the vine by row, play its animation, enable or disable damage windows, and repeat the pattern.
-Inputs: Inspector references for the shared arena controller and timing values.
-Outputs or effects: Reuses this vine object itself instead of spawning duplicate prefabs.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the arena origin, cell size, object pivot, and hitbox timing in Play Mode.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class VineMonster : MonoBehaviour
 {
     public event Action<VineMonster> RoundCompleted;
-
-    private enum HorizontalAlignment
+private enum HorizontalAlignment
     {
         Center,
         LeftEdge,
         RightEdge
     }
-
-    private enum VerticalPattern
+private enum VerticalPattern
     {
         TopToBottomThenBack,
         BottomToTopThenBack
     }
 
-    [Header("区域设置")]
+    [Header("区域设置 / Area Settings")]
     [SerializeField] private bool useArenaSettings = true;
     [SerializeField] private MonsterController controller;
     [SerializeField] private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
@@ -37,7 +34,7 @@ public class VineMonster : MonoBehaviour
     [Tooltip("基于对齐点额外补的世界坐标偏移。适合微调素材锚点。")]
     [SerializeField] private Vector2 spawnOffset = Vector2.zero;
 
-    [Header("时序")]
+    [Header("时序 / Timing")]
     [SerializeField] private float rowVisibleDuration = 0.7f;
     [SerializeField] private float gapBetweenRows = 0.35f;
     [SerializeField] private bool playOnStart = false;
@@ -49,7 +46,7 @@ public class VineMonster : MonoBehaviour
     private Renderer[] renderersToToggle;
     private bool isAttackEnabled;
 
-    // Starts the configured pattern automatically when requested.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         ResolveController();
@@ -62,7 +59,7 @@ public class VineMonster : MonoBehaviour
         }
     }
 
-    // Starts the row pattern routine.
+    // Executes the action associated with the current selection.
     public void ActivateMonster()
     {
         if (!isActiveAndEnabled)
@@ -81,7 +78,7 @@ public class VineMonster : MonoBehaviour
         patternRoutine = StartCoroutine(useArenaSettings ? PlayFirstPatternRoutine() : PlayStaticPatternRoutine());
     }
 
-    // Stops the active pattern immediately.
+    // Handles the deactivate monster step for this script.
     public void DeactivateMonster()
     {
         isAttackEnabled = false;
@@ -95,7 +92,7 @@ public class VineMonster : MonoBehaviour
         SetActiveState(false);
     }
 
-    // Spawns one vine row at a time and loops from top-to-bottom and back again.
+    // Plays the play first pattern routine sequence or audio feedback.
     private IEnumerator PlayFirstPatternRoutine()
     {
         if (!TryGetArenaValues(out Vector2 topLeftPosition, out int safeColumns, out int safeRows, out float safeCellSize))
@@ -142,7 +139,7 @@ public class VineMonster : MonoBehaviour
         patternRoutine = null;
     }
 
-    // Repeats the same visible and gap timing without moving the vine away from its placed position.
+    // Plays the play static pattern routine sequence or audio feedback.
     private IEnumerator PlayStaticPatternRoutine()
     {
         float safeVisibleDuration = Mathf.Max(0.01f, rowVisibleDuration);
@@ -167,7 +164,7 @@ public class VineMonster : MonoBehaviour
         patternRoutine = null;
     }
 
-    // Spawns one row, waits for its lifetime, then waits for the configured gap.
+    // Plays the play row sequence or audio feedback.
     private IEnumerator PlayRow(int rowIndex, Vector2 topLeftPosition, float arenaWidth, float safeCellSize, float safeVisibleDuration, float safeGap)
     {
         transform.position = GetSpawnPosition(topLeftPosition, rowIndex, arenaWidth, safeCellSize);
@@ -196,7 +193,7 @@ public class VineMonster : MonoBehaviour
         }
     }
 
-    // Calculates the spawn point for one row based on the chosen alignment and anchor.
+    // Returns the requested value or runtime object.
     private Vector3 GetSpawnPosition(Vector2 topLeftPosition, int rowIndex, float arenaWidth, float safeCellSize)
     {
         Vector3 topLeft = new Vector3(topLeftPosition.x, topLeftPosition.y, transform.position.z);
@@ -219,7 +216,7 @@ public class VineMonster : MonoBehaviour
         return new Vector3(spawnX + spawnOffset.x, spawnY + spawnOffset.y, topLeft.z);
     }
 
-    // Finds the shared arena config when not explicitly assigned.
+    // Resolves the best available value for the requested data.
     private void ResolveController()
     {
         if (controller == null)
@@ -228,7 +225,7 @@ public class VineMonster : MonoBehaviour
         }
     }
 
-    // Finds this monster's own visual and collision components when not explicitly assigned.
+    // Resolves the best available value for the requested data.
     private void ResolveComponents()
     {
         if (animator == null)
@@ -252,7 +249,7 @@ public class VineMonster : MonoBehaviour
         }
     }
 
-    // Reads shared arena values from the scene config.
+    // Attempts the requested operation and reports whether it succeeded.
     private bool TryGetArenaValues(out Vector2 topLeftPosition, out int safeColumns, out int safeRows, out float safeCellSize)
     {
         if (!useArenaSettings)
@@ -282,7 +279,7 @@ public class VineMonster : MonoBehaviour
         return true;
     }
 
-    // Restarts the spawned vine animation from its first frame.
+    // Handles the restart animation step for this script.
     private void RestartAnimation(Animator animator)
     {
         if (animator == null)
@@ -295,7 +292,7 @@ public class VineMonster : MonoBehaviour
         animator.Update(0f);
     }
 
-    // Shows or hides this vine monster's visuals and hitbox based on whether it is currently attacking.
+    // Updates the requested value or component state.
     private void SetActiveState(bool isActive)
     {
         ResolveComponents();
@@ -322,19 +319,19 @@ public class VineMonster : MonoBehaviour
         }
     }
 
-    // Lets vines without arena movement enabled still damage the player while staying in place.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         TryDamagePlayerOnContact(other);
     }
 
-    // Keeps stationary vines hazardous while the player remains inside the trigger.
+    // Handles 2D trigger stay events for this object.
     private void OnTriggerStay2D(Collider2D other)
     {
         TryDamagePlayerOnContact(other);
     }
 
-    // Applies contact damage for static vines that do not use arena row movement.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryDamagePlayerOnContact(Collider2D other)
     {
         if (useArenaSettings || !isAttackEnabled)
@@ -352,7 +349,7 @@ public class VineMonster : MonoBehaviour
         controller.TryDamagePlayer("VineMonster", this);
     }
 
-    // Draws the configured arena bounds in the editor for easier placement.
+    // Draws editor-only debug helpers while this object is selected.
     private void OnDrawGizmosSelected()
     {
         if (!useArenaSettings)

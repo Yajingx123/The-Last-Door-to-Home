@@ -1,39 +1,38 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 /*
-Purpose: Manages e le va to ri nt er ac ti on behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class ElevatorInteraction : MonoBehaviour, IInteractable
 {
     [Serializable]
-    public class ElevatorOption
+public class ElevatorOption
     {
         public string optionText = "Go";
         public string targetSceneName = "";
         public Vector2 spawnPosition;
     }
 
-    [Header("前置对白（可空）")]
+    [Header("前置对白（可空） / Intro Dialogue (Optional)")]
     [TextArea(3, 10)]
     public string[] preDialogues;
 
-    [Header("电梯选项")]
+    [Header("电梯选项 / Elevator Options")]
     public ElevatorOption[] options;
 
-    [Header("音效")]
+    [Header("音效 / Audio")]
     public AudioClip sceneSwitchSfx;
     [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (OptionMenu.Instance == null) return;
@@ -54,7 +53,7 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
         OptionMenu.Instance.ShowOptions(entries, false, null);
     }
 
-    // Builds the option entries that should be shown to the player.
+    // Builds data or UI objects required by this system.
     private List<OptionMenu.OptionEntry> BuildEntries()
     {
         var entries = new List<OptionMenu.OptionEntry>();
@@ -74,7 +73,7 @@ public class ElevatorInteraction : MonoBehaviour, IInteractable
         return entries;
     }
 
-    // Starts loading the requested scene through the transition flow.
+    // Loads the requested data, scene, or runtime content.
     private void LoadScene(ElevatorOption option)
     {
         if (string.IsNullOrWhiteSpace(option.targetSceneName)) return;

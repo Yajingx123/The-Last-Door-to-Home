@@ -1,65 +1,63 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
 /*
-Purpose: Manages m en un av ig at io n behavior for this part of the game.
-Attached GameObject: Main menu canvas or UI controller GameObject.
-Main responsibilities: Process menu navigation input and drive scene or UI transitions.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Controls keyboard-only navigation for the main menu buttons.
+Attached GameObject: Main menu Canvas or menu controller GameObject.
+Main responsibilities: Selects menu buttons, moves selection with keyboard input, invokes the selected button, and disables pointer raycasts.
+Inputs: Configured Button list, W/S or arrow-key input, Return input, and the Continue load-panel state.
+Outputs or effects: Updates button highlight alpha, UGUI selection, and button OnClick invocation.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify keyboard navigation wraps correctly, Return triggers the right action, and mouse clicks remain disabled.
 */
 
 public class MenuNavigation : MonoBehaviour
 {
-    [Header("菜单按钮列表")]
-    public List<Button> menuButtons; // 按顺序存放菜单按钮（如Start、Quit）
-    private int currentSelectedIndex = 0; // 当前选中的按钮索引
+    [Header("菜单按钮列表 / Menu Button List")]
+    public List<Button> menuButtons; // Menu buttons in display order, such as Start, Continue, and Quit.
+    private int currentSelectedIndex = 0; // Index of the currently selected button.
     private const float SelectedAlpha = 1f;
     private const float UnselectedAlpha = 66f / 255f;
 
-    // Prepares runtime state after the scene finishes its initial setup.
+    // Prepares runtime state after the scene has finished its initial setup.
     void Start()
     {
         DisableMouseInteraction();
 
-        // 初始化：选中第一个按钮
+        // Select the first button by default.
         if (menuButtons.Count > 0)
         {
             SelectButton(currentSelectedIndex);
         }
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (MainMenuLoadPanelController.IsOpen) return;
 
-        // 监听上下键/WASD的上下（W=上，S=下；上箭头=上，下箭头=下）
+        // W/Up moves upward; S/Down moves downward.
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
-            Navigate(-1); // 向上选（索引-1）
+            Navigate(-1);
         }
         else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-            Navigate(1); // 向下选（索引+1）
+            Navigate(1);
         }
 
-        // 按回车触发当前选中的按钮
+        // Return activates the current option.
         if (Input.GetKeyDown(KeyCode.Return))
         {
             TriggerCurrentButton();
         }
     }
 
-    // 菜单导航逻辑
-    // Moves the current menu selection in the requested direction.
+    // Handles the navigate step for this script.
     void Navigate(int direction)
     {
         currentSelectedIndex += direction;
-        // 循环选择（到顶/到底后绕回）
+        // Wrap around when the selection moves past either end.
         if (currentSelectedIndex < 0)
         {
             currentSelectedIndex = menuButtons.Count - 1;
@@ -68,12 +66,11 @@ public class MenuNavigation : MonoBehaviour
         {
             currentSelectedIndex = 0;
         }
-        // 选中当前索引的按钮
+        // Refresh the visual state for the current selection.
         SelectButton(currentSelectedIndex);
     }
 
-    // 选中指定按钮（视觉反馈+聚焦）
-    // Updates the current button selection and visual highlight state.
+    // Handles the select button step for this script.
     void SelectButton(int index)
     {
         for (int i = 0; i < menuButtons.Count; i++)
@@ -89,11 +86,10 @@ public class MenuNavigation : MonoBehaviour
         }
 
         Button selectedBtn = menuButtons[index];
-        selectedBtn.Select(); // UGUI聚焦，保证按钮可触发
+        selectedBtn.Select(); // Focus the selected UGUI button so Return can trigger it.
     }
 
-    // 触发当前选中的按钮点击事件
-    // Invokes the currently selected menu button action.
+    // Handles the trigger current button step for this script.
     void TriggerCurrentButton()
     {
         if (menuButtons.Count > 0)
@@ -102,7 +98,7 @@ public class MenuNavigation : MonoBehaviour
         }
     }
 
-    // Disables pointer raycasts on the configured main-menu buttons so keyboard navigation is the only input path.
+    // Handles the disable mouse interaction step for this script.
     void DisableMouseInteraction()
     {
         foreach (var btn in menuButtons)

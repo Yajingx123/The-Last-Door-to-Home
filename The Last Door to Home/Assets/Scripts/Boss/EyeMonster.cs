@@ -1,37 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 /*
-Purpose: Teleports an eye monster around the arena, and after every two player touches removes one configured target in sequence.
-Attached GameObject: The eye monster object with its visual renderers and a trigger collider.
-Main responsibilities: Choose valid spawn cells, fade in, detect player contact, relocate, and remove linked monsters in order.
-Inputs: Shared arena settings from MonsterController, timing values, and an ordered list of target GameObjects to remove.
-Outputs or effects: Moves this eye monster between grid cells without damaging the player and disables linked targets over time.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the trigger collider size, fade timing, and ordered target removal flow in Play Mode.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class EyeMonster : MonoBehaviour
 {
-    [Header("道具条件")]
+    [Header("道具条件 / Item Requirement")]
     [Tooltip("只有拿到这个 PickableItem.itemUniqueID 后，Eye Monster 才会出现并启用机制。留空则总是启用。")]
     [SerializeField] private string requiredItemUniqueID = "";
 
-    [Header("区域设置")]
+    [Header("区域设置 / Area Settings")]
     [SerializeField] private MonsterController controller;
     [SerializeField] private Vector2 spawnOffset = Vector2.zero;
 
-    [Header("出现规则")]
+    [Header("出现规则 / Spawn Rules")]
     [SerializeField] private int spawnDistanceInCells = 3;
     [SerializeField] private int maxSpawnDistanceInCells = 8;
     [SerializeField] private float fadeInDuration = 1f;
 
-    [Header("碰撞反馈")]
+    [Header("自动换位 / Auto Relocation")]
+    [Tooltip("Eye Monster 出现后，如果玩家在这段时间内没有碰到它，它会自动淡出并换到下一个位置。")]
+    [SerializeField] private float visibleDurationBeforeAutoRelocate = 8f;
+    [SerializeField] private float fadeOutDuration = 1f;
+
+    [Header("碰撞反馈 / Collision Feedback")]
     [SerializeField] private float blinkDurationOnTouch = 1f;
     [SerializeField] private int blinkCountOnTouch = 5;
 
-    [Header("消除目标")]
+    [Header("消除目标 / Removal Targets")]
     [SerializeField] private List<GameObject> targetsToRemove = new List<GameObject>();
     [SerializeField] private int touchesPerRemoval = 2;
 
@@ -42,9 +46,11 @@ public class EyeMonster : MonoBehaviour
     private bool hasClearedAllTargets;
     private int touchCount;
     private int nextTargetIndex;
+    private Coroutine autoRelocateRoutine;
 
     public bool HasClearedAllTargets => hasClearedAllTargets;
 
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         if (!CanAppearWithInventory())
@@ -53,7 +59,7 @@ public class EyeMonster : MonoBehaviour
         }
     }
 
-    // Places the eye in the arena and keeps it visible from the start.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         if (!CanAppearWithInventory())
@@ -65,27 +71,28 @@ public class EyeMonster : MonoBehaviour
         ResolveController();
         ResolveComponents();
         MoveToNextSpawnPosition();
-        StartCoroutine(FadeInRoutine());
+        StartCoroutine(ShowAtCurrentPositionRoutine());
     }
 
+    // Returns whether this script can can appear with inventory.
     private bool CanAppearWithInventory()
     {
         return string.IsNullOrWhiteSpace(requiredItemUniqueID) || Inventory.HasCollected(requiredItemUniqueID);
     }
 
-    // Detects the player stepping on the visible eye monster.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         TryHandlePlayerContact(other);
     }
 
-    // Keeps the eye responsive even if it becomes visible while the player is already overlapping it.
+    // Handles 2D trigger stay events for this object.
     private void OnTriggerStay2D(Collider2D other)
     {
         TryHandlePlayerContact(other);
     }
 
-    // Relocates the eye immediately when the player touches it.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryHandlePlayerContact(Collider2D other)
     {
         if (isRelocating || other == null)
@@ -98,11 +105,20 @@ public class EyeMonster : MonoBehaviour
             return;
         }
 
+        StopAutoRelocateRoutine();
         isRelocating = true;
         StartCoroutine(BlinkAndRelocateRoutine());
     }
 
-    // Plays a short blink, then hides and teleports the eye to its next legal position or disappears after removing the last target.
+    // 在当前位置淡入显示，显示完成后开始计时等待玩家碰撞。
+    // Shows the monster at its current position, then starts the auto-relocation timer.
+    private IEnumerator ShowAtCurrentPositionRoutine()
+    {
+        yield return StartCoroutine(FadeInRoutine());
+        StartAutoRelocateTimer();
+    }
+
+    // Handles the blink and relocate routine step for this script.
     private IEnumerator BlinkAndRelocateRoutine()
     {
         SetHitboxEnabled(false);
@@ -128,10 +144,10 @@ public class EyeMonster : MonoBehaviour
         }
 
         MoveToNextSpawnPosition();
-        yield return StartCoroutine(FadeInRoutine());
+        yield return StartCoroutine(ShowAtCurrentPositionRoutine());
     }
 
-    // Reveals the eye gradually after it spawns or relocates.
+    // Fades the related visual element for the fade in routine step.
     private IEnumerator FadeInRoutine()
     {
         SetHitboxEnabled(false);
@@ -153,7 +169,73 @@ public class EyeMonster : MonoBehaviour
         isRelocating = false;
     }
 
-    // Picks a valid cell on the same row or column, starting at the configured minimum distance away from the player.
+    // 开始8秒自动换位计时，如果玩家没有碰到Eye Monster就会触发淡出换位。
+    // Starts the timer that relocates the monster when the player does not touch it.
+    private void StartAutoRelocateTimer()
+    {
+        StopAutoRelocateRoutine();
+
+        if (!isActiveAndEnabled || hasClearedAllTargets)
+        {
+            return;
+        }
+
+        autoRelocateRoutine = StartCoroutine(AutoRelocateAfterDelayRoutine());
+    }
+
+    // 停止自动换位计时，通常在玩家碰到Eye Monster时调用。
+    // Stops the current auto-relocation timer.
+    private void StopAutoRelocateRoutine()
+    {
+        if (autoRelocateRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(autoRelocateRoutine);
+        autoRelocateRoutine = null;
+    }
+
+    // 等待指定时间后自动淡出，然后换到下一个位置重新出现。
+    // Waits, fades out, relocates, and shows the monster again.
+    private IEnumerator AutoRelocateAfterDelayRoutine()
+    {
+        float delay = Mathf.Max(0f, visibleDurationBeforeAutoRelocate);
+        if (delay > 0f)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+
+        autoRelocateRoutine = null;
+        isRelocating = true;
+        SetHitboxEnabled(false);
+
+        yield return StartCoroutine(FadeOutRoutine());
+
+        SetVisibleImmediate(false);
+        MoveToNextSpawnPosition();
+        yield return StartCoroutine(ShowAtCurrentPositionRoutine());
+    }
+
+    // 慢慢降低透明度，让Eye Monster自然消失。
+    // Fades the monster out before it relocates.
+    private IEnumerator FadeOutRoutine()
+    {
+        float duration = Mathf.Max(0.01f, fadeOutDuration);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            SetRendererAlpha(1f - t);
+            yield return null;
+        }
+
+        SetRendererAlpha(0f);
+    }
+
+    // Moves the current selection or object in the requested direction.
     private void MoveToNextSpawnPosition()
     {
         ResolveController();
@@ -203,7 +285,7 @@ public class EyeMonster : MonoBehaviour
         transform.position = new Vector3(worldCenter.x + spawnOffset.x, worldCenter.y + spawnOffset.y, transform.position.z);
     }
 
-    // Adds one legal spawn candidate when it still fits inside the arena and is not already present.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryAddCandidate(Vector2Int cell, Vector2Int[] candidates, ref int candidateCount)
     {
         if (controller == null)
@@ -228,7 +310,7 @@ public class EyeMonster : MonoBehaviour
         candidateCount++;
     }
 
-    // Finds shared arena references and caches renderers/collider.
+    // Resolves the best available value for the requested data.
     private void ResolveController()
     {
         if (controller == null)
@@ -237,7 +319,7 @@ public class EyeMonster : MonoBehaviour
         }
     }
 
-    // Finds the visual and collision components used by the eye monster.
+    // Resolves the best available value for the requested data.
     private void ResolveComponents()
     {
         if (hitbox == null)
@@ -274,14 +356,14 @@ public class EyeMonster : MonoBehaviour
         }
     }
 
-    // Shows or hides the eye monster immediately without playing an animation.
+    // Updates the requested value or component state.
     private void SetVisibleImmediate(bool visible)
     {
         SetHitboxEnabled(visible);
         SetRendererAlpha(visible ? 1f : 0f);
     }
 
-    // Applies a shared alpha multiplier to every tracked sprite renderer.
+    // Updates the requested value or component state.
     private void SetRendererAlpha(float alpha)
     {
         ResolveComponents();
@@ -304,7 +386,7 @@ public class EyeMonster : MonoBehaviour
         }
     }
 
-    // Enables contact detection only while the eye is active.
+    // Updates the requested value or component state.
     private void SetHitboxEnabled(bool enabled)
     {
         ResolveComponents();
@@ -314,7 +396,7 @@ public class EyeMonster : MonoBehaviour
         }
     }
 
-    // Counts touches and removes the next configured target whenever the threshold is reached.
+    // Attempts the requested operation and reports whether it succeeded.
     private bool TryAdvanceRemovalProgress()
     {
         touchCount++;
@@ -351,7 +433,7 @@ public class EyeMonster : MonoBehaviour
         return false;
     }
 
-    // Disables one configured target safely, including known monster cleanup hooks.
+    // Handles the remove target step for this script.
     private void RemoveTarget(GameObject target)
     {
         if (target == null)
@@ -384,7 +466,7 @@ public class EyeMonster : MonoBehaviour
         target.SetActive(false);
     }
 
-    // Returns true when there is still another non-null target left to remove later.
+    // Returns whether the required has remaining valid targets condition is met.
     private bool HasRemainingValidTargets()
     {
         for (int i = nextTargetIndex; i < targetsToRemove.Count; i++)
@@ -396,5 +478,12 @@ public class EyeMonster : MonoBehaviour
         }
 
         return false;
+    }
+
+    // 对象关闭或销毁时停止自动换位计时，避免协程继续跑。
+    // Stops timer coroutines when this object is disabled.
+    private void OnDisable()
+    {
+        StopAutoRelocateRoutine();
     }
 }

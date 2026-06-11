@@ -2,46 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 /*
- Purpose: Stores shared boss arena data and manages common player combat feedback for monster encounters.
-Attached GameObject: A single scene object that represents the shared monster arena controller.
- Main responsibilities: Provide arena dimensions, resolve the player, convert between world positions and grid cells, manage battle hearts, and handle hit feedback.
- Inputs: Inspector values for arena layout, player reference, heart UI settings, and optional ending sequence reference.
- Outputs or effects: Centralizes shared boss combat setup so individual monster scripts stay focused on behavior.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the arena coordinates, player reference, and overlap checks in Play Mode.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class MonsterController : MonoBehaviour
 {
-    [Header("玩家")]
+    [Header("玩家 / Player")]
     [SerializeField] private Transform player;
 
-    [Header("区域设置")]
+    [Header("区域设置 / Area Settings")]
     [Tooltip("战斗区域左上角格子的左上角世界坐标。")]
     [SerializeField] private Vector2 topLeftPosition;
     [SerializeField] private int columns = 6;
     [SerializeField] private int rows = 6;
     [SerializeField] private float cellSize = 1f;
 
-    [Header("受伤设置")]
+    [Header("受伤设置 / Damage Settings")]
     [SerializeField] private int maxHearts = 8;
     [SerializeField] private float invulnerabilityDuration = 1f;
     [SerializeField] private float flickerInterval = 0.1f;
     [SerializeField] private float flickerAlpha = 0.25f;
 
-    [Header("爱心UI")]
+    [Header("爱心UI / Heart UI")]
     [SerializeField] private Vector2 heartsUiOffset = new Vector2(36f, -36f);
     [SerializeField] private Vector2 heartIconSize = new Vector2(36f, 36f);
     [SerializeField] private float heartSpacing = 8f;
     [SerializeField] private Sprite fullHeartSprite;
     [SerializeField] private Color fullHeartColor = Color.white;
 
-    [Header("生命归零")]
+    [Header("生命归零 / Zero Health")]
     [SerializeField] private MonsterEndingSequence endingSequence;
 
-    [Header("怪物回合配置")]
+    [Header("怪物回合配置 / Monster Phase Setup")]
     [SerializeField] private VineMonster primaryVineMonster;
     [SerializeField] private StalkerMonster stalkerMonster;
     [SerializeField] private VineMonster secondaryVineMonster;
@@ -71,13 +70,13 @@ public class MonsterController : MonoBehaviour
     public int Rows => Mathf.Max(1, rows);
     public float CellSize => Mathf.Max(0.01f, cellSize);
 
-    // Initializes player combat state as early as possible for monster startup order safety.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         currentHearts = Mathf.Max(1, maxHearts);
     }
 
-    // Prepares heart state and cached player visuals before gameplay begins.
+    // Prepares runtime state after the scene has finished its initial setup.
     private void Start()
     {
         ResolvePlayerReference();
@@ -88,7 +87,7 @@ public class MonsterController : MonoBehaviour
         SetupBattlePhases();
     }
 
-    // Finds the player automatically when no explicit reference is assigned.
+    // Resolves the best available value for the requested data.
     public void ResolvePlayerReference()
     {
         if (player != null)
@@ -106,7 +105,7 @@ public class MonsterController : MonoBehaviour
     // Returns true when the player can currently be hurt by monsters.
     public bool CanPlayerTakeDamage => !isInvulnerable && !isDeathSequenceActive && Player != null;
 
-    // Applies one monster hit to the player and starts the proper feedback flow.
+    // Attempts the requested operation and reports whether it succeeded.
     public bool TryDamagePlayer(string sourceName, Object damageSource = null)
     {
         ResolvePlayerReference();
@@ -142,7 +141,7 @@ public class MonsterController : MonoBehaviour
         return true;
     }
 
-    // Sets up the opening monster states so the stalker can wait briefly before joining the fight.
+    // Updates the requested value or component state.
     private void SetupBattlePhases()
     {
         if (primaryVineMonster != null)
@@ -162,7 +161,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Starts the delayed opening activation for the stalker monster.
+    // Starts the start opening stalker routine sequence or runtime effect.
     private void StartOpeningStalkerRoutine()
     {
         StopOpeningStalkerRoutine();
@@ -181,7 +180,7 @@ public class MonsterController : MonoBehaviour
         openingStalkerRoutine = StartCoroutine(OpeningStalkerRoutine());
     }
 
-    // Cancels the pending stalker startup when the controller is torn down.
+    // Stops the stop opening stalker routine sequence or runtime effect.
     private void StopOpeningStalkerRoutine()
     {
         if (openingStalkerRoutine == null)
@@ -193,7 +192,7 @@ public class MonsterController : MonoBehaviour
         openingStalkerRoutine = null;
     }
 
-    // Waits the configured time, then starts the stalker movement loop.
+    // Opens the related UI or gameplay flow.
     private IEnumerator OpeningStalkerRoutine()
     {
         yield return new WaitForSeconds(Mathf.Max(0f, stalkerOpeningIdleDuration));
@@ -206,7 +205,7 @@ public class MonsterController : MonoBehaviour
         openingStalkerRoutine = null;
     }
 
-    // Returns the center of the requested grid cell.
+    // Returns the requested value or runtime object.
     public Vector2 GetCellCenter(int columnIndex, int rowIndex)
     {
         float x = topLeftPosition.x + CellSize * (columnIndex + 0.5f);
@@ -214,7 +213,7 @@ public class MonsterController : MonoBehaviour
         return new Vector2(x, y);
     }
 
-    // Converts a world position into the nearest valid grid cell indices.
+    // Returns the requested value or runtime object.
     public Vector2Int GetClosestCell(Vector2 worldPosition)
     {
         float localX = (worldPosition.x - topLeftPosition.x) / CellSize - 0.5f;
@@ -225,7 +224,7 @@ public class MonsterController : MonoBehaviour
         return new Vector2Int(column, row);
     }
 
-    // Returns the player's current nearest grid cell.
+    // Returns the requested value or runtime object.
     public Vector2Int GetClosestCellToPlayer()
     {
         Transform currentPlayer = Player;
@@ -237,13 +236,13 @@ public class MonsterController : MonoBehaviour
         return GetClosestCell(currentPlayer.position);
     }
 
-    // Returns the center cell of the arena.
+    // Returns the requested value or runtime object.
     public Vector2Int GetCenterCell()
     {
         return new Vector2Int((Columns - 1) / 2, (Rows - 1) / 2);
     }
 
-    // Returns the world-space center point of the arena.
+    // Returns the requested value or runtime object.
     public Vector2 GetArenaCenter()
     {
         float centerX = topLeftPosition.x + Columns * CellSize * 0.5f;
@@ -251,7 +250,7 @@ public class MonsterController : MonoBehaviour
         return new Vector2(centerX, centerY);
     }
 
-    // Returns true when the target collider overlaps any player collider.
+    // Returns whether is player overlapping is true for the current state.
     public bool IsPlayerOverlapping(Collider2D targetCollider)
     {
         Transform currentPlayer = Player;
@@ -279,7 +278,7 @@ public class MonsterController : MonoBehaviour
         return false;
     }
 
-    // Finds the ending sequence automatically when no explicit reference is assigned.
+    // Resolves the best available value for the requested data.
     public void ResolveEndingSequence()
     {
         if (endingSequence == null)
@@ -288,7 +287,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Caches player sprite renderers so flicker and fade effects can reuse them.
+    // Caches references or values needed by cache player renderers.
     private void CachePlayerRenderers()
     {
         Transform currentPlayer = Player;
@@ -313,7 +312,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Creates a runtime heart counter under the best available canvas.
+    // Ensures the required ensure heart ui objects or state exist.
     private void EnsureHeartUI()
     {
         if (heartImages != null && heartImages.Length == Mathf.Max(1, maxHearts))
@@ -376,7 +375,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Chooses an existing UI canvas when possible so the heart UI fits the current scene.
+    // Searches the scene hierarchy or data collection for the requested target.
     private Canvas FindBestUiCanvas()
     {
         if (DialogueManager.Instance != null && DialogueManager.Instance.dialoguePanel != null)
@@ -387,7 +386,7 @@ public class MonsterController : MonoBehaviour
         return FindObjectOfType<Canvas>();
     }
 
-    // Rebuilds the heart string after each damage or initialization step.
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshHeartUI()
     {
         EnsureHeartUI();
@@ -410,7 +409,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Makes the player flicker during a short invulnerability window after taking a hit.
+    // Plays the player invulnerability routine sequence or audio feedback.
     private IEnumerator PlayerInvulnerabilityRoutine()
     {
         isInvulnerable = true;
@@ -434,7 +433,7 @@ public class MonsterController : MonoBehaviour
         invulnerabilityRoutine = null;
     }
 
-    // Starts the external ending flow once all hearts are gone.
+    // Begins the begin death sequence sequence.
     private void BeginDeathSequence()
     {
         if (isDeathSequenceActive)
@@ -452,7 +451,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Restores all tracked player sprite renderers to the requested alpha multiplier.
+    // Handles the restore player visual alpha step for this script.
     private void RestorePlayerVisualAlpha(float alphaMultiplier)
     {
         if (playerRenderers == null || originalRendererColors == null)
@@ -473,7 +472,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-    // Draws the shared arena bounds in the Scene view.
+    // Draws editor-only debug helpers while this object is selected.
     private void OnDrawGizmosSelected()
     {
         float width = Columns * CellSize;
@@ -487,7 +486,7 @@ public class MonsterController : MonoBehaviour
         Gizmos.DrawWireCube(center, new Vector3(width, height, 0.05f));
     }
 
-    // Cleans up runtime UI if this controller is destroyed.
+    // Cleans up runtime references before the object is destroyed.
     private void OnDestroy()
     {
         StopOpeningStalkerRoutine();

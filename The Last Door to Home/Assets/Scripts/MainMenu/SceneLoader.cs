@@ -1,28 +1,57 @@
 using UnityEngine;
 
 /*
-Purpose: Manages s ce ne lo ad er behavior for this part of the game.
-Attached GameObject: Main menu canvas or UI controller GameObject.
-Main responsibilities: Process menu navigation input and drive scene or UI transitions.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Provides main-menu button actions for starting, continuing, loading, and quitting the game.
+Attached GameObject: Main menu controller GameObject referenced by UI button OnClick events.
+Main responsibilities: Routes menu button requests into scene transitions, new-game setup, save-slot UI, or application quit.
+Inputs: Button OnClick events, configured new-game scene name, and shared game/session state.
+Outputs or effects: Clears or updates runtime state, opens the Continue panel, starts scene transitions, or quits Play Mode/application.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify each main-menu button calls the expected method and handles empty scene names safely.
 */
 
 public class SceneLoader : MonoBehaviour
 {
-    [Header("New Game 跳转场景")]
+    [System.Serializable]
+    public class StartingItem
+    {
+        [Header("物品唯一ID / Item Unique ID")]
+        public string itemUniqueID;
+
+        [Header("物品名称 / Item Name")]
+        public string itemName;
+
+        [Header("物品类型 / Item Type")]
+        public ItemType itemType;
+
+        [Header("物品详情 / Item Details")]
+        [TextArea(2, 6)]
+        public string itemDescription;
+
+        [Header("图标资源路径 / Icon Resource Path")]
+        [Tooltip("Optional. For a single Sprite in Resources, use a path without extension, e.g. ItemIcons/Flower. For a sliced sprite sheet, use SheetPath#SpriteName, e.g. ItemIcons/Items#flower_01.")]
+        public string itemIconResourcePath;
+    }
+
+    [Header("New Game 跳转场景 / New Game Target Scene")]
     public string newGameSceneName = "IntroCutscene";
 
-    // 跳转到指定场景（通过场景名）
-    // Starts loading the requested scene through the transition flow.
+    [Header("初始物品 / Starting Items")]
+    public StartingItem[] startingItems;
+
+    // Loads the requested data, scene, or runtime content.
     public void LoadScene(string sceneName)
     {
+        if (string.Equals(sceneName, newGameSceneName, System.StringComparison.OrdinalIgnoreCase))
+        {
+            StartNewGame();
+            return;
+        }
+
         SceneTransition.LoadScene(sceneName);
     }
 
-    // Starts a new game flow from the main menu.
+    // Starts the start new game sequence or runtime effect.
     public void StartNewGame()
     {
         if (string.IsNullOrWhiteSpace(newGameSceneName))
@@ -32,29 +61,49 @@ public class SceneLoader : MonoBehaviour
         }
 
         Inventory.Clear();
+        AddStartingItems();
         PlayerSpawn.NEED_SPAWN = false;
         CutsceneReturnContext.Clear();
         GameSessionTracker.StartNewSession();
         SceneTransition.LoadScene(newGameSceneName);
     }
 
-    // Opens the manual Continue slot list from the main menu.
+    // Adds the configured new-game inventory items after clearing previous state.
+    private void AddStartingItems()
+    {
+        if (startingItems == null) return;
+
+        for (int i = 0; i < startingItems.Length; i++)
+        {
+            StartingItem item = startingItems[i];
+            if (item == null || string.IsNullOrWhiteSpace(item.itemUniqueID)) continue;
+
+            Inventory.AddItem(
+                item.itemName,
+                item.itemType,
+                item.itemUniqueID,
+                item.itemDescription,
+                item.itemIconResourcePath
+            );
+        }
+    }
+
+    // Continues the continue game flow from its current state.
     public void ContinueGame()
     {
         MainMenuLoadPanelController.OpenPanel();
     }
 
-    // 退出游戏（仅打包后生效，编辑器中无效果）
-    // Quits the application from the main menu flow.
+    // Quits the application or exits Play Mode in the Unity Editor.
     public void QuitGame()
     {
         Application.Quit();
         #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false; // 编辑器中停止运行
+        UnityEditor.EditorApplication.isPlaying = false; // Stop Play Mode in the Unity Editor.
         #endif
     }
 
-    // Alias for UI buttons labeled Exit.
+    // Handles the exit game step for this script.
     public void ExitGame()
     {
         QuitGame();

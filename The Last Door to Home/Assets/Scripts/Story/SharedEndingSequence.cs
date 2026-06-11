@@ -1,20 +1,19 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
 /*
-Purpose: Provides the shared two-phase ending flow used by story and battle defeat sequences.
-Attached GameObject: A component that triggers or owns a two-stage ending sequence.
-Main responsibilities: Lock the player, fade the player out, run first and second dialogue phases, manage blackout, and finish the ending.
-Inputs: Serialized dialogue content, optional images and audio settings, and scene-finish configuration supplied by derived classes.
-Outputs or effects: Centralizes the shared ending presentation so individual triggers only define how the sequence starts.
-Authorship or assistance: Original gameplay script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the dialogue ordering, blackout layering, player fade, and final scene transition in Play Mode.
+Purpose: Defines or executes story progression logic.
+Attached GameObject: Story controller, trigger object, or ScriptableObject asset depending on the script type.
+Main responsibilities: Tracks story flags/counters, evaluates story beats, and triggers dialogue or ending flows.
+Inputs: Story event IDs, flags, counters, configured beats, interaction triggers, and scene state.
+Outputs or effects: Updates story state, starts dialogue/events, blocks progression when needed, or triggers ending sequences.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify each story event fires once or repeats as designed and survives save/load when required.
 */
 
 public abstract class SharedEndingSequence : MonoBehaviour
 {
-    [Header("第一段对话")]
+    [Header("第一段对话 / First Dialogue")]
     [TextArea(2, 8)]
     public string[] firstDialogues;
     public Sprite firstDialogueImage;
@@ -23,30 +22,30 @@ public abstract class SharedEndingSequence : MonoBehaviour
     [Tooltip("第一段配图从第几句开始时关闭。若大于第一段对话数量，则第一段播完后关闭。")]
     [Min(1)]
     public int firstDialogueImageHideLine = 2;
-    [Header("第一段配图出场背景渐变")]
+    [Header("第一段配图出场背景渐变 / First Illustration Background Fade")]
     [SerializeField] private float firstImageDarkenDuration = 0.35f;
     [SerializeField] private float firstImageBrightenDuration = 0.45f;
     [Range(0f, 1f)]
     [SerializeField] private float firstImageBackgroundDarkAlpha = 1f;
 
-    [Header("第二段结局对话")]
+    [Header("第二段结局对话 / Second Ending Dialogue")]
     [TextArea(2, 8)]
     public string[] endingDialogues;
     public Sprite endingImage;
     public DialogueAudioSettings endingDialogueAudioSettings;
 
-    [Header("场景切换")]
+    [Header("场景切换 / Scene Transition")]
     public string mainMenuSceneName = "MainMenu";
     public bool clearInventoryOnFinish = false;
 
-    [Header("玩家消失效果")]
+    [Header("玩家消失效果 / Player Disappear Effect")]
     [Tooltip("Player 从第一段对话的第几句开始消失。若大于第一段对话数量，则第一段播完后再消失，然后进入黑屏。")]
     [Min(1)]
     [SerializeField] private int playerFadeStartLine = 1;
     [SerializeField] private float playerFadeDuration = 1.2f;
     [SerializeField] private float postFadeDelay = 0.15f;
 
-    [Header("第二段前黑屏")]
+    [Header("第二段前黑屏 / Blackout Before Second Phase")]
     [SerializeField] private float blackoutFadeDuration = 0.8f;
     [SerializeField] private Color blackoutColor = Color.black;
 
@@ -63,7 +62,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
     private Coroutine firstDialogueImageRevealRoutine;
     private Coroutine firstDialogueImageCloseRoutine;
 
-    // Starts the shared ending flow once and ignores repeat triggers.
+    // Starts the start ending sequence or runtime effect.
     protected void StartEnding(GameObject playerObject)
     {
         if (triggered)
@@ -75,7 +74,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         StartCoroutine(PlayEndingSequence(playerObject));
     }
 
-    // Starts the ending sequence flow after the trigger conditions are met.
+    // Plays the play ending sequence sequence or audio feedback.
     private IEnumerator PlayEndingSequence(GameObject playerObject)
     {
         DialogueManager dialogueManager = DialogueManager.Instance;
@@ -140,7 +139,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         yield return BeginSecondPhase(dialogueManager);
     }
 
-    // Starts the blackout transition and then opens the second ending dialogue segment.
+    // Begins the begin second phase sequence.
     private IEnumerator BeginSecondPhase(DialogueManager dialogueManager)
     {
         UnregisterFirstDialogueImageTrigger();
@@ -186,7 +185,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         dialogueManager.ShowDialogue(endingDialogues, null, null, FinishEnding, endingDialogueAudioSettings);
     }
 
-    // Starts waiting for the configured first-phase line before revealing the illustration.
+    // Registers callbacks used by register first dialogue image trigger.
     private void RegisterFirstDialogueImageTrigger()
     {
         if (firstDialogueImage == null)
@@ -199,7 +198,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         DialogueManager.DialogueLineShown += HandleFirstDialogueLineShown;
     }
 
-    // Stops listening for the first-phase image trigger once it is no longer needed.
+    // Unregisters callbacks used by unregister first dialogue image trigger.
     private void UnregisterFirstDialogueImageTrigger()
     {
         if (!isWaitingToShowFirstDialogueImage)
@@ -211,7 +210,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         isWaitingToShowFirstDialogueImage = false;
     }
 
-    // Reveals the first dialogue image once the configured line index is reached.
+    // Handles the event or callback associated with this method.
     private void HandleFirstDialogueLineShown(string lineText, int lineIndex, int totalLines)
     {
         if (!isWaitingToShowFirstDialogueImage || firstDialogueImage == null)
@@ -234,7 +233,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         UnregisterFirstDialogueImageTrigger();
     }
 
-    // Starts waiting for the configured line before hiding the first illustration.
+    // Registers callbacks used by register first dialogue image hide trigger.
     private void RegisterFirstDialogueImageHideTrigger()
     {
         if (firstDialogueImage == null)
@@ -247,7 +246,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         DialogueManager.DialogueLineShown += HandleFirstDialogueImageHideLineShown;
     }
 
-    // Stops listening for the first illustration hide line.
+    // Unregisters callbacks used by unregister first dialogue image hide trigger.
     private void UnregisterFirstDialogueImageHideTrigger()
     {
         if (!isWaitingToHideFirstDialogueImage)
@@ -259,7 +258,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         isWaitingToHideFirstDialogueImage = false;
     }
 
-    // Hides the first illustration once its configured ending line is reached.
+    // Handles the event or callback associated with this method.
     private void HandleFirstDialogueImageHideLineShown(string lineText, int lineIndex, int totalLines)
     {
         if (!isWaitingToHideFirstDialogueImage)
@@ -286,7 +285,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         }
     }
 
-    // Darkens the background before showing the first illustration.
+    // Handles the reveal first dialogue image step for this script.
     private void RevealFirstDialogueImage(DialogueManager dialogueManager)
     {
         if (dialogueManager == null || firstDialogueImage == null)
@@ -300,7 +299,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageRevealRoutine = StartCoroutine(RevealFirstDialogueImageRoutine(dialogueManager));
     }
 
-    // Uses the existing blackout layer below dialogue UI so only the scene background fades.
+    // Handles the reveal first dialogue image routine step for this script.
     private IEnumerator RevealFirstDialogueImageRoutine(DialogueManager dialogueManager)
     {
         yield return FadeBlackout(firstImageBackgroundDarkAlpha, firstImageDarkenDuration);
@@ -314,7 +313,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageRevealRoutine = null;
     }
 
-    // Starts the first illustration close transition if it is not already running.
+    // Starts the start first dialogue image close sequence or runtime effect.
     private void StartFirstDialogueImageClose(DialogueManager dialogueManager)
     {
         if (firstDialogueImageCloseRoutine != null)
@@ -325,7 +324,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageCloseRoutine = StartCoroutine(CloseFirstDialogueImageIfNeeded(dialogueManager));
     }
 
-    // Waits for any active close transition, or runs one at first dialogue end.
+    // Handles the wait for first dialogue image close step for this script.
     private IEnumerator WaitForFirstDialogueImageClose(DialogueManager dialogueManager)
     {
         if (firstDialogueImageCloseRoutine != null)
@@ -337,7 +336,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         yield return CloseFirstDialogueImageIfNeeded(dialogueManager);
     }
 
-    // Hides the first illustration, waits for its exit animation, then restores the background.
+    // Closes the related UI or gameplay flow.
     private IEnumerator CloseFirstDialogueImageIfNeeded(DialogueManager dialogueManager)
     {
         UnregisterFirstDialogueImageHideTrigger();
@@ -358,7 +357,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageCloseRoutine = null;
     }
 
-    // Prevents the first-image reveal fade from fighting the ending blackout.
+    // Stops the stop first dialogue image reveal routine sequence or runtime effect.
     private void StopFirstDialogueImageRevealRoutine()
     {
         if (firstDialogueImageRevealRoutine == null)
@@ -370,7 +369,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageRevealRoutine = null;
     }
 
-    // Stops any active first-image close transition during teardown or a fresh reveal.
+    // Stops the stop first dialogue image close routine sequence or runtime effect.
     private void StopFirstDialogueImageCloseRoutine()
     {
         if (firstDialogueImageCloseRoutine == null)
@@ -382,7 +381,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         firstDialogueImageCloseRoutine = null;
     }
 
-    // Starts waiting for the configured first-phase line before beginning the player fade.
+    // Registers callbacks used by register player fade trigger.
     private void RegisterPlayerFadeTrigger()
     {
         if (pendingPlayerObject == null)
@@ -396,7 +395,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         DialogueManager.DialogueLineShown += HandlePlayerFadeLineShown;
     }
 
-    // Stops listening for the player-fade trigger once it has fired or is no longer needed.
+    // Unregisters callbacks used by unregister player fade trigger.
     private void UnregisterPlayerFadeTrigger()
     {
         if (!isWaitingToStartPlayerFade)
@@ -408,7 +407,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         isWaitingToStartPlayerFade = false;
     }
 
-    // Starts the player fade once the configured first dialogue line is shown.
+    // Handles the event or callback associated with this method.
     private void HandlePlayerFadeLineShown(string lineText, int lineIndex, int totalLines)
     {
         if (!isWaitingToStartPlayerFade)
@@ -431,7 +430,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         StartPlayerFadeIfNeeded();
     }
 
-    // Ensures the player fade coroutine is launched only once.
+    // Starts the start player fade if needed sequence or runtime effect.
     private void StartPlayerFadeIfNeeded()
     {
         if (isPlayerFadeStarted)
@@ -443,7 +442,7 @@ public abstract class SharedEndingSequence : MonoBehaviour
         StartCoroutine(FadeOutPlayer(pendingPlayerObject));
     }
 
-    // Fades out the player presentation before the ending finishes.
+    // Fades the related visual element for the fade out player step.
     private IEnumerator FadeOutPlayer(GameObject playerObject)
     {
         if (playerObject == null)
@@ -500,13 +499,13 @@ public abstract class SharedEndingSequence : MonoBehaviour
         isPlayerFadeComplete = true;
     }
 
-    // Checks whether the supplied dialogue array contains at least one usable line.
+    // Returns whether the required has dialogue condition is met.
     private bool HasDialogue(string[] dialogues)
     {
         return dialogues != null && dialogues.Length > 0;
     }
 
-    // Creates a blackout overlay that sits below the dialogue UI but above the scene.
+    // Ensures the required ensure blackout overlay objects or state exist.
     private void EnsureBlackoutOverlay(DialogueManager dialogueManager)
     {
         if (blackoutCanvasGroup != null) return;
@@ -555,13 +554,13 @@ public abstract class SharedEndingSequence : MonoBehaviour
         blackoutOverlay.transform.SetSiblingIndex(Mathf.Max(0, overlayIndex));
     }
 
-    // Fades the scene blackout layer while keeping the dialogue UI visible above it.
+    // Fades the related visual element for the fade blackout step.
     private IEnumerator FadeBlackout(float targetAlpha)
     {
         yield return FadeBlackout(targetAlpha, blackoutFadeDuration);
     }
 
-    // Fades the scene blackout layer over a caller-specified duration.
+    // Fades the related visual element for the fade blackout step.
     private IEnumerator FadeBlackout(float targetAlpha, float duration)
     {
         if (blackoutCanvasGroup == null) yield break;

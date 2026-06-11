@@ -1,36 +1,36 @@
 using UnityEngine;
 /*
-Purpose: Manages s wi tc hs ce ne behavior for this part of the game.
-Attached GameObject: Relevant scene controller GameObject.
-Main responsibilities: Coordinate inspector data, runtime checks, and the main behaviour handled by this script.
-Inputs: Inspector configuration, scene references, and runtime method calls.
-Outputs or effects: Applies runtime side effects through component state, UI updates, or return values.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Changes scenes when the player enters a configured trigger.
+Attached GameObject: Scene exit or doorway GameObject with a 2D trigger collider.
+Main responsibilities: Detects the player, optionally runs a story event, sets the next spawn point, plays SFX, and loads the target scene.
+Inputs: Player trigger events, target scene name, spawn position, optional story event ID, and scene-switch audio settings.
+Outputs or effects: Stops the player when blocked, updates PlayerSpawn, plays SFX, and starts a scene transition.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify trigger cooldown, blocked story events, spawn placement, and transition audio.
 */
 
 public class SwitchScene : MonoBehaviour
 {
-    [Header("目标场景")]
+    [Header("目标场景 / Target Scene")]
     public string targetSceneName;
 
-    [Header("出生点")]
+    [Header("出生点 / Spawn Position")]
     public Vector2 spawnPosition;
 
-    [Header("离场剧情事件（可选）")]
+    [Header("离场剧情事件（可选） / Exit Story Event (Optional)")]
     public string beforeExitEventId;
 
-    [Header("拦截后再次触发冷却（秒）")]
+    [Header("拦截后再次触发冷却（秒） / Retrigger Cooldown After Block (Seconds)")]
     public float reTriggerCooldown = 0.25f;
 
-    [Header("音效")]
+    [Header("音效 / Audio")]
     public AudioClip sceneSwitchSfx;
     [Range(0f, 1f)] public float sceneSwitchSfxVolume = 1f;
 
     private bool handledThisStay;
     private float nextAllowedTriggerTime;
 
-    // Handles trigger entry events for this gameplay object.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
@@ -53,7 +53,7 @@ public class SwitchScene : MonoBehaviour
         SwitchNow();
     }
 
-    // Stops the player immediately before a forced scene transition.
+    // Handles the force stop player step for this script.
     private void ForceStopPlayer(GameObject playerObj)
     {
         if (playerObj == null) return;
@@ -71,7 +71,7 @@ public class SwitchScene : MonoBehaviour
         }
     }
 
-    // Performs the actual scene switch once trigger conditions are satisfied.
+    // Switches to the target scene or state for switch now.
     private void SwitchNow()
     {
         if (string.IsNullOrWhiteSpace(targetSceneName)) return;
@@ -87,7 +87,7 @@ public class SwitchScene : MonoBehaviour
         });
     }
 
-    // Handles trigger exit events for this gameplay object.
+    // Handles 2D trigger exit events for this object.
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;

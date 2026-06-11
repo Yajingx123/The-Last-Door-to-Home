@@ -2,45 +2,44 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System;
-
 /*
-Purpose: Manages s af ei nt er ac ti on behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class SafeInteraction : MonoBehaviour, IInteractable
 {
-    [Header("保险箱唯一ID（用于跨场景记忆解锁状态）")]
+    [Header("保险箱唯一ID（用于跨场景记忆解锁状态） / Safe Unique ID (Remembers Unlock Across Scenes)")]
     public string safeUniqueID = "safe_01";
 
-    [Header("密码设置")]
+    [Header("密码设置 / Password Settings")]
     public string correctPassword = "0420";
 
-    [Header("对白：未破解")]
+    [Header("对白：未破解 / Dialogue: Locked")]
     [TextArea(2, 8)]
     public string[] lockedDialogues;
 
-    [Header("对白：密码错误")]
+    [Header("对白：密码错误 / Dialogue: Wrong Password")]
     [TextArea(2, 8)]
     public string[] wrongPasswordDialogues = new string[] { "密码错误。" };
 
-    [Header("对白：破解后（最后一句会出现拾取选项）")]
+    [Header("对白：破解后（最后一句会出现拾取选项） / Dialogue: Unlocked (Pickup Option On Last Line)")]
     [TextArea(2, 8)]
     public string[] unlockedDialogues;
 
-    [Header("对白：奖励已拾取后")]
+    [Header("对白：奖励已拾取后 / Dialogue: Reward Already Collected")]
     [TextArea(2, 8)]
     public string[] afterLootDialogues = new string[] { "保险箱已经空了。" };
 
-    [Header("奖励物品（挂了PickableItem的物体）")]
+    [Header("奖励物品（挂了PickableItem的物体） / Reward Item (Object With PickableItem)")]
     public PickableItem rewardItem;
 
-    [Header("密码UI（4位）")]
+    [Header("密码UI（4位） / Password UI (4 Digits)")]
     public GameObject passwordPanel;
     public TextMeshProUGUI[] digitTexts;
     public Color selectedColor = Color.yellow;
@@ -52,7 +51,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
     private int currentDigitIndex;
     private int passwordOpenFrame = -1;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
         isUnlocked = Inventory.IsSafeUnlocked(safeUniqueID);
@@ -60,7 +59,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         ResetPasswordInput();
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (!isPasswordInputActive) return;
@@ -102,7 +101,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null) return;
@@ -119,7 +118,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
             return;
         }
 
-        // 未破解：先对话，最后一句打开4位密码输入面板
+        // Locked state: play dialogue first, then open the four-digit password input.
         if (lockedDialogues != null && lockedDialogues.Length > 0)
         {
             DialogueManager.Instance.ShowDialogue(lockedDialogues, null, OpenPasswordInput);
@@ -130,7 +129,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Opens the safe password input UI for player entry.
+    // Opens the related UI or gameplay flow.
     private void OpenPasswordInput()
     {
         TryResolvePasswordUIReferences();
@@ -151,7 +150,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         RefreshPasswordUI();
     }
 
-    // Attempts to resolve missing password UI references from the scene hierarchy.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryResolvePasswordUIReferences()
     {
         if (passwordPanel == null)
@@ -213,7 +212,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Finds a child transform by name within the current hierarchy.
+    // Searches the scene hierarchy or data collection for the requested target.
     private Transform FindChildByName(Transform root, string targetName)
     {
         for (int i = 0; i < root.childCount; i++)
@@ -226,7 +225,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         return null;
     }
 
-    // Builds a readable hierarchy path for debugging and lookup logs.
+    // Returns the requested value or runtime object.
     private string GetHierarchyPath(Transform node)
     {
         if (node == null) return string.Empty;
@@ -242,7 +241,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         return string.Join("/", names.ToArray());
     }
 
-    // Validates and submits the currently entered safe password.
+    // Submits the current input for the submit password flow.
     private void SubmitPassword()
     {
         string input = BuildPasswordString();
@@ -260,14 +259,14 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         ShowFallbackDialogue(wrongPasswordDialogues, "密码错误。", true);
     }
 
-    // Closes the safe password input UI and restores the prior state.
+    // Closes the related UI or gameplay flow.
     private void ClosePasswordInput()
     {
         isPasswordInputActive = false;
         if (passwordPanel != null) passwordPanel.SetActive(false);
     }
 
-    // Clears the current password entry state and updates the UI.
+    // Resets the reset password input state to its default value.
     private void ResetPasswordInput()
     {
         for (int i = 0; i < currentDigits.Length; i++) currentDigits[i] = 0;
@@ -275,7 +274,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         RefreshPasswordUI();
     }
 
-    // Refreshes the safe password UI to match the current input state.
+    // Refreshes UI text, selection, or cached runtime data.
     private void RefreshPasswordUI()
     {
         if (digitTexts == null || digitTexts.Length < 4) return;
@@ -288,7 +287,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Builds the current password string from the entered digits.
+    // Builds data or UI objects required by this system.
     private string BuildPasswordString()
     {
         return string.Concat(
@@ -299,12 +298,12 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         );
     }
 
-    // Shows the unlocked safe dialogue and then offers the reward pickup.
+    // Shows the show unlocked dialogue with pick UI or dialogue flow.
     private void ShowUnlockedDialogueWithPick()
     {
         if (DialogueManager.Instance == null) return;
 
-        // 破解后的对白最后一句弹出拾取选项；拾取提示由PickableItem内部处理
+        // After unlocking, the final dialogue line opens the pickup option.
         if (rewardItem != null)
         {
             DialogueManager.Instance.ShowDialogue(unlockedDialogues, rewardItem);
@@ -315,7 +314,7 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Continues the unlocked safe dialogue flow after the password is accepted.
+    // Continues the continue unlocked dialogue with pick after password flow from its current state.
     private void ContinueUnlockedDialogueWithPickAfterPassword()
     {
         if (DialogueManager.Instance == null) return;
@@ -330,14 +329,14 @@ public class SafeInteraction : MonoBehaviour, IInteractable
         }
     }
 
-    // Checks whether the safe reward has already been collected.
+    // Returns whether is reward collected is true for the current state.
     private bool IsRewardCollected()
     {
         if (rewardItem == null) return false;
         return Inventory.HasCollected(rewardItem.itemUniqueID);
     }
 
-    // Shows the fallback dialogue for this interaction state.
+    // Shows the show fallback dialogue UI or dialogue flow.
     private void ShowFallbackDialogue(string[] lines, string fallback, bool continueAfterOption = false)
     {
         if (DialogueManager.Instance == null) return;

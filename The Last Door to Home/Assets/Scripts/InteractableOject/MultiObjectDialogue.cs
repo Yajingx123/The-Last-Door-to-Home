@@ -1,41 +1,41 @@
 using UnityEngine;
 
 /// <summary>
-/// 多对象共享对话进度：
-/// - targets: 指定属于同一组进度的对象
-/// - beatSet: 按顺序触发的剧情条目
-/// - 每个对象首次触发会推进一次进度
-/// - 当进度超过 beat 数量时，索引停在最后一个 beat（但仍受 StoryBeat 全局只播一次限制）
+/// Shares dialogue progress across multiple objects.
+/// - targets: Objects that belong to the same progress group.
+/// - beatSet: Story beats triggered in sequence.
+/// - Each object's first interaction advances progress once.
+/// - When progress exceeds the beat count, the index stays on the final beat.
 /// </summary>
 /*
-Purpose: Manages m ul ti ob je ct di al og ue behavior for this part of the game.
-Attached GameObject: Interactable scene object with collider and interaction logic.
-Main responsibilities: Respond to player interaction requests and trigger the correct object-specific outcome.
-Inputs: Player interaction calls, inspector configuration, and current story or inventory state.
-Outputs or effects: Triggers dialogue, state changes, item flow, or scene reactions after interaction.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Implements a world interaction used by the player interaction system.
+Attached GameObject: Scene object with a Collider2D and interaction-specific serialized settings.
+Main responsibilities: Checks interaction requirements, updates inventory/story/scene state, and provides player feedback.
+Inputs: Player interaction calls, serialized IDs/text, inventory state, story flags, and optional audio or scene settings.
+Outputs or effects: Starts dialogue, changes locked/collected state, updates Inventory/StoryFlags, plays audio, or triggers scene flow.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify successful interaction, missing-requirement feedback, repeated interaction behavior, and save/load persistence.
 */
 
 public class MultiObjectDialogue : MonoBehaviour, IInteractable
 {
-    [Header("参与这组进度的对象")]
+    [Header("参与这组进度的对象 / Objects In This Progress Group")]
     public GameObject[] targets;
 
-    [Header("按顺序触发的剧情条目组")]
+    [Header("按顺序触发的剧情条目组 / Sequential Story Beat Group")]
     public StoryBeatSet beatSet;
 
-    [Header("进度组ID（同一组对象要相同）")]
+    [Header("进度组ID（同一组对象要相同） / Progress Group ID (Same For Group Objects)")]
     public string groupId = "multi_object_dialogue";
 
-    [Header("未命中剧情时的兜底对白（可选）")]
+    [Header("未命中剧情时的兜底对白（可选） / Fallback Dialogue When No Story Matches (Optional)")]
     [TextArea(2, 6)]
     public string[] fallbackDialogues;
 
-    [Header("调试")]
+    [Header("调试 / Debug")]
     public bool enableDebugLogs = true;
 
-    // Executes this object interaction when the player activates it.
+    // Handles player interaction with this object.
     public void OnInteract()
     {
         if (DialogueManager.Instance == null) return;
@@ -79,7 +79,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         }
     }
 
-    // Resolves the trigger target that this interaction should use.
+    // Resolves the best available value for the requested data.
     private GameObject ResolveTriggerTarget()
     {
         if (targets == null || targets.Length == 0) return gameObject;
@@ -110,7 +110,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return best != null ? best : gameObject;
     }
 
-    // Finds or returns the player transform used by this interaction.
+    // Returns the requested value or runtime object.
     private Transform GetPlayerTransform()
     {
         if (DialogueManager.Instance != null && DialogueManager.Instance.player != null)
@@ -122,7 +122,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return player != null ? player.transform : null;
     }
 
-    // Returns the closest valid interaction point for the player.
+    // Returns the requested value or runtime object.
     private Vector2 GetClosestPoint(GameObject target, Vector3 playerPos)
     {
         if (target == null) return playerPos;
@@ -152,34 +152,34 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return bestPoint;
     }
 
-    // Builds a stable identifier for this interactable target.
+    // Returns the requested value or runtime object.
     private string GetStableId(Transform targetTransform)
     {
         if (targetTransform == null) return "UnknownTarget";
         return gameObject.scene.name + ":" + targetTransform.GetHierarchyPath();
     }
 
-    // Builds the counter key used for repeat interaction tracking.
+    // Returns the requested value or runtime object.
     private static string GetCounterKey(string group)
     {
         return $"MOD:Counter:{group}";
     }
 
-    // Normalizes the supplied identifier into a consistent comparison format.
+    // Normalizes the normalize value for reliable comparisons.
     private static string Normalize(string value, string fallback)
     {
         if (string.IsNullOrWhiteSpace(value)) return fallback;
         return value.Trim();
     }
 
-    // Shows fallback feedback when no specific interaction result is available.
+    // Shows the show fallback UI or dialogue flow.
     private void ShowFallback()
     {
         if (fallbackDialogues == null || fallbackDialogues.Length == 0) return;
         DialogueManager.Instance.ShowDialogue(fallbackDialogues);
     }
 
-    // Returns the blocking reason that prevents this interaction from proceeding.
+    // Returns the requested value or runtime object.
     private string GetBlockReason(StoryBeat beat)
     {
         if (StoryDirector.Instance == null) return "StoryDirector.Instance 为空。";
@@ -204,7 +204,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return "未知原因（建议检查 Console 其他报错）。";
     }
 
-    // Verifies that every required story flag is currently set.
+    // Returns whether the required has all flags condition is met.
     private bool HasAllFlags(string[] flags)
     {
         if (flags == null) return true;
@@ -217,7 +217,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return true;
     }
 
-    // Checks whether any blocking story flag is currently set.
+    // Returns whether the required has any flag condition is met.
     private bool HasAnyFlag(string[] flags)
     {
         if (flags == null) return false;
@@ -230,7 +230,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return false;
     }
 
-    // Verifies that all required inventory items are currently collected.
+    // Returns whether the required has all items condition is met.
     private bool HasAllItems(string[] itemIDs)
     {
         if (itemIDs == null) return true;
@@ -243,7 +243,7 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return true;
     }
 
-    // Checks whether any blocked inventory item is currently collected.
+    // Returns whether the required has any item condition is met.
     private bool HasAnyItem(string[] itemIDs)
     {
         if (itemIDs == null) return false;
@@ -282,17 +282,16 @@ public class MultiObjectDialogue : MonoBehaviour, IInteractable
         return beat.dialogues;
     }
 
-    // Writes a contextual debug message for this interaction helper.
+    // Writes debug information for the log flow when logging is enabled.
     private void Log(string msg)
     {
         if (!enableDebugLogs) return;
         Debug.Log($"[MultiObjectDialogue] {msg}", this);
     }
 }
-
 public static class TransformPathExtensions
 {
-    // Builds a readable hierarchy path for debugging and lookup logs.
+    // Returns the requested value or runtime object.
     public static string GetHierarchyPath(this Transform transform)
     {
         if (transform == null) return "Unknown";

@@ -1396,6 +1396,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   newGameSceneName: IntroCutScene
+  startingItems:
+  - itemUniqueID: ID_card_Kian
+    itemName: Your ID Card
+    itemType: 0
+    itemDescription: You own ID card.
+    itemIconResourcePath: ItemIcons/Stone_ID_card#mirror_ID_card_2
 --- !u!114 &1792449901
 MonoBehaviour:
   m_ObjectHideFlags: 0

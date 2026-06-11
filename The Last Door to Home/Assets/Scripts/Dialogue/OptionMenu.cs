@@ -2,21 +2,20 @@ using UnityEngine;
 using TMPro;
 using System;
 using System.Collections.Generic;
-
 /*
-Purpose: Displays interactive option choices and routes the player selection to callbacks.
-Attached GameObject: Dialogue UI manager or option menu GameObject in the scene canvas.
-Main responsibilities: Control dialogue UI state, react to input, and notify dependent gameplay systems.
-Inputs: UI references, dialogue content arrays, callbacks, and player input.
-Outputs or effects: Shows or hides UI, locks controls, and triggers dialogue-related side effects.
-Authorship or assistance: Original game script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify inspector references, expected play-mode behavior, and any related UI or audio feedback after changes.
+Purpose: Displays a keyboard-driven option menu for interactions and dialogue choices.
+Attached GameObject: Option menu UI controller or runtime singleton.
+Main responsibilities: Builds option entries, tracks selection, validates availability, and invokes selected actions.
+Inputs: Option entries, navigation keys, confirmation/cancel input, and optional close callbacks.
+Outputs or effects: Updates option UI and executes the selected option action.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify disabled options, wrapping selection, cancel behavior, and callback order.
 */
 
 public class OptionMenu : MonoBehaviour
 {
     [Serializable]
-    public class OptionEntry
+public class OptionEntry
     {
         public string text;
         public Func<bool> canExecute;
@@ -26,7 +25,7 @@ public class OptionMenu : MonoBehaviour
 
     public static OptionMenu Instance;
 
-    [Header("UI")]
+    [Header("UI / 界面")]
     public GameObject optionPanel;
     public TextMeshProUGUI[] options;
     [SerializeField] private int maxOptions = 4;
@@ -35,7 +34,7 @@ public class OptionMenu : MonoBehaviour
     [SerializeField] private float panelPaddingBottom = 20f;
     [SerializeField] private float optionLineGap = 20f;
 
-    [Header("玩家物体（拖Player）")]
+    [Header("玩家物体（拖Player） / Player Object (Drag Player)")]
     public GameObject player;
 
     private int currentSelect;
@@ -55,7 +54,7 @@ public class OptionMenu : MonoBehaviour
     private readonly Color selectedTextColor = new Color(1f, 0.92f, 0.45f, 1f);
     private readonly Color normalTextColor = Color.white;
 
-    // Initializes cached references and one-time component state before gameplay begins.
+    // Initializes component references and singleton ownership before Start runs.
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -76,7 +75,7 @@ public class OptionMenu : MonoBehaviour
         InitializeOptionTemplate();
     }
 
-    // Cleans up cached state and running effects during teardown.
+    // Cleans up runtime references before the object is destroyed.
     void OnDestroy()
     {
         if (Instance == this)
@@ -85,7 +84,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Processes per-frame input and keeps this behaviour responsive during gameplay.
+    // Reads per-frame input and updates frame-dependent runtime state.
     void Update()
     {
         if (EscapeMenuController.IsMenuOpen) return;
@@ -110,7 +109,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Shows the available pick options for this interaction.
+    // Shows the show pick options UI or dialogue flow.
     public void ShowPickOptions(PickableItem item)
     {
         if (item == null) return;
@@ -133,7 +132,7 @@ public class OptionMenu : MonoBehaviour
         ShowOptions(entries, true, null);
     }
 
-    // Shows the supplied option entries in the dialogue option menu.
+    // Shows the show options UI or dialogue flow.
     public void ShowOptions(List<OptionEntry> entries, bool closeDialogueOnConfirm = true, Action onMenuClosed = null)
     {
         if (optionPanel == null)
@@ -180,7 +179,7 @@ public class OptionMenu : MonoBehaviour
         RefreshVisualSelection();
     }
 
-    // Refreshes the option text styling to match the pause menu selection style.
+    // Refreshes UI text, selection, or cached runtime data.
     void RefreshVisualSelection()
     {
         if (currentEntries == null || currentEntries.Count == 0) return;
@@ -201,7 +200,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Initializes the reusable option UI template reference.
+    // Handles the initialize option template step for this script.
     private void InitializeOptionTemplate()
     {
         optionSlots.Clear();
@@ -233,7 +232,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Ensures the option menu has enough UI slots for the current entries.
+    // Ensures the required ensure option slots objects or state exist.
     private void EnsureOptionSlots(int requiredCount)
     {
         if (requiredCount <= 0) return;
@@ -264,7 +263,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Resizes the option panel to fit the active entry count.
+    // Handles the resize option panel step for this script.
     private void ResizeOptionPanel(int count)
     {
         if (optionPanel == null) return;
@@ -289,7 +288,7 @@ public class OptionMenu : MonoBehaviour
         RepositionOptionSlots(count);
     }
 
-    // Repositions option slots so the current menu layout stays aligned.
+    // Handles the reposition option slots step for this script.
     private void RepositionOptionSlots(int count)
     {
         if (count <= 0) return;
@@ -307,7 +306,7 @@ public class OptionMenu : MonoBehaviour
         }
     }
 
-    // Confirms the currently highlighted option and runs its callback.
+    // Handles the confirm select step for this script.
     void ConfirmSelect()
     {
         if (currentEntries == null || currentEntries.Count == 0) return;

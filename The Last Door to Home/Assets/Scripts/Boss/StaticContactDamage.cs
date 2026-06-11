@@ -1,13 +1,12 @@
 using UnityEngine;
-
 /*
-Purpose: Applies monster-style contact damage from a stationary scene hazard.
-Attached GameObject: Any static hazard object with a Collider2D trigger.
-Main responsibilities: Resolve the shared monster controller and damage the player on trigger contact.
-Inputs: Optional monster controller reference and a source label for debug logging.
-Outputs or effects: Reduces player hearts through MonsterController without moving the hazard.
-Authorship or assistance: Original gameplay support script with English documentation assistance added via OpenAI Codex.
-Testing notes: Verify the collider is set as a trigger and that the scene contains a MonsterController.
+Purpose: Controls boss, enemy, damage, or boss-ending behavior.
+Attached GameObject: Boss/enemy GameObject, damage hitbox, or boss-scene controller.
+Main responsibilities: Updates combat movement/state, resolves contact damage, handles defeat, and triggers ending or door behavior.
+Inputs: Player position, colliders, serialized combat settings, health/progression state, and scene triggers.
+Outputs or effects: Moves enemies, applies damage, updates animations, changes story/ending state, or loads scenes.
+Authorship or assistance: Original project script; comments and documentation wording assisted by OpenAI Codex.
+Testing notes: Verify combat states, damage timing, defeat conditions, and ending transitions.
 */
 
 public class StaticContactDamage : MonoBehaviour
@@ -15,25 +14,25 @@ public class StaticContactDamage : MonoBehaviour
     [SerializeField] private MonsterController controller;
     [SerializeField] private string sourceName = "StaticHazard";
 
-    // Finds the shared monster controller automatically when one is not assigned.
+    // Initializes component references and singleton ownership before Start runs.
     private void Awake()
     {
         ResolveController();
     }
 
-    // Damages the player when they first touch this hazard.
+    // Handles 2D trigger entry events for this object.
     private void OnTriggerEnter2D(Collider2D other)
     {
         TryDamagePlayer(other);
     }
 
-    // Keeps the hazard damaging when the player remains inside it.
+    // Handles 2D trigger stay events for this object.
     private void OnTriggerStay2D(Collider2D other)
     {
         TryDamagePlayer(other);
     }
 
-    // Sends one damage request through the shared monster battle controller.
+    // Attempts the requested operation and reports whether it succeeded.
     private void TryDamagePlayer(Collider2D other)
     {
         ResolveController();
@@ -46,7 +45,7 @@ public class StaticContactDamage : MonoBehaviour
         controller.TryDamagePlayer(sourceName, this);
     }
 
-    // Finds the scene monster controller when the reference is left empty.
+    // Resolves the best available value for the requested data.
     private void ResolveController()
     {
         if (controller == null)

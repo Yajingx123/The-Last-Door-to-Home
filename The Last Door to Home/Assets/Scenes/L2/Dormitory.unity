@@ -5212,7 +5212,7 @@ MonoBehaviour:
     Jeff is your roommate but you hardly see
     him. He is the administtrator of the archive room.'
   itemIcon: {fileID: 1726944928, guid: 5b5281d7abd695c458bc2eb9d91616a9, type: 3}
-  itemIconResourcePath: 
+  itemIconResourcePath: ItemIcons/Stone_ID_card#mirror_ID_card_3
   prePickDialogues:
   - Jeff's closet. It is empty ... wait, you see his ID card laying at the bottom
     layer.
@@ -5220,7 +5220,10 @@ MonoBehaviour:
   pickOptionText: Pick it
   leaveOptionText: Leave
   afterPickOptionDialogues:
-  - You got Jeff's ID card.
+  - 'You got Jeff''s ID card.
+
+
+    Press [Tab] to see your inventory.'
   - How did he leave this thing here?
   afterLeaveOptionDialogues:
   - You left it there. You can come back and get it at any time.
@@ -5668,7 +5671,7 @@ MonoBehaviour:
   itemType: 4
   itemDescription: The energy stone, which is the key items to help you home.
   itemIcon: {fileID: 1507595433, guid: 5b5281d7abd695c458bc2eb9d91616a9, type: 3}
-  itemIconResourcePath: 
+  itemIconResourcePath: ItemIcons/Stone_ID_card#mirror_ID_card_0
   prePickDialogues: []
   pickOptionText: Pick Up
   leaveOptionText: Leave
