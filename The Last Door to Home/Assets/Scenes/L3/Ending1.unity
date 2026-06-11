@@ -158,6 +158,11 @@ MonoBehaviour:
   - Ameli----!
   - ...
   firstDialogueImage: {fileID: 0}
+  firstDialogueImageStartLine: 1
+  firstDialogueImageHideLine: 2
+  firstImageDarkenDuration: 0.35
+  firstImageBrightenDuration: 0.45
+  firstImageBackgroundDarkAlpha: 1
   endingDialogues:
   - ...
   - 'Ending 1: You Died
@@ -170,7 +175,7 @@ MonoBehaviour:
   - Luckily, this is just a game. You have thoundsands of chances to go home with
     Amelia.
   - Amelia is waiting for you in the next round.
-  endingImage: {fileID: 21300000, guid: 5657b0e86d4587746b9c3556db91b61d, type: 3}
+  endingImage: {fileID: 21300000, guid: 91f06dc980ef8e14994ce5d9dfad04aa, type: 3}
   endingDialogueAudioSettings:
     bgmOnStart: {fileID: 8300000, guid: 60dace1d550d772408beeb1c0c5bc66c, type: 3}
     bgmOnStartFadeOutDuration: 1
@@ -187,6 +192,7 @@ MonoBehaviour:
     quotedTypingSfxVolume: 0.25
   mainMenuSceneName: MainMenu
   clearInventoryOnFinish: 1
+  playerFadeStartLine: 1
   playerFadeDuration: 4
   postFadeDelay: 0.15
   blackoutFadeDuration: 0.8
@@ -1943,6 +1949,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3757411182501947603, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3974275403115473221, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
       propertyPath: m_Camera
       value: 
@@ -1960,6 +1970,90 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d3ca59d19f477154db3333315ca529b9, type: 3}
+--- !u!1 &1032630654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1032630656}
+  - component: {fileID: 1032630655}
+  m_Layer: 0
+  m_Name: FakeDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &1032630655
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032630654}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 5
+  m_Sprite: {fileID: 596278716, guid: 134e0615c39c1684a97b818e552cdffc, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1.25, y: 2.21875}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!4 &1032630656
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032630654}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.06, y: 5.09, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1199599442
 GameObject:
   m_ObjectHideFlags: 0
@@ -3762,7 +3856,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2b4a0a4f503d3234c9af26ba035442be, type: 2}
   - {fileID: 11400000, guid: 9e1f71b26cead444ca7a04d034edcd2e, type: 2}
   beatSets: []
-  persistBeatPlayedToPlayerPrefs: 0
   autoPlayFirstBeatOnStart: 1
   autoPlayDelaySeconds: 1
 --- !u!4 &2024124469
@@ -3793,3 +3886,4 @@ SceneRoots:
   - {fileID: 2024124469}
   - {fileID: 416062860}
   - {fileID: 1888716533}
+  - {fileID: 1032630656}

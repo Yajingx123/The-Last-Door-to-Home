@@ -5207,8 +5207,11 @@ MonoBehaviour:
   itemUniqueID: ID_card_Jeff
   itemName: Jeff's ID card
   itemType: 0
-  itemDescription: No description yet.
-  itemIcon: {fileID: 0}
+  itemDescription: 'Jeff''s ID card.
+
+    Jeff is your roommate but you hardly see
+    him. He is the administtrator of the archive room.'
+  itemIcon: {fileID: 1726944928, guid: 5b5281d7abd695c458bc2eb9d91616a9, type: 3}
   itemIconResourcePath: 
   prePickDialogues:
   - Jeff's closet. It is empty ... wait, you see his ID card laying at the bottom
@@ -5660,11 +5663,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 329389bf02f350244a1de052dfb65a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemUniqueID: stone
-  itemName: enery stone
+  itemUniqueID: stone01
+  itemName: Enery Stone
   itemType: 4
-  itemDescription: No description yet.
-  itemIcon: {fileID: 0}
+  itemDescription: The energy stone, which is the key items to help you home.
+  itemIcon: {fileID: 1507595433, guid: 5b5281d7abd695c458bc2eb9d91616a9, type: 3}
   itemIconResourcePath: 
   prePickDialogues: []
   pickOptionText: Pick Up

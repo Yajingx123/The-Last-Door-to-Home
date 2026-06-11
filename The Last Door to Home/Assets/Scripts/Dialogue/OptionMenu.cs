@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections.Generic;
@@ -30,7 +29,6 @@ public class OptionMenu : MonoBehaviour
     [Header("UI")]
     public GameObject optionPanel;
     public TextMeshProUGUI[] options;
-    public Image cursor;
     [SerializeField] private int maxOptions = 4;
     [SerializeField] private float minPanelHeight = 120f;
     [SerializeField] private float panelPaddingTop = 20f;
@@ -44,9 +42,8 @@ public class OptionMenu : MonoBehaviour
     private List<OptionEntry> currentEntries = new List<OptionEntry>();
     private Action onClose;
     private bool closeDialogueWhenConfirmed;
-    private RectTransform cursorRect;
-    private float cursorFixedX;
     private readonly List<TextMeshProUGUI> optionSlots = new List<TextMeshProUGUI>();
+    private readonly List<string> currentOptionLabels = new List<string>();
     private float optionSpacing = 100f;
     private float optionItemHeight = 50f;
     private RectTransform optionPanelRect;
@@ -55,6 +52,8 @@ public class OptionMenu : MonoBehaviour
     private TextMeshProUGUI optionTemplate;
     private float optionSlotsBaseCenterY;
     private bool hasOptionSlotsBaseCenterY;
+    private readonly Color selectedTextColor = new Color(1f, 0.92f, 0.45f, 1f);
+    private readonly Color normalTextColor = Color.white;
 
     // Initializes cached references and one-time component state before gameplay begins.
     void Awake()
@@ -72,12 +71,6 @@ public class OptionMenu : MonoBehaviour
         {
             optionPanelBaseAnchoredPos = optionPanelRect.anchoredPosition;
             hasPanelBaseAnchoredPos = true;
-        }
-
-        cursorRect = cursor != null ? cursor.GetComponent<RectTransform>() : null;
-        if (cursorRect != null)
-        {
-            cursorFixedX = cursorRect.anchoredPosition.x;
         }
 
         InitializeOptionTemplate();
@@ -102,13 +95,13 @@ public class OptionMenu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             currentSelect = Mathf.Max(0, currentSelect - 1);
-            UpdateCursor();
+            RefreshVisualSelection();
         }
         if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
             int maxIndex = Mathf.Max(0, currentEntries.Count - 1);
             currentSelect = Mathf.Min(maxIndex, currentSelect + 1);
-            UpdateCursor();
+            RefreshVisualSelection();
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
@@ -164,9 +157,11 @@ public class OptionMenu : MonoBehaviour
         EnsureOptionSlots(clampedCount);
 
         currentEntries = new List<OptionEntry>(clampedCount);
+        currentOptionLabels.Clear();
         for (int i = 0; i < clampedCount; i++)
         {
             currentEntries.Add(entries[i]);
+            currentOptionLabels.Add(entries[i].text);
         }
 
         closeDialogueWhenConfirmed = closeDialogueOnConfirm;
@@ -179,27 +174,31 @@ public class OptionMenu : MonoBehaviour
         {
             bool active = i < currentEntries.Count;
             optionSlots[i].gameObject.SetActive(active);
-            if (active) optionSlots[i].text = currentEntries[i].text;
         }
 
         ResizeOptionPanel(currentEntries.Count);
-        UpdateCursor();
+        RefreshVisualSelection();
     }
 
-    // Updates the visual cursor position for the currently selected option.
-    void UpdateCursor()
+    // Refreshes the option text styling to match the pause menu selection style.
+    void RefreshVisualSelection()
     {
-        if (cursorRect == null || currentEntries == null || currentEntries.Count == 0) return;
-        if (currentSelect < 0 || currentSelect >= currentEntries.Count) return;
-        if (currentSelect >= optionSlots.Count || optionSlots[currentSelect] == null) return;
+        if (currentEntries == null || currentEntries.Count == 0) return;
 
-        RectTransform optionRect = optionSlots[currentSelect].GetComponent<RectTransform>();
-        if (optionRect == null) return;
+        for (int i = 0; i < optionSlots.Count; i++)
+        {
+            TextMeshProUGUI optionText = optionSlots[i];
+            if (optionText == null) continue;
 
-        Vector2 pos = cursorRect.anchoredPosition;
-        pos.x = cursorFixedX;
-        pos.y = optionRect.anchoredPosition.y;
-        cursorRect.anchoredPosition = pos;
+            bool active = i < currentEntries.Count;
+            optionText.gameObject.SetActive(active);
+            if (!active) continue;
+
+            bool isSelected = i == currentSelect;
+            string label = i < currentOptionLabels.Count ? currentOptionLabels[i] : currentEntries[i].text;
+            optionText.text = isSelected ? $"> {label}" : $"  {label}";
+            optionText.color = isSelected ? selectedTextColor : normalTextColor;
+        }
     }
 
     // Initializes the reusable option UI template reference.

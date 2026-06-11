@@ -14,6 +14,10 @@ public class PlayerMove : MonoBehaviour
 {
     [Header("移动速度")]
     public float moveSpeed = 2.5f;
+    [Header("道具速度加成")]
+    [Tooltip("拿到这个 PickableItem.itemUniqueID 后，把玩家速度改成下面的数值。留空则不启用。")]
+    public string speedBoostItemUniqueID = "";
+    public float speedBoostMoveSpeed = 3f;
     [Header("松键后动画缓冲时间（秒）")]
     public float stopFreezeDelay = 0.08f;
     [Header("脚步音效")]
@@ -40,6 +44,18 @@ public class PlayerMove : MonoBehaviour
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        ApplyInventorySpeedEffect();
+    }
+
+    private void OnEnable()
+    {
+        Inventory.ItemCollected += HandleItemCollected;
+        ApplyInventorySpeedEffect();
+    }
+
+    private void OnDisable()
+    {
+        Inventory.ItemCollected -= HandleItemCollected;
     }
 
     // Processes per-frame input and keeps this behaviour responsive during gameplay.
@@ -177,5 +193,21 @@ public class PlayerMove : MonoBehaviour
 
         anim.speed = 0f;
         isMoving = false;
+    }
+
+    private void HandleItemCollected(string uniqueID)
+    {
+        if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
+        if (uniqueID != speedBoostItemUniqueID) return;
+
+        moveSpeed = speedBoostMoveSpeed;
+    }
+
+    private void ApplyInventorySpeedEffect()
+    {
+        if (string.IsNullOrWhiteSpace(speedBoostItemUniqueID)) return;
+        if (!Inventory.HasCollected(speedBoostItemUniqueID)) return;
+
+        moveSpeed = speedBoostMoveSpeed;
     }
 }
