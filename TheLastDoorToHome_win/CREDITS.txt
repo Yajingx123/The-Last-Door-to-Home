@@ -1,0 +1,90 @@
+=============================================
+                    CREDITS
+=============================================
+
+Game Version: 1.0.0
+
+---------------------------------------------
+DEVELOPMENT TEAM
+---------------------------------------------
+Lead Designer, Story Writer, Artist & Visual Design: Yajing
+Programming: Codex
+
+---------------------------------------------
+DEVELOPMENT TOOLS & ENGINE
+---------------------------------------------
+Game Engine: Unity 2022.3.62f3
+Pixel Art & Image Editing: Aseprite
+Illustration Creation: Huashijie Pro
+
+---------------------------------------------
+FONT NOTICE (Source from fonts.net.cn)
+---------------------------------------------
+Font Name: Pixel Operator
+This font is free for PERSONAL NON-COMMERCIAL USE ONLY.
+url: https://www.fonts.net.cn/font-16533239040.html
+
+---------------------------------------------
+AUDIO ASSETS (Sourced from Freesound)
+---------------------------------------------
+All sound effects are provided by creators on Freesound platform.
+Assets are licensed under CC0 and CC BY 4.0.
+
+---------- CC0 LICENSED SOUNDS ----------
+(No mandatory attribution required)
+
+1. Elevator_opening by GilPS -- https://freesound.org/s/241763/ -- License: Creative Commons 0
+
+2. Footsteps one person CLEAN.wav by RaggedyAngst -- https://freesound.org/s/546270/ -- License: Creative Commons 0
+
+3. Door Open:Close, Weather Stripping.wav by Barnface -- https://freesound.org/s/333249/ -- License: Creative Commons 0
+
+4. random_noises by Stoomy -- https://freesound.org/s/795382/ -- License: Creative Commons 0
+
+5. Diseased Piano loop 100bpm by Boatlanman- -- https://freesound.org/s/768420/ -- License: Creative Commons 0
+
+6. bittersweet.wav by joanne_pang -- https://freesound.org/s/841957/ -- License: Creative Commons 0
+
+invitation to meditation by solarpsychedelic -- https://freesound.org/s/808536/ -- License: Creative Commons 0
+
+7. Tortured distorted scream by jhumbucker -- https://freesound.org/s/250543/ -- License: Creative Commons 0
+
+8. Paranoia Drone by tboneaudio -- https://freesound.org/s/829019/ -- License: Creative Commons 0
+
+
+---------- CC BY 3.0 LICENSED SOUNDS ----------
+(Creative Commons Attribution 3.0 International)
+1. Dungeon Ambiance by phlair -- https://freesound.org/s/388340/ -- License: Attribution 3.0
+
+---------- CC BY 4.0 LICENSED SOUNDS ----------
+(Creative Commons Attribution 4.0 International)
+Full attribution as required by license:
+
+1. malexmedia_lazymanphone_pagerbeep.wav by malexmedia -- https://freesound.org/s/31802/ -- License: Attribution 4.0
+
+2. UI, Mechanical, Text-Scroll, 03, FX, 01, LOOP.wav by InspectorJ -- https://freesound.org/s/458587/ -- License: Attribution 4.0
+
+3. Horror Theme Loop.wav by Mrthenoronha -- https://freesound.org/s/530057/ -- License: Attribution NonCommercial 4.0
+
+4. Private hunting.wav by BloodPixelHero -- https://freesound.org/s/496878/ -- License: Attribution 4.0
+
+5. Horror Theme Loop 2.wav by Mrthenoronha -- https://freesound.org/s/530277/ -- License: Attribution NonCommercial 4.0
+
+6. Sci-Fi Horror Ambience – Living Alien Ship Interior with Organic Pulsing Drone (Loop) by Coghezzi -- https://freesound.org/s/852315/ -- License: Attribution 4.0
+
+7. Creeping Dread Atmosphere by Matio888 -- https://freesound.org/s/793482/ -- License: Attribution 4.0
+
+8. Continuous Authorization 76BPM Loop by ExpiredSoda -- https://freesound.org/s/844481/ -- License: Attribution 4.0
+
+9. Mystic Horrible by ViraMiller -- https://freesound.org/s/741612/ -- License: Attribution 4.0
+
+---------------------------------------------
+LEGAL STATEMENT
+---------------------------------------------
+1. All audio assets are used in compliance with their original license terms.
+2. The included font shall not be used for any commercial purposes.
+3. Original game content is created by the listed developer.
+
+---------------------------------------------
+Special thanks to all creators and contributors.
+=============================================
